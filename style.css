@@ -11,13 +11,16 @@
   width: 100vw;
   height: 100vh;
   background-color: #e5e7eb;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 0fr 1fr;
 }
 .header {
-  width: 100vw;
   background-color: white;
   padding: 24px;
   font-family: "Montserrat-Bold", sans-serif;
 }
 .sidebar {
-  background-color: white;
+  background-color: rgb(48, 36, 206);
+  grid-row: 1 / 3;
 }
