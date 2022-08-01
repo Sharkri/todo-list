@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "Montserrat-Bold";
+  src: url(fonts/static/Montserrat-Bold.ttf);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+#content {
+  width: 100vw;
+  height: 100vh;
+  background-color: #e5e7eb;
+}
+.header {
+  width: 100vw;
+  background-color: white;
+  padding: 24px;
+  font-family: "Montserrat-Bold", sans-serif;
+}
