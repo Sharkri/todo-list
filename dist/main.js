@@ -1,0 +1,1 @@
+(()=>{"use strict";!function(e){let t=document.createElement("div");t.classList.add("header");let n=document.createElement("h1");n.textContent="Todo List",t.appendChild(n),e.appendChild(t)}(document.querySelector("#content"))})();
