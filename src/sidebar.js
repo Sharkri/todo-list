@@ -1,5 +1,5 @@
-export default function loadSidebar(element) {
+export default function sidebar() {
   let sidebar = document.createElement("div");
   sidebar.classList.add("sidebar");
-  element.appendChild(header);
+  return sidebar;
 }

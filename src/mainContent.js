@@ -1,5 +1,5 @@
-export default function loadMain(element) {
+export default function main() {
   let main = document.createElement("div");
   main.classList.add("main");
-  element.appendChild(header);
+  return main;
 }
