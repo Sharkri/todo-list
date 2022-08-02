@@ -13,4 +13,11 @@ const APP = (function () {
   }
   return { createTodo };
 })();
-const DOM = (function () {})();
+const DOM = (function () {
+  const projects = document.querySelector(".projects");
+  const svgArrow = document.querySelector(".projects > svg");
+  projects.addEventListener("click", () => {
+    svgArrow.classList.toggle("rotated");
+    // show projects
+  });
+})();
