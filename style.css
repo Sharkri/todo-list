@@ -60,3 +60,9 @@ svg {
 .projects:hover {
   background-color: #e5e7eb;
 }
+.projects svg.rotated {
+  transform: rotate(-90deg);
+}
+.projects svg {
+  transition: 250ms;
+}
