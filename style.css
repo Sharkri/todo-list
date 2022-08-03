@@ -66,3 +66,7 @@ svg {
 .projects svg {
   transition: 250ms;
 }
+.links div.active,
+.projects div.active {
+  background-color: #e5e7eb;
+}
