@@ -14,6 +14,20 @@ const APP = (function () {
   return { createTodo };
 })();
 const DOM = (function () {
+  const links = document.querySelectorAll(".links div");
+  links[0].classList.toggle("active");
+
+  links.forEach((link) =>
+    link.addEventListener("click", (e) => {
+      removeAllActiveClass();
+      link.classList.toggle("active");
+    })
+  );
+
+  function removeAllActiveClass() {
+    links.forEach((element) => element.classList.remove("active"));
+  }
+
   const projects = document.querySelector(".projects");
   const svgArrow = document.querySelector(".projects > svg");
   projects.addEventListener("click", () => {
