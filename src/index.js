@@ -8,10 +8,20 @@ content.appendChild(main());
 content.appendChild(sidebar());
 
 const APP = (function () {
+  const todos = localStorage.todos;
+
+  function setLocalStorageItem(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function getLocalStorageItem(key) {
+    return JSON.parse(localStorage.getItem(key));
+  }
+
   function createTodo(title, description, dueDate, priority) {
     return { title, description, dueDate, priority };
   }
-  return { createTodo };
+  return { getLocalStorageItem };
 })();
 const DOM = (function () {
   const links = document.querySelectorAll(".links div");
