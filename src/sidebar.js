@@ -11,18 +11,16 @@ export default function sidebar() {
     "currentColor",
     "M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
   );
-  let inboxText = document.createTextNode("Inbox");
   inbox.appendChild(inboxIcon);
-  inbox.appendChild(inboxText);
+  inbox.appendChild(document.createTextNode("Inbox"));
 
   let today = document.createElement("div");
   let calendarIcon = createSVG(
     "currentColor",
     "M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"
   );
-  let todayText = document.createTextNode("Today");
   today.appendChild(calendarIcon);
-  today.appendChild(todayText);
+  today.appendChild(document.createTextNode("Today"));
 
   let upcoming = document.createElement("div");
   let upcomingCalendar = createSVG(
@@ -41,16 +39,16 @@ export default function sidebar() {
     "currentColor",
     "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
   );
-  let projectText = document.createTextNode("Projects");
   let addButton = document.createElement("button");
-  let addProject = createSVG(
+  let addSVG = createSVG(
     "currentColor",
     "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
   );
   addButton.classList.add("add-project");
-  addButton.appendChild(addProject);
+  addButton.appendChild(addSVG);
+
   openProjects.appendChild(arrow);
-  openProjects.appendChild(projectText);
+  openProjects.appendChild(document.createTextNode("Projects"));
   projects.appendChild(openProjects);
   projects.appendChild(addButton);
 

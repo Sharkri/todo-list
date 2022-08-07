@@ -33,6 +33,7 @@ const APP = (function () {
   return { getLocalStorageItem };
 })();
 const DOM = (function () {
+  // initial selected
   const links = document.querySelectorAll(".links div");
   links[0].classList.toggle("active");
 
@@ -51,7 +52,10 @@ const DOM = (function () {
   const svgArrow = document.querySelector(".openProject > svg");
   projects.addEventListener("click", (e) => {
     console.log(e.target.contains(svgArrow));
-    if (!e.target.contains(svgArrow)) return;
+    // If add new project button was clicked
+    if (!e.target.contains(svgArrow)) {
+      return;
+    }
     svgArrow.classList.toggle("rotated");
     // show projects
   });
