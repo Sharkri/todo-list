@@ -1,3 +1,5 @@
+import { add } from "date-fns";
+
 export default function sidebar() {
   let sidebar = document.createElement("div");
   sidebar.classList.add("sidebar");
@@ -32,14 +34,25 @@ export default function sidebar() {
   upcoming.appendChild(upcomingText);
 
   let projects = document.createElement("div");
+  let openProjects = document.createElement("div");
+  openProjects.classList.add("openProject");
   projects.classList.add("projects");
   let arrow = createSVG(
     "currentColor",
     "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
   );
   let projectText = document.createTextNode("Projects");
-  projects.appendChild(arrow);
-  projects.appendChild(projectText);
+  let addButton = document.createElement("button");
+  let addProject = createSVG(
+    "currentColor",
+    "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+  );
+  addButton.classList.add("add-project");
+  addButton.appendChild(addProject);
+  openProjects.appendChild(arrow);
+  openProjects.appendChild(projectText);
+  projects.appendChild(openProjects);
+  projects.appendChild(addButton);
 
   inbox.classList.add("inbox");
   today.classList.add("today");

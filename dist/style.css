@@ -7,6 +7,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
 }
 
 #content {
@@ -25,7 +26,6 @@
 .sidebar {
   background-color: white;
   grid-row: 2 / 3;
-  font-family: "Montserrat", sans-serif;
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -48,25 +48,42 @@ svg {
 }
 
 .links div,
-.projects {
+.openProject {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.links div,
+.projects {
   border-radius: 6px;
   padding: 4px;
+  cursor: pointer;
 }
 
 .links div:hover,
-.projects:hover {
+.active,
+button:hover {
   background-color: #e5e7eb;
 }
-.projects svg.rotated {
-  transform: rotate(-90deg);
-}
-.projects svg {
+
+.openProject svg {
   transition: 250ms;
 }
-.links div.active,
-.projects div.active {
-  background-color: #e5e7eb;
+.openProject svg.rotated {
+  transform: rotate(-90deg);
+}
+
+.projects {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 2px;
 }

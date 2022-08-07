@@ -1,6 +1,12 @@
 import header from "./header";
 import main from "./mainContent";
 import sidebar from "./sidebar";
+import {
+  formatDistance,
+  subDays,
+  addDays,
+  formatDistanceStrict,
+} from "date-fns";
 let content = document.querySelector("#content");
 // Initial load
 content.appendChild(header());
@@ -8,19 +14,22 @@ content.appendChild(main());
 content.appendChild(sidebar());
 
 const APP = (function () {
-  const todos = localStorage.todos;
+  const todos = getLocalStorageItem("todos");
 
   function setLocalStorageItem(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
   function getLocalStorageItem(key) {
-    return JSON.parse(localStorage.getItem(key));
+    let item = JSON.parse(localStorage.getItem(key));
+    // if item exists in the local storage, return it. else empty array.
+    return item ? item : [];
   }
 
   function createTodo(title, description, dueDate, priority) {
     return { title, description, dueDate, priority };
   }
+
   return { getLocalStorageItem };
 })();
 const DOM = (function () {
@@ -39,8 +48,10 @@ const DOM = (function () {
   }
 
   const projects = document.querySelector(".projects");
-  const svgArrow = document.querySelector(".projects > svg");
-  projects.addEventListener("click", () => {
+  const svgArrow = document.querySelector(".openProject > svg");
+  projects.addEventListener("click", (e) => {
+    console.log(e.target.contains(svgArrow));
+    if (!e.target.contains(svgArrow)) return;
     svgArrow.classList.toggle("rotated");
     // show projects
   });
