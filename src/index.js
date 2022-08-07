@@ -1,17 +1,9 @@
-import header from "./header";
-import main from "./mainContent";
-import sidebar from "./sidebar";
 import {
   formatDistance,
   subDays,
   addDays,
   formatDistanceStrict,
 } from "date-fns";
-let content = document.querySelector("#content");
-// Initial load
-content.appendChild(header());
-content.appendChild(main());
-content.appendChild(sidebar());
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
@@ -54,7 +46,8 @@ const DOM = (function () {
     console.log(e.target.contains(svgArrow));
     // If add new project button was clicked
     if (!e.target.contains(svgArrow)) {
-      return;
+      document.querySelector(".modal").classList.toggle("open");
+      document.querySelector(".formModal").classList.toggle("open");
     }
     svgArrow.classList.toggle("rotated");
     // show projects
