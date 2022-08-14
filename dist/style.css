@@ -10,7 +10,10 @@
   font-family: "Montserrat", sans-serif;
 }
 
-#content {
+body {
+  --grey: #e5e7eb;
+  --light-grey: #f9fafb;
+  --main-theme-color: #38bdf8;
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -19,7 +22,7 @@
 }
 
 .header {
-  background-color: #38bdf8;
+  background-color: var(--main-theme-color);
   grid-column: span 3;
 }
 
@@ -33,62 +36,66 @@
 }
 
 .main {
-  background-color: #e5e7eb;
+  background-color: var(--grey);
 }
 
+button {
+  cursor: pointer;
+}
 svg {
   width: 24px;
   height: 24px;
 }
 
-.links {
+.links,
+.projects {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .links div,
-.openProject {
+.open-project {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 .links div,
-.projects {
+.project,
+.projectTab {
   border-radius: 6px;
-  padding: 4px;
+  padding: 8px;
   cursor: pointer;
 }
 
 .links div:hover,
+.project:hover,
 .active,
-button:hover {
+.add-project:hover {
   background-color: #e5e7eb;
 }
 
-.openProject svg {
+.open-project svg {
   transition: 250ms;
 }
-.openProject svg.rotated {
+.open-project svg.rotated {
   transform: rotate(-90deg);
 }
 
-.projects {
+.projectTab {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-radius: 6px;
 }
 
-button {
+.add-project {
   background-color: transparent;
   border: none;
-  cursor: pointer;
   border-radius: 4px;
   padding: 1px 2px;
 }
-.modal.open {
-  display: flex;
+.modal {
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -100,7 +107,53 @@ button {
   left: 0;
   background: rgba(0, 0, 0, 0.5);
 }
-.formModal.open {
+.modal.open {
+  display: flex;
+}
+.modal-content {
   background-color: white;
+  border-radius: 12px;
+  width: 25%;
+}
+
+.modal-header {
+  background-color: var(--light-grey);
   padding: 16px;
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #ddd;
+}
+.modal-form {
+  padding: 16px;
+}
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input {
+  border: var(--grey) 1.5px solid;
+  border-radius: 4px;
+  padding: 6px;
+}
+input:focus {
+  border: #3a60c7 1.5px solid;
+  transition: 0.5s;
+  outline: none;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.form-buttons button {
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+}
+.submit {
+  background-color: var(--main-theme-color);
 }

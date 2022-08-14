@@ -8,41 +8,57 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="content">
-      <div class="header"></div>
-      <div class="main"></div>
-      <div class="sidebar">
-        <div class="links">
-          <div class="inbox">
-            <svg viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
-              ></path>
-            </svg>
-            Inbox
+    <div class="modal">
+      <div class="modal-content">
+        <h3 class="modal-header">Add Project</h3>
+        <form action="" class="modal-form" onsubmit="return false;">
+          <div class="input">
+            <label for="name">Name</label>
+            <input type="text" placeholder="Name" id="name" required />
+            <div class="form-buttons">
+              <button class="cancel" type="button">Cancel</button>
+              <button type="submit" class="submit">Add</button>
+            </div>
           </div>
-          <div class="today">
-            <svg viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"
-              ></path>
-            </svg>
-            Today
-          </div>
-          <div class="upcoming">
-            <svg viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"
-              ></path>
-            </svg>
-            View all
-          </div>
+        </form>
+      </div>
+    </div>
+    <div class="header"></div>
+    <div class="main"></div>
+    <div class="sidebar">
+      <div class="links">
+        <div class="inbox">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
+            ></path>
+          </svg>
+          Inbox
         </div>
-        <div class="projects">
-          <div class="openProject">
+        <div class="today">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"
+            ></path>
+          </svg>
+          Today
+        </div>
+        <div class="upcoming">
+          <svg viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"
+            ></path>
+          </svg>
+          View all
+        </div>
+      </div>
+
+      <div class="projects-container">
+        <div class="projectTab">
+          <div class="open-project">
             <svg viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -60,6 +76,7 @@
             </svg>
           </button>
         </div>
+        <div class="projects"></div>
       </div>
     </div>
   </body>
