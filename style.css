@@ -21,10 +21,24 @@ body {
   grid-template-rows: 0.15fr 2fr;
 }
 
+/* HEADER */
+
 .header {
   background-color: var(--main-theme-color);
   grid-column: span 3;
 }
+
+/* MAIN */
+
+.main {
+  background-color: var(--grey);
+}
+
+.main h1 {
+  margin: 18px;
+}
+
+/* SIDEBAR */
 
 .sidebar {
   background-color: white;
@@ -34,17 +48,18 @@ body {
   flex-direction: column;
   gap: 28px;
 }
-
-.main {
-  background-color: var(--grey);
-}
-
-button {
+button,
+.links div,
+.projectTab {
   cursor: pointer;
 }
 svg {
   width: 24px;
   height: 24px;
+}
+
+.projects.closed {
+  display: none;
 }
 
 .links,
@@ -54,6 +69,7 @@ svg {
 }
 
 .links div,
+.project,
 .open-project {
   display: flex;
   align-items: center;
@@ -64,7 +80,6 @@ svg {
 .projectTab {
   border-radius: 6px;
   padding: 8px;
-  cursor: pointer;
 }
 
 .links div:hover,
@@ -85,7 +100,6 @@ svg {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 6px;
 }
 
 .add-project {
@@ -94,6 +108,9 @@ svg {
   border-radius: 4px;
   padding: 1px 2px;
 }
+
+/* MODAL */
+
 .modal {
   display: none;
   flex-direction: column;
@@ -110,6 +127,7 @@ svg {
 .modal.open {
   display: flex;
 }
+
 .modal-content {
   background-color: white;
   border-radius: 12px;
