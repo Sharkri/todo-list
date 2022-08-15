@@ -38,22 +38,6 @@ const APP = (function () {
   return { createTodo, createProject, getTodos, getProjects };
 })();
 const DOM = (function () {
-  // initial selected
-  const links = document.querySelectorAll(".links div");
-  links[0].classList.toggle("active");
-
-  links.forEach((link) =>
-    link.addEventListener("click", () => {
-      removeAllActiveClass(links);
-      removeAllActiveClass(projects.childNodes);
-      // highlight clicked link
-      link.classList.toggle("active");
-    })
-  );
-
-  function removeAllActiveClass(element) {
-    element.forEach((e) => e.classList.remove("active"));
-  }
   // declare selector
   const modal = document.querySelector(".modal");
   const modalForm = document.querySelector(".modal-form");
@@ -61,14 +45,62 @@ const DOM = (function () {
   const submit = document.querySelector(".submit");
   const svgArrow = document.querySelector(".open-project > svg");
   const projects = document.querySelector(".projects");
+  const main = document.querySelector(".main");
+  const projectTab = document.querySelector(".projectTab");
+  const links = document.querySelectorAll(".links div");
+
+  function switchTab(title) {
+    main.innerHTML = "";
+    const header = document.createElement("h1");
+    header.textContent = title;
+    main.appendChild(header);
+  }
+  switchTab("Inbox");
+
+  function removeAllActiveClass() {
+    links.forEach((e) => e.classList.remove("active"));
+    projects.childNodes.forEach((e) => e.classList.remove("active"));
+  }
+
+  function appendProject(projectName) {
+    const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    SVG.setAttribute("viewBox", "0 0 24 24");
+    path.setAttribute("fill", "currentColor");
+    path.setAttribute(
+      "d",
+      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z"
+    );
+    SVG.appendChild(path);
+    let project = document.createElement("div");
+    project.classList.add("project");
+    project.appendChild(SVG);
+    project.appendChild(document.createTextNode(projectName));
+    projects.appendChild(project);
+  }
+
+  links.forEach((link) =>
+    link.addEventListener("click", () => {
+      removeAllActiveClass();
+      link.classList.toggle("active");
+      switchTab(link.textContent);
+    })
+  );
+
+  projects.addEventListener("click", (e) => {
+    removeAllActiveClass();
+    e.target.classList.add("active");
+    let index = Array.from(e.target.parentNode.children).indexOf(e.target);
+    switchTab(APP.getProjects()[index].projectName);
+  });
+
   // Initial load for Local Storage
   for (let project of APP.getProjects()) appendProject(project.projectName);
 
-  const projectTab = document.querySelector(".projectTab");
-
   projectTab.addEventListener("click", (e) => {
-    // show projects
     if (e.target.contains(svgArrow)) {
+      // toggle show project
+      projects.classList.toggle("closed");
       svgArrow.classList.toggle("rotated");
       return;
     }
@@ -76,24 +108,12 @@ const DOM = (function () {
     modalForm.reset();
   });
 
-  function appendProject(projectName) {
-    let project = document.createElement("div");
-    project.classList.add("project");
-    project.appendChild(document.createTextNode(projectName));
-    projects.appendChild(project);
-  }
-
-  cancel.addEventListener("click", () => modal.classList.toggle("open"));
+  cancel.addEventListener("click", () => modal.classList.remove("open"));
   submit.addEventListener("click", () => {
     let name = document.querySelector("#name");
     if (!name.value) return;
-    modal.classList.toggle("open");
+    modal.classList.remove("open");
     APP.createProject(name.value);
     appendProject(name.value);
-  });
-  projects.addEventListener("click", (e) => {
-    removeAllActiveClass(links);
-    removeAllActiveClass(projects.childNodes);
-    e.target.classList.add("active");
   });
 })();
