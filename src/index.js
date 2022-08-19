@@ -26,10 +26,10 @@ const APP = (function () {
     return { projectName, title, description, dueDate, priority };
   }
 
-  function createProject(projectName) {
-    projects.push({ projectName });
+  function createProject(name) {
+    projects.push({ name, todos: [] });
     setLocalStorageItem("projects", projects);
-    return { projectName };
+    return { name, todos: [] };
   }
 
   const getTodos = () => todos;
@@ -48,12 +48,23 @@ const DOM = (function () {
   const main = document.querySelector(".main");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
+  // Shows LocalStorage projects
+  for (let project of APP.getProjects()) appendProject(project.name);
 
   function switchTab(title) {
-    main.innerHTML = "";
+    // Resets main content
+    main.textContent = "";
+
     const header = document.createElement("h1");
+    const addTask = document.createElement("button");
+    const todos = document.createElement("div");
+
+    todos.classList.add("todos");
     header.textContent = title;
+    addTask.textContent = "+ Add Task";
     main.appendChild(header);
+    main.appendChild(todos);
+    main.appendChild(addTask);
   }
   switchTab("Inbox");
 
@@ -62,7 +73,7 @@ const DOM = (function () {
     projects.childNodes.forEach((e) => e.classList.remove("active"));
   }
 
-  function appendProject(projectName) {
+  function appendProject(title) {
     const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     SVG.setAttribute("viewBox", "0 0 24 24");
@@ -75,7 +86,7 @@ const DOM = (function () {
     let project = document.createElement("div");
     project.classList.add("project");
     project.appendChild(SVG);
-    project.appendChild(document.createTextNode(projectName));
+    project.appendChild(document.createTextNode(title));
     projects.appendChild(project);
   }
 
@@ -90,12 +101,12 @@ const DOM = (function () {
   projects.addEventListener("click", (e) => {
     removeAllActiveClass();
     e.target.classList.add("active");
+    // Gets index of project
     let index = Array.from(e.target.parentNode.children).indexOf(e.target);
-    switchTab(APP.getProjects()[index].projectName);
+    const projects = APP.getProjects();
+    switchTab(projects[index]["name"]);
+    console.log(projects, index);
   });
-
-  // Initial load for Local Storage
-  for (let project of APP.getProjects()) appendProject(project.projectName);
 
   projectTab.addEventListener("click", (e) => {
     if (e.target.contains(svgArrow)) {

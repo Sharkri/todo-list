@@ -32,10 +32,7 @@ body {
 
 .main {
   background-color: var(--grey);
-}
-
-.main h1 {
-  margin: 18px;
+  padding: 18px;
 }
 
 /* SIDEBAR */
