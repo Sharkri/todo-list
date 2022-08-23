@@ -18,7 +18,13 @@ body {
   height: 100vh;
   display: grid;
   grid-template-columns: 250px 1fr;
-  grid-template-rows: 0.15fr 2fr;
+  grid-template-rows: auto 2fr;
+  background-color: var(--grey);
+}
+
+/* change to 1 column if sidebar is hidden */
+body.sidebar-hidden {
+  grid-template-columns: 1fr;
 }
 
 /* HEADER */
@@ -26,13 +32,23 @@ body {
 .header {
   background-color: var(--main-theme-color);
   grid-column: span 3;
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+}
+
+.hamburger {
+  border: none;
+  background-color: transparent;
 }
 
 /* MAIN */
 
 .main {
-  background-color: var(--grey);
   padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .main > button {
@@ -60,13 +76,18 @@ body {
   flex-direction: column;
   gap: 28px;
 }
+
+.sidebar.hidden {
+  display: none;
+}
+
 button,
 .links div,
 .projectTab {
   cursor: pointer;
 }
 svg {
-  width: 24px;
+  min-width: 24px;
   height: 24px;
 }
 
@@ -78,6 +99,12 @@ svg {
 .projects {
   display: flex;
   flex-direction: column;
+}
+
+.project-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .links div,
@@ -183,7 +210,9 @@ input:focus {
   border: none;
   padding: 8px;
   border-radius: 4px;
+  font-weight: bold;
 }
 .submit {
   background-color: var(--main-theme-color);
+  color: var(--grey);
 }

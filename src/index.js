@@ -8,6 +8,7 @@ import {
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
+  const inbox = getLocalStorageItem("inbox");
   const projects = getLocalStorageItem("projects");
 
   function setLocalStorageItem(key, value) {
@@ -50,8 +51,9 @@ const APP = (function () {
 
   const getTodos = () => todos;
   const getProjects = () => projects;
+  const getInbox = () => inbox;
 
-  return { createTodo, createProject, getTodos, getProjects };
+  return { createTodo, createProject, getTodos, getProjects, getInbox };
 })();
 const DOM = (function () {
   // declare selector
@@ -64,6 +66,8 @@ const DOM = (function () {
   const main = document.querySelector(".main");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
+  const menu = document.querySelector(".hamburger");
+  const sidebar = document.querySelector(".sidebar");
   // Shows LocalStorage projects
   for (let project of APP.getProjects()) displayProject(project.name);
 
@@ -79,12 +83,17 @@ const DOM = (function () {
     ADD_TASK.appendChild(addSymbol);
     ADD_TASK.appendChild(document.createTextNode("Add Task"));
 
-    const todo = document.createElement("div");
-    todo.classList.add("todos");
+    const todosContainer = document.createElement("div");
+    todosContainer.classList.add("todos");
+    todos = todos ? todos : [];
+    for (const todo of todos) {
+      let todoElement = document.createElement("div");
+      // append todo
+    }
 
     header.textContent = title;
     main.appendChild(header);
-    main.appendChild(todo);
+    main.appendChild(todosContainer);
     main.appendChild(ADD_TASK);
   }
   switchTab("Inbox");
@@ -99,13 +108,21 @@ const DOM = (function () {
       "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z";
     let fill = "currentColor";
     const SVG = createSVG(d, fill);
-
+    const text = document.createElement("span");
+    text.textContent = title;
+    text.classList.add("project-title");
     let project = document.createElement("div");
     project.classList.add("project");
     project.appendChild(SVG);
-    project.appendChild(document.createTextNode(title));
+    project.appendChild(text);
     projects.appendChild(project);
   }
+
+  main.addEventListener("click", (e) => {
+    if (e.target.closest("button")) {
+      // add task
+    }
+  });
 
   links.forEach((link) => {
     link.addEventListener("click", () => {
@@ -145,6 +162,12 @@ const DOM = (function () {
     displayProject(name.value);
   });
 
+  // Toggle sidebar showing
+  menu.addEventListener("click", () => {
+    document.querySelector("body").classList.toggle("sidebar-hidden");
+    sidebar.classList.toggle("hidden");
+  });
+
   // Helper Functions
 
   function createSVG(d, fill) {
@@ -156,4 +179,5 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
+  function createTodoElement(title, dueDate) {}
 })();

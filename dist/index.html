@@ -14,7 +14,13 @@
         <form action="" class="modal-form" onsubmit="return false;">
           <div class="input">
             <label for="name">Name</label>
-            <input type="text" placeholder="Name" id="name" required />
+            <input
+              type="text"
+              placeholder="Name"
+              id="name"
+              maxlength="120"
+              required
+            />
             <div class="form-buttons">
               <button class="cancel" type="button">Cancel</button>
               <button type="submit" class="submit">Add</button>
@@ -23,7 +29,16 @@
         </form>
       </div>
     </div>
-    <div class="header"></div>
+    <div class="header">
+      <button class="hamburger">
+        <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+          <path
+            fill="white"
+            d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
+          />
+        </svg>
+      </button>
+    </div>
     <div class="main"></div>
     <div class="sidebar">
       <div class="links">
