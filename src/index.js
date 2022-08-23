@@ -20,6 +20,7 @@ const APP = (function () {
     return item ? item : [];
   }
 
+  // Pushes todo object into array and sets local storage
   function createTodo(projectName, title, description, dueDate, priority) {
     todos.push({ projectName, title, description, dueDate, priority });
     setLocalStorageItem("todos", todos);
@@ -27,9 +28,24 @@ const APP = (function () {
   }
 
   function createProject(name) {
-    projects.push({ name, todos: [] });
+    const projectTodos = [];
+    function addTodo(projectName, title, description, dueDate, priority) {
+      const todo = createTodo(
+        projectName,
+        title,
+        description,
+        dueDate,
+        priority
+      );
+      projectTodos.push(todo);
+    }
+    projects.push({ name, todos: projectTodos, addTodo });
     setLocalStorageItem("projects", projects);
-    return { name, todos: [] };
+    return { name, todos: projectTodos, addTodo };
+  }
+
+  function removeProject(index) {
+    projects.splice(index, 1);
   }
 
   const getTodos = () => todos;
@@ -49,22 +65,22 @@ const DOM = (function () {
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
   // Shows LocalStorage projects
-  for (let project of APP.getProjects()) appendProject(project.name);
+  for (let project of APP.getProjects()) displayProject(project.name);
 
-  function switchTab(title) {
+  function switchTab(title, todos) {
     // Resets main content
     main.textContent = "";
 
     const header = document.createElement("h1");
-    const addTask = document.createElement("button");
-    const todos = document.createElement("div");
+    const ADD_TASK = document.createElement("button");
+    const todo = document.createElement("div");
+    todo.classList.add("todos");
 
-    todos.classList.add("todos");
     header.textContent = title;
-    addTask.textContent = "+ Add Task";
+    ADD_TASK.textContent = "Add Task";
     main.appendChild(header);
-    main.appendChild(todos);
-    main.appendChild(addTask);
+    main.appendChild(todo);
+    main.appendChild(ADD_TASK);
   }
   switchTab("Inbox");
 
@@ -73,7 +89,7 @@ const DOM = (function () {
     projects.childNodes.forEach((e) => e.classList.remove("active"));
   }
 
-  function appendProject(title) {
+  function displayProject(title) {
     const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     SVG.setAttribute("viewBox", "0 0 24 24");
@@ -99,6 +115,7 @@ const DOM = (function () {
   );
 
   projects.addEventListener("click", (e) => {
+    // Highlights clicked.
     removeAllActiveClass();
     e.target.classList.add("active");
     // Gets index of project
@@ -106,6 +123,7 @@ const DOM = (function () {
     const projects = APP.getProjects();
     switchTab(projects[index]["name"]);
     console.log(projects, index);
+    console.log(projects[index].addTodo("john"));
   });
 
   projectTab.addEventListener("click", (e) => {
@@ -120,11 +138,12 @@ const DOM = (function () {
   });
 
   cancel.addEventListener("click", () => modal.classList.remove("open"));
+  // Adds project to localstorage and displays it.
   submit.addEventListener("click", () => {
     let name = document.querySelector("#name");
     if (!name.value) return;
     modal.classList.remove("open");
     APP.createProject(name.value);
-    appendProject(name.value);
+    displayProject(name.value);
   });
 })();
