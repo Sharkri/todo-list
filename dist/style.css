@@ -13,7 +13,7 @@
 body {
   --grey: #e5e7eb;
   --light-grey: #f9fafb;
-  --main-theme-color: #38bdf8;
+  --main-theme-color: #0369a1;
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -33,6 +33,21 @@ body {
 .main {
   background-color: var(--grey);
   padding: 18px;
+}
+
+.main > button {
+  border: none;
+  background-color: transparent;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.main > button:hover {
+  color: var(--main-theme-color);
 }
 
 /* SIDEBAR */
@@ -83,7 +98,7 @@ svg {
 .project:hover,
 .active,
 .add-project:hover {
-  background-color: #e5e7eb;
+  background-color: var(--grey);
 }
 
 .open-project svg {

@@ -72,12 +72,17 @@ const DOM = (function () {
     main.textContent = "";
 
     const header = document.createElement("h1");
+    let d = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z";
+    let fill = "#0369a1";
+    const addSymbol = createSVG(d, fill);
     const ADD_TASK = document.createElement("button");
+    ADD_TASK.appendChild(addSymbol);
+    ADD_TASK.appendChild(document.createTextNode("Add Task"));
+
     const todo = document.createElement("div");
     todo.classList.add("todos");
 
     header.textContent = title;
-    ADD_TASK.textContent = "Add Task";
     main.appendChild(header);
     main.appendChild(todo);
     main.appendChild(ADD_TASK);
@@ -90,15 +95,11 @@ const DOM = (function () {
   }
 
   function displayProject(title) {
-    const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    SVG.setAttribute("viewBox", "0 0 24 24");
-    path.setAttribute("fill", "currentColor");
-    path.setAttribute(
-      "d",
-      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z"
-    );
-    SVG.appendChild(path);
+    let d =
+      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z";
+    let fill = "currentColor";
+    const SVG = createSVG(d, fill);
+
     let project = document.createElement("div");
     project.classList.add("project");
     project.appendChild(SVG);
@@ -106,14 +107,13 @@ const DOM = (function () {
     projects.appendChild(project);
   }
 
-  links.forEach((link) =>
+  links.forEach((link) => {
     link.addEventListener("click", () => {
       removeAllActiveClass();
       link.classList.toggle("active");
       switchTab(link.textContent);
-    })
-  );
-
+    });
+  });
   projects.addEventListener("click", (e) => {
     // Highlights clicked.
     removeAllActiveClass();
@@ -122,8 +122,6 @@ const DOM = (function () {
     let index = Array.from(e.target.parentNode.children).indexOf(e.target);
     const projects = APP.getProjects();
     switchTab(projects[index]["name"]);
-    console.log(projects, index);
-    console.log(projects[index].addTodo("john"));
   });
 
   projectTab.addEventListener("click", (e) => {
@@ -146,4 +144,16 @@ const DOM = (function () {
     APP.createProject(name.value);
     displayProject(name.value);
   });
+
+  // Helper Functions
+
+  function createSVG(d, fill) {
+    const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    SVG.setAttribute("viewBox", "0 0 24 24");
+    path.setAttribute("fill", fill);
+    path.setAttribute("d", d);
+    SVG.appendChild(path);
+    return SVG;
+  }
 })();
