@@ -47,20 +47,31 @@ const APP = (function () {
 
   function removeProject(index) {
     projects.splice(index, 1);
+    setLocalStorageItem("projects", projects);
   }
 
   const getTodos = () => todos;
   const getProjects = () => projects;
   const getInbox = () => inbox;
 
-  return { createTodo, createProject, getTodos, getProjects, getInbox };
+  return {
+    createTodo,
+    createProject,
+    removeProject,
+    getTodos,
+    getProjects,
+    getInbox,
+  };
 })();
 const DOM = (function () {
   // declare selector
   const modal = document.querySelector(".modal");
   const modalForm = document.querySelector(".modal-form");
-  const cancel = document.querySelector(".cancel");
+  const addProjectModal = document.querySelector(".add-project-modal");
+  const deleteModal = document.querySelector(".delete-modal");
+  const cancel = document.querySelectorAll(".cancel");
   const submit = document.querySelector(".submit");
+  const deleteButton = document.querySelector(".delete");
   const svgArrow = document.querySelector(".open-project > svg");
   const projects = document.querySelector(".projects");
   const main = document.querySelector(".main");
@@ -98,24 +109,32 @@ const DOM = (function () {
   }
   switchTab("Inbox");
 
-  function removeAllActiveClass() {
-    links.forEach((e) => e.classList.remove("active"));
-    projects.childNodes.forEach((e) => e.classList.remove("active"));
-  }
-
   function displayProject(title) {
-    const d =
-      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z";
-    const fill = "currentColor";
-    const SVG = createSVG(d, fill);
-    const text = document.createElement("span");
-    text.textContent = title;
-    text.classList.add("project-title");
-
     const project = document.createElement("div");
+    const projectLeft = document.createElement("div");
+    const projectRight = document.createElement("button");
     project.classList.add("project");
-    project.appendChild(SVG);
-    project.appendChild(text);
+    projectLeft.classList.add("project-left");
+    projectRight.classList.add("project-right");
+
+    const LIST_SVG = createSVG(
+      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z",
+      "currentColor"
+    );
+    const projectTitle = document.createElement("span");
+    projectTitle.textContent = title;
+    projectTitle.classList.add("project-title");
+
+    const DELETE_SVG = createSVG(
+      "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
+      "currentColor"
+    );
+
+    projectLeft.appendChild(LIST_SVG);
+    projectLeft.appendChild(projectTitle);
+    projectRight.appendChild(DELETE_SVG);
+    project.appendChild(projectLeft);
+    project.appendChild(projectRight);
     projects.appendChild(project);
   }
 
@@ -133,17 +152,21 @@ const DOM = (function () {
     });
   });
   projects.addEventListener("click", (e) => {
+    // if delete button clicked, show confirm modal
+    if (e.target.closest(".project-right")) {
+      modal.classList.add("open");
+      deleteModal.classList.add("open");
+    }
+
     const project = e.target.closest(".project");
-    const projectsContainer = document.querySelector(".projects");
     // Highlights clicked.
     removeAllActiveClass();
     project.classList.add("active");
-    // Gets index of project
-    const index = Array.from(projectsContainer.children).indexOf(project);
-
-    const projects = APP.getProjects();
-    const projectName = projects[index]["name"];
-    switchTab(projectName);
+    const index = getActiveProjectIndex();
+    const APP_PROJECTS = APP.getProjects();
+    const projectName = APP_PROJECTS[index]["name"];
+    const projectTodos = APP_PROJECTS[index]["todos"];
+    switchTab(projectName, projectTodos);
   });
 
   projectTab.addEventListener("click", (e) => {
@@ -154,17 +177,33 @@ const DOM = (function () {
       return;
     }
     modal.classList.toggle("open");
+    addProjectModal.classList.toggle("open");
+    console.log(addProjectModal.classList);
+
     modalForm.reset();
   });
 
-  cancel.addEventListener("click", () => modal.classList.remove("open"));
+  cancel.forEach((btn) => btn.addEventListener("click", closeAllModals));
   // Adds project to localstorage and displays it.
   submit.addEventListener("click", () => {
     const name = document.querySelector("#name").value;
     if (!name) return;
-    modal.classList.remove("open");
+    closeAllModals();
     APP.createProject(name);
     displayProject(name);
+  });
+
+  deleteButton.addEventListener("click", () => {
+    let inbox = document.querySelector(".inbox");
+    let projectIndex = getActiveProjectIndex();
+    let project = projects.children[projectIndex];
+    // Remove project from app and dom
+    APP.removeProject(projectIndex);
+    projects.removeChild(project);
+    closeAllModals();
+    // default to inbox tab
+    switchTab("Inbox");
+    inbox.classList.add("active");
   });
 
   // Toggle sidebar showing
@@ -175,6 +214,22 @@ const DOM = (function () {
 
   // Helper Functions
 
+  function removeAllActiveClass() {
+    const active = document.querySelectorAll(".active");
+    active.forEach((element) => element.classList.remove("active"));
+  }
+  function closeAllModals() {
+    modal.classList.remove("open");
+    addProjectModal.classList.remove("open");
+    deleteModal.classList.remove("open");
+  }
+
+  function getActiveProjectIndex() {
+    const project = document.querySelector(".project.active");
+    // Search in projectsContainer the index of active project
+    return Array.from(projects.children).indexOf(project);
+  }
+
   function createSVG(d, fill) {
     const SVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -184,5 +239,7 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
-  function createTodoElement(title, dueDate) {}
+  function createTodoElement(title, dueDate) {
+    return "TOODOOOO";
+  }
 })();
