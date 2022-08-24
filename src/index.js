@@ -16,7 +16,7 @@ const APP = (function () {
   }
 
   function getLocalStorageItem(key) {
-    let item = JSON.parse(localStorage.getItem(key));
+    const item = JSON.parse(localStorage.getItem(key));
     // if item exists in the local storage, return it. else empty array.
     return item ? item : [];
   }
@@ -76,8 +76,8 @@ const DOM = (function () {
     main.textContent = "";
 
     const header = document.createElement("h1");
-    let d = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z";
-    let fill = "#0369a1";
+    const d = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z";
+    const fill = "#0369a1";
     const addSymbol = createSVG(d, fill);
     const ADD_TASK = document.createElement("button");
     ADD_TASK.appendChild(addSymbol);
@@ -104,14 +104,15 @@ const DOM = (function () {
   }
 
   function displayProject(title) {
-    let d =
+    const d =
       "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z";
-    let fill = "currentColor";
+    const fill = "currentColor";
     const SVG = createSVG(d, fill);
     const text = document.createElement("span");
     text.textContent = title;
     text.classList.add("project-title");
-    let project = document.createElement("div");
+
+    const project = document.createElement("div");
     project.classList.add("project");
     project.appendChild(SVG);
     project.appendChild(text);
@@ -132,13 +133,17 @@ const DOM = (function () {
     });
   });
   projects.addEventListener("click", (e) => {
+    const project = e.target.closest(".project");
+    const projectsContainer = document.querySelector(".projects");
     // Highlights clicked.
     removeAllActiveClass();
-    e.target.classList.add("active");
+    project.classList.add("active");
     // Gets index of project
-    let index = Array.from(e.target.parentNode.children).indexOf(e.target);
+    const index = Array.from(projectsContainer.children).indexOf(project);
+
     const projects = APP.getProjects();
-    switchTab(projects[index]["name"]);
+    const projectName = projects[index]["name"];
+    switchTab(projectName);
   });
 
   projectTab.addEventListener("click", (e) => {
@@ -155,11 +160,11 @@ const DOM = (function () {
   cancel.addEventListener("click", () => modal.classList.remove("open"));
   // Adds project to localstorage and displays it.
   submit.addEventListener("click", () => {
-    let name = document.querySelector("#name");
-    if (!name.value) return;
+    const name = document.querySelector("#name").value;
+    if (!name) return;
     modal.classList.remove("open");
-    APP.createProject(name.value);
-    displayProject(name.value);
+    APP.createProject(name);
+    displayProject(name);
   });
 
   // Toggle sidebar showing
