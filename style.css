@@ -95,30 +95,67 @@ svg {
   display: none;
 }
 
+.project {
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-right {
+  background-color: transparent;
+  border: none;
+  opacity: 0;
+}
+.project-left {
+  flex-grow: 1;
+  padding: 8px 0 8px 8px;
+}
+
+.project-right {
+  padding: 8px 8px 8px 0;
+}
+
+.project-left:hover ~ .project-right,
+.project-right:hover {
+  opacity: 1;
+  transition: 0.3s;
+}
+
+.project-right > svg:hover path {
+  fill: #dc2626;
+  transition: 0.3s;
+}
+
+.project-left {
+  overflow: hidden;
+}
+
+.project-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .links,
 .projects {
   display: flex;
   flex-direction: column;
 }
 
-.project-title {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 .links div,
-.project,
-.open-project {
+.open-project,
+.project-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .links div,
-.project,
 .projectTab {
   border-radius: 6px;
   padding: 8px;
+}
+
+.project {
+  border-radius: 6px;
 }
 
 .links div:hover,
@@ -162,15 +199,27 @@ svg {
   top: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 .modal.open {
   display: flex;
 }
 
-.modal-content {
+.add-project-modal,
+.delete-modal {
+  display: none;
   background-color: white;
   border-radius: 12px;
-  width: 25%;
+  width: clamp(150px, 50%, 550px);
+}
+
+.add-project-modal.open,
+.delete-modal.open {
+  display: block;
+}
+
+.delete-text {
+  margin-bottom: 16px;
 }
 
 .modal-header {
@@ -180,9 +229,11 @@ svg {
   border-radius: 12px 12px 0 0;
   border-bottom: 1px solid #ddd;
 }
-.modal-form {
+.modal-form,
+.delete-form {
   padding: 16px;
 }
+
 .input {
   display: flex;
   flex-direction: column;
@@ -200,13 +251,13 @@ input:focus {
   outline: none;
 }
 
-.form-buttons {
+.buttons {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
-.form-buttons button {
+.modal button {
   border: none;
   padding: 8px;
   border-radius: 4px;
@@ -215,4 +266,9 @@ input:focus {
 .submit {
   background-color: var(--main-theme-color);
   color: var(--grey);
+}
+
+.delete {
+  background-color: #dc2626;
+  color: white;
 }
