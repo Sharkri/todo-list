@@ -27,6 +27,37 @@ body.sidebar-hidden {
   grid-template-columns: 1fr;
 }
 
+input,
+textarea,
+select {
+  border: #ddd 1.5px solid;
+  border-radius: 4px;
+  padding: 6px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border: rgb(58, 96, 199) 1.5px solid;
+  transition: 0.3s;
+  outline: none;
+  box-shadow: rgba(58, 96, 199, 0.2) 0px 7px 29px 0px;
+}
+
+textarea {
+  resize: vertical;
+  max-height: 500px;
+}
+
+select {
+  background-color: white;
+}
+
+svg {
+  min-width: 24px;
+  height: 24px;
+}
+
 /* HEADER */
 
 .header {
@@ -35,6 +66,7 @@ body.sidebar-hidden {
   display: flex;
   align-items: center;
   padding: 12px 18px;
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
 }
 
 .hamburger {
@@ -97,10 +129,6 @@ button,
 .projectTab {
   cursor: pointer;
 }
-svg {
-  min-width: 24px;
-  height: 24px;
-}
 
 .projects.closed {
   display: none;
@@ -131,7 +159,7 @@ svg {
   transition: 0.3s;
 }
 
-.project-right > svg:hover path {
+.delete-svg:hover path {
   fill: #dc2626;
   transition: 0.3s;
 }
@@ -212,20 +240,19 @@ svg {
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
+
 .modal.open {
   display: flex;
 }
 
-.add-project-modal,
-.delete-modal {
+.modal > div {
   display: none;
   background-color: white;
   border-radius: 12px;
-  width: clamp(150px, 50%, 550px);
+  width: clamp(250px, 50%, 600px);
 }
 
-.add-project-modal.open,
-.delete-modal.open {
+.modal > div.open {
   display: block;
 }
 
@@ -240,29 +267,39 @@ svg {
   border-radius: 12px 12px 0 0;
   border-bottom: 1px solid #ddd;
 }
+
 .modal-form,
-.delete-form {
+.delete-form,
+.add-todo-form {
   padding: 16px;
 }
 
-.input {
+.add-todo-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
 }
 
-input {
-  border: var(--grey) 1.5px solid;
-  border-radius: 4px;
-  padding: 6px;
-}
-input:focus {
-  border: #3a60c7 1.5px solid;
-  transition: 0.5s;
-  outline: none;
+.inputs,
+.inputs-container,
+.input,
+.add-project-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.buttons {
+.inputs {
+  flex: 1;
+}
+
+.inputs-container {
+  gap: 24px;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
