@@ -12,16 +12,18 @@
       <div class="add-project-modal">
         <h3 class="modal-header">Add Project</h3>
         <form action="" class="modal-form" onsubmit="return false;">
-          <div class="input">
+          <div class="add-project-container">
             <label for="name">Name</label>
             <input
               type="text"
               placeholder="Name"
               id="name"
               maxlength="100"
+              oninvalid="this.setCustomValidity('Project name cannot be empty.')"
+              oninput="this.setCustomValidity('')"
               required
             />
-            <div class="buttons">
+            <div class="modal-buttons">
               <button class="cancel" type="button">Cancel</button>
               <button type="submit" class="submit">Add</button>
             </div>
@@ -33,7 +35,7 @@
         <h3 class="modal-header">Delete project</h3>
         <div class="delete-form">
           <p class="delete-text">Are you sure you want to delete this?</p>
-          <div class="buttons">
+          <div class="modal-buttons">
             <button class="cancel" type="button">Cancel</button>
             <button class="delete">Delete</button>
           </div>
@@ -42,7 +44,52 @@
 
       <div class="add-todo-modal">
         <h3 class="modal-header">Add Todo</h3>
-        <form class="add-todo-form"></form>
+        <form class="add-todo-form" onsubmit="return false;">
+          <div class="inputs-container">
+            <div class="inputs">
+              <div class="input">
+                <label for="todo-title">Title:</label>
+                <input type="text" id="todo-title" required />
+              </div>
+
+              <div class="input">
+                <label for="description">Description:</label>
+                <textarea id="description"></textarea>
+              </div>
+            </div>
+
+            <div class="inputs">
+              <div class="input">
+                <label for="due-date">Due date:</label>
+                <input
+                  type="date"
+                  id="due-date"
+                  placeholder="joe mama"
+                  required
+                />
+              </div>
+              <div class="input">
+                <label for="priority">Priority:</label>
+                <select id="priority">
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+              </div>
+              <div class="input">
+                <label for="project">Projects:</label>
+                <select id="project">
+                  <!-- DISPLAY PROJECTTSS -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button class="cancel" type="button">Cancel</button>
+            <button type="submit" class="submit">Add Todo</button>
+          </div>
+        </form>
       </div>
     </div>
 

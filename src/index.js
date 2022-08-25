@@ -108,6 +108,7 @@ const DOM = (function () {
       "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
       "currentColor"
     );
+    DELETE_SVG.classList.add("delete-svg");
 
     projectLeft.appendChild(LIST_SVG);
     projectLeft.appendChild(projectTitle);
@@ -117,7 +118,11 @@ const DOM = (function () {
     projects.appendChild(project);
   }
 
-  addTodo.addEventListener("click", () => {});
+  addTodo.addEventListener("click", () => {
+    const addTodoModal = document.querySelector(".add-todo-modal");
+    modal.classList.add("open");
+    addTodoModal.classList.add("open");
+  });
 
   links.forEach((link) => {
     link.addEventListener("click", () => {
