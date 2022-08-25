@@ -123,19 +123,22 @@ const DOM = (function () {
     const addTodoModal = document.querySelector(".add-todo-modal");
     modal.classList.add("open");
     addTodoModal.classList.add("open");
-    const select = document.querySelector("#project");
+
+    const selectProject = document.querySelector("#project");
+    // Reset select project
+    selectProject.innerHTML = "<option value='Inbox'>Inbox</option";
 
     for (const project of APP.getProjects()) {
-      let option = document.createElement("option");
+      let projectOption = document.createElement("option");
       let projectName = project.name;
       // if length of name is more than 20 then truncate it
       if (project.name.length > 20) {
         projectName = project.name.substring(0, 20) + "...";
       }
 
-      option.value = projectName;
-      option.textContent = projectName;
-      select.appendChild(option);
+      projectOption.value = projectName;
+      projectOption.textContent = projectName;
+      selectProject.appendChild(projectOption);
     }
   });
 
