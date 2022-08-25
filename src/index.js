@@ -71,6 +71,7 @@ const DOM = (function () {
   const deleteModal = document.querySelector(".delete-modal");
   const cancel = document.querySelectorAll(".cancel");
   const submit = document.querySelector(".submit");
+  const submitTodo = document.querySelector(".submit-todo");
   const deleteButton = document.querySelector(".delete");
   const svgArrow = document.querySelector(".open-project > svg");
   const projects = document.querySelector(".projects");
@@ -122,6 +123,20 @@ const DOM = (function () {
     const addTodoModal = document.querySelector(".add-todo-modal");
     modal.classList.add("open");
     addTodoModal.classList.add("open");
+    const select = document.querySelector("#project");
+
+    for (const project of APP.getProjects()) {
+      let option = document.createElement("option");
+      let projectName = project.name;
+      // if length of name is more than 20 then truncate it
+      if (project.name.length > 20) {
+        projectName = project.name.substring(0, 20) + "...";
+      }
+
+      option.value = projectName;
+      option.textContent = projectName;
+      select.appendChild(option);
+    }
   });
 
   links.forEach((link) => {
@@ -163,7 +178,9 @@ const DOM = (function () {
     modalForm.reset();
   });
 
-  cancel.forEach((btn) => btn.addEventListener("click", closeAllModals));
+  cancel.forEach((btn) => {
+    btn.addEventListener("click", closeAllModals);
+  });
   // Adds project to localstorage and displays it.
   submit.addEventListener("click", () => {
     const name = document.querySelector("#name").value;
@@ -171,6 +188,13 @@ const DOM = (function () {
     closeAllModals();
     APP.createProject(name);
     displayProject(name);
+  });
+
+  submitTodo.addEventListener("click", (e) => {
+    const title = document.querySelector("#todo-title");
+    const description = document.querySelector("#description");
+    const dueDate = document.querySelector("#due-date");
+    const project = document.querySelector("#project");
   });
 
   deleteButton.addEventListener("click", () => {

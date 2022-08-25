@@ -311,7 +311,8 @@ button,
   border-radius: 4px;
   font-weight: bold;
 }
-.submit {
+.submit,
+.submit-todo {
   background-color: var(--main-theme-color);
   color: var(--grey);
 }
