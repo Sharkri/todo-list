@@ -18,7 +18,7 @@
               type="text"
               placeholder="Name"
               id="name"
-              maxlength="100"
+              maxlength="80"
               oninvalid="this.setCustomValidity('Project name cannot be empty.')"
               oninput="this.setCustomValidity('')"
               required
@@ -61,12 +61,7 @@
             <div class="inputs">
               <div class="input">
                 <label for="due-date">Due date:</label>
-                <input
-                  type="date"
-                  id="due-date"
-                  placeholder="joe mama"
-                  required
-                />
+                <input type="date" id="due-date" placeholder="joe mama" />
               </div>
               <div class="input">
                 <label for="priority">Priority:</label>
@@ -77,9 +72,9 @@
                 </select>
               </div>
               <div class="input">
-                <label for="project">Projects:</label>
+                <label for="project">Project:</label>
                 <select id="project">
-                  <!-- DISPLAY PROJECTTSS -->
+                  <option value="Inbox">Inbox</option>
                 </select>
               </div>
             </div>
@@ -87,7 +82,7 @@
 
           <div class="modal-buttons">
             <button class="cancel" type="button">Cancel</button>
-            <button type="submit" class="submit">Add Todo</button>
+            <button type="submit" class="submit-todo">Add Todo</button>
           </div>
         </form>
       </div>
