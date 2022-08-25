@@ -74,7 +74,7 @@ const DOM = (function () {
   const deleteButton = document.querySelector(".delete");
   const svgArrow = document.querySelector(".open-project > svg");
   const projects = document.querySelector(".projects");
-  const main = document.querySelector(".main");
+  const addTodo = document.querySelector(".add-todo");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
@@ -83,29 +83,8 @@ const DOM = (function () {
   for (let project of APP.getProjects()) displayProject(project.name);
 
   function switchTab(title, todos) {
-    // Resets main content
-    main.textContent = "";
-
-    const header = document.createElement("h1");
-    const d = "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z";
-    const fill = "#0369a1";
-    const addSymbol = createSVG(d, fill);
-    const ADD_TASK = document.createElement("button");
-    ADD_TASK.appendChild(addSymbol);
-    ADD_TASK.appendChild(document.createTextNode("Add Task"));
-
-    const todosContainer = document.createElement("div");
-    todosContainer.classList.add("todos");
-    todos = todos ? todos : [];
-    for (const todo of todos) {
-      let todoElement = document.createElement("div");
-      // append todo
-    }
-
+    const header = document.querySelector(".main-header");
     header.textContent = title;
-    main.appendChild(header);
-    main.appendChild(todosContainer);
-    main.appendChild(ADD_TASK);
   }
   switchTab("Inbox");
 
@@ -138,11 +117,7 @@ const DOM = (function () {
     projects.appendChild(project);
   }
 
-  main.addEventListener("click", (e) => {
-    if (e.target.closest("button")) {
-      // add task
-    }
-  });
+  addTodo.addEventListener("click", () => {});
 
   links.forEach((link) => {
     link.addEventListener("click", () => {
@@ -218,15 +193,17 @@ const DOM = (function () {
     const active = document.querySelectorAll(".active");
     active.forEach((element) => element.classList.remove("active"));
   }
+
   function closeAllModals() {
     modal.classList.remove("open");
-    addProjectModal.classList.remove("open");
-    deleteModal.classList.remove("open");
+    for (let i = 0; i < modal.childElementCount; i++) {
+      modal.children[i].classList.remove("open");
+    }
   }
 
   function getActiveProjectIndex() {
     const project = document.querySelector(".project.active");
-    // Search in projectsContainer the index of active project
+    // Search in projects the index of current active project
     return Array.from(projects.children).indexOf(project);
   }
 

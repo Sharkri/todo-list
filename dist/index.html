@@ -18,7 +18,7 @@
               type="text"
               placeholder="Name"
               id="name"
-              maxlength="120"
+              maxlength="100"
               required
             />
             <div class="buttons">
@@ -28,6 +28,7 @@
           </div>
         </form>
       </div>
+
       <div class="delete-modal">
         <h3 class="modal-header">Delete project</h3>
         <div class="delete-form">
@@ -38,7 +39,13 @@
           </div>
         </div>
       </div>
+
+      <div class="add-todo-modal">
+        <h3 class="modal-header">Add Todo</h3>
+        <form class="add-todo-form"></form>
+      </div>
     </div>
+
     <div class="header">
       <button class="hamburger">
         <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
@@ -49,7 +56,17 @@
         </svg>
       </button>
     </div>
-    <div class="main"></div>
+
+    <div class="main">
+      <h1 class="main-header"></h1>
+      <button class="add-todo">
+        <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+          <path fill="#0369a1" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+        </svg>
+        Add Todo
+      </button>
+    </div>
+
     <div class="sidebar">
       <div class="links">
         <div class="inbox active">
