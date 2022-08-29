@@ -8,8 +8,9 @@ import {
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
-  const inbox = getLocalStorageItem("inbox");
   const projects = getLocalStorageItem("projects");
+  // On load, re adds function. JSON can't store functions
+  for (const project of projects) project.addTodo = addProjectTodo;
 
   function setLocalStorageItem(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
@@ -21,28 +22,24 @@ const APP = (function () {
     return item ? item : [];
   }
 
-  // Pushes todo object into array and sets local storage
-  function createTodo(projectName, title, description, dueDate, priority) {
-    todos.push({ projectName, title, description, dueDate, priority });
+  function createTodo(title, description, dueDate, priority) {
+    todos.push({ title, description, dueDate, priority });
     setLocalStorageItem("todos", todos);
-    return { projectName, title, description, dueDate, priority };
+    return { title, description, dueDate, priority };
   }
 
   function createProject(name) {
-    const projectTodos = [];
-    function addTodo(projectName, title, description, dueDate, priority) {
-      const todo = createTodo(
-        projectName,
-        title,
-        description,
-        dueDate,
-        priority
-      );
-      projectTodos.push(todo);
-    }
-    projects.push({ name, todos: projectTodos, addTodo });
+    const todos = [];
+    const addTodo = addProjectTodo;
+    console.log(projects);
+    projects.push({ name, todos, addTodo });
     setLocalStorageItem("projects", projects);
-    return { name, todos: projectTodos, addTodo };
+    return { name, todos, addTodo };
+  }
+
+  function addProjectTodo(title, description, dueDate, priority, projectTodos) {
+    const todo = createTodo(title, description, dueDate, priority);
+    projectTodos.push(todo);
   }
 
   function removeProject(index) {
@@ -52,7 +49,10 @@ const APP = (function () {
 
   const getTodos = () => todos;
   const getProjects = () => projects;
-  const getInbox = () => inbox;
+  const getProject = (index) => {
+    console.log("getproject func", index, projects);
+    return projects[index];
+  };
 
   return {
     createTodo,
@@ -60,14 +60,16 @@ const APP = (function () {
     removeProject,
     getTodos,
     getProjects,
-    getInbox,
+    getProject,
   };
 })();
 const DOM = (function () {
   // declare selector
   const modal = document.querySelector(".modal");
   const modalForm = document.querySelector(".modal-form");
+  const todoForm = document.querySelector(".add-todo-form");
   const addProjectModal = document.querySelector(".add-project-modal");
+  const addTodoModal = document.querySelector(".add-todo-modal");
   const deleteModal = document.querySelector(".delete-modal");
   const cancel = document.querySelectorAll(".cancel");
   const submit = document.querySelector(".submit");
@@ -76,6 +78,7 @@ const DOM = (function () {
   const svgArrow = document.querySelector(".open-project > svg");
   const projects = document.querySelector(".projects");
   const addTodo = document.querySelector(".add-todo");
+  const todosContainer = document.querySelector(".todos");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
@@ -83,9 +86,13 @@ const DOM = (function () {
   // Shows LocalStorage projects
   for (let project of APP.getProjects()) displayProject(project.name);
 
-  function switchTab(title, todos) {
+  function switchTab(title, todos = []) {
     const header = document.querySelector(".main-header");
     header.textContent = title;
+    todosContainer.textContent = "";
+    for (const todo of todos) {
+      todosContainer.appendChild(createTodoElement(todo.title));
+    }
   }
   switchTab("Inbox");
 
@@ -119,26 +126,22 @@ const DOM = (function () {
     projects.appendChild(project);
   }
 
-  addTodo.addEventListener("click", () => {
-    const addTodoModal = document.querySelector(".add-todo-modal");
+  addTodo.addEventListener("click", (e) => {
+    todoForm.reset();
     modal.classList.add("open");
     addTodoModal.classList.add("open");
 
     const selectProject = document.querySelector("#project");
-    // Reset select project
     selectProject.innerHTML = "<option value='Inbox'>Inbox</option";
 
     for (const project of APP.getProjects()) {
-      let projectOption = document.createElement("option");
       let projectName = project.name;
-      // if length of name is more than 20 then truncate it
-      if (project.name.length > 20) {
-        projectName = project.name.substring(0, 20) + "...";
+      // if name length is greater than 19 then truncate it
+      if (projectName.length > 19) {
+        projectName = projectName.substring(0, 19) + "...";
       }
-
-      projectOption.value = projectName;
-      projectOption.textContent = projectName;
-      selectProject.appendChild(projectOption);
+      let option = createOption(projectName);
+      selectProject.appendChild(option);
     }
   });
 
@@ -155,16 +158,15 @@ const DOM = (function () {
       modal.classList.add("open");
       deleteModal.classList.add("open");
     }
-
-    const project = e.target.closest(".project");
-    // Highlights clicked.
+    console.log(APP.getProjects());
     removeAllActiveClass();
-    project.classList.add("active");
+    e.target.closest(".project").classList.add("active");
     const index = getActiveProjectIndex();
-    const APP_PROJECTS = APP.getProjects();
-    const projectName = APP_PROJECTS[index]["name"];
-    const projectTodos = APP_PROJECTS[index]["todos"];
-    switchTab(projectName, projectTodos);
+    console.log(index);
+    const project = APP.getProject(index);
+    console.log({ project });
+
+    switchTab(project.name, project.todos);
   });
 
   projectTab.addEventListener("click", (e) => {
@@ -176,8 +178,6 @@ const DOM = (function () {
     }
     modal.classList.toggle("open");
     addProjectModal.classList.toggle("open");
-    console.log(addProjectModal.classList);
-
     modalForm.reset();
   });
 
@@ -193,20 +193,27 @@ const DOM = (function () {
     displayProject(name);
   });
 
-  submitTodo.addEventListener("click", (e) => {
-    const title = document.querySelector("#todo-title");
-    const description = document.querySelector("#description");
-    const dueDate = document.querySelector("#due-date");
-    const project = document.querySelector("#project");
+  submitTodo.addEventListener("click", () => {
+    const title = document.querySelector("#todo-title").value;
+    if (!title) return;
+    const description = document.querySelector("#description").value || "";
+    const dueDate = document.querySelector("#due-date").value || "";
+    const priority = document.querySelector("#priority").value;
+    const projectIndex = document.querySelector("#project").selectedIndex;
+    const project = APP.getProject(projectIndex);
+    project.addTodo(title, description, dueDate, priority, project.todos);
+    const todoElement = createTodoElement(title, dueDate);
+    todosContainer.appendChild(todoElement);
+    closeAllModals();
   });
 
   deleteButton.addEventListener("click", () => {
     let inbox = document.querySelector(".inbox");
     let projectIndex = getActiveProjectIndex();
-    let project = projects.children[projectIndex];
+    let selectedProject = projects.children[projectIndex];
     // Remove project from app and dom
     APP.removeProject(projectIndex);
-    projects.removeChild(project);
+    projects.removeChild(selectedProject);
     closeAllModals();
     // default to inbox tab
     switchTab("Inbox");
@@ -221,9 +228,18 @@ const DOM = (function () {
 
   // Helper Functions
 
+  function createOption(name) {
+    let option = document.createElement("option");
+    option.textContent = name;
+    option.value = name;
+    return option;
+  }
+
   function removeAllActiveClass() {
-    const active = document.querySelectorAll(".active");
-    active.forEach((element) => element.classList.remove("active"));
+    const active = document.querySelector(".active");
+    console.log(active);
+    active.classList.remove("active");
+    console.log("err");
   }
 
   function closeAllModals() {
@@ -249,6 +265,14 @@ const DOM = (function () {
     return SVG;
   }
   function createTodoElement(title, dueDate) {
-    return "TOODOOOO";
+    const todoContainer = document.createElement("div");
+    todoContainer.classList.add("todo");
+    const todoTitle = document.createElement("span");
+    todoTitle.textContent = title;
+    const markComplete = document.createElement("button");
+    markComplete.classList.add("mark-todo-complete");
+    todoContainer.appendChild(markComplete);
+    todoContainer.appendChild(todoTitle);
+    return todoContainer;
   }
 })();
