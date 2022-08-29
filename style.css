@@ -91,7 +91,8 @@ svg {
 
 .main-header {
   overflow-wrap: anywhere;
-  text-align: center;
+  margin: 8px 0;
+  padding: 8px;
 }
 
 .add-todo {
@@ -102,11 +103,35 @@ svg {
   align-items: center;
   gap: 6px;
   padding: 8px;
-  border-radius: 12px;
 }
 
 .add-todo:hover {
   color: var(--main-theme-color);
+}
+
+.todos {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.todo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px;
+  overflow-wrap: anywhere;
+}
+
+.mark-todo-complete {
+  border-radius: 50%;
+  border: 1px solid var(--main-theme-color);
+  min-height: 24px;
+  min-width: 24px;
 }
 
 /* SIDEBAR */
@@ -136,7 +161,6 @@ button,
 
 .project {
   display: flex;
-  justify-content: space-between;
 }
 
 .project-right {

@@ -49,7 +49,7 @@
             <div class="inputs">
               <div class="input">
                 <label for="todo-title">Title:</label>
-                <input type="text" id="todo-title" required />
+                <input type="text" id="todo-title" maxlength="100" required />
               </div>
 
               <div class="input">
@@ -61,14 +61,14 @@
             <div class="inputs">
               <div class="input">
                 <label for="due-date">Due date:</label>
-                <input type="date" id="due-date" placeholder="joe mama" />
+                <input type="date" id="due-date" />
               </div>
               <div class="input">
                 <label for="priority">Priority:</label>
                 <select id="priority">
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
                 </select>
               </div>
               <div class="input">
@@ -100,13 +100,19 @@
     </div>
 
     <div class="main">
-      <h1 class="main-header"></h1>
-      <button class="add-todo">
-        <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
-          <path fill="#0369a1" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-        </svg>
-        Add Todo
-      </button>
+      <div class="main-content">
+        <h1 class="main-header"></h1>
+        <div class="todos"></div>
+        <button class="add-todo">
+          <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+            <path
+              fill="#0369a1"
+              d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+            />
+          </svg>
+          Add Todo
+        </button>
+      </div>
     </div>
 
     <div class="sidebar">
