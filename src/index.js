@@ -10,7 +10,9 @@ const APP = (function () {
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
   // On load, re adds function. JSON can't store functions
-  for (const project of projects) project.addTodo = addProjectTodo;
+  for (const project of projects) {
+    project.addTodo = getAddTodoFunction(project.todos);
+  }
 
   function setLocalStorageItem(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
@@ -24,27 +26,44 @@ const APP = (function () {
 
   function createTodo(title, description, dueDate, priority) {
     todos.push({ title, description, dueDate, priority });
-    setLocalStorageItem("todos", todos);
+    saveToLocalStorage();
     return { title, description, dueDate, priority };
+  }
+
+  function updateTodos() {
+    todos.length = 0;
+    for (const project of projects) {
+      for (const todo of project.todos) {
+        todos.push(todo);
+      }
+    }
   }
 
   function createProject(name) {
     const todos = [];
-    const addTodo = addProjectTodo;
-    console.log(projects);
+    const addTodo = getAddTodoFunction(todos);
     projects.push({ name, todos, addTodo });
-    setLocalStorageItem("projects", projects);
+    saveToLocalStorage();
     return { name, todos, addTodo };
   }
 
-  function addProjectTodo(title, description, dueDate, priority, projectTodos) {
-    const todo = createTodo(title, description, dueDate, priority);
-    projectTodos.push(todo);
+  function getAddTodoFunction(todos) {
+    return function (title, description, dueDate, priority) {
+      const todo = createTodo(title, description, dueDate, priority);
+      todos.push(todo);
+      saveToLocalStorage();
+    };
+  }
+
+  function saveToLocalStorage() {
+    setLocalStorageItem("projects", projects);
+    setLocalStorageItem("todos", todos);
   }
 
   function removeProject(index) {
     projects.splice(index, 1);
-    setLocalStorageItem("projects", projects);
+    updateTodos();
+    saveToLocalStorage();
   }
 
   const getTodos = () => todos;
