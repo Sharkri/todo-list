@@ -49,15 +49,24 @@ const APP = (function () {
     };
   }
 
-  function removeProject(index) {
-    projects.splice(index, 1);
-    // Refresh todos to get rid of removed ones.
+  function updateTodos() {
     todos.length = 0;
     for (const project of projects) {
       for (const todo of project.todos) {
         todos.push(todo);
       }
     }
+  }
+
+  function removeTodo(todos, index) {
+    todos.splice(index, 1);
+    updateTodos();
+    saveToLocalStorage();
+  }
+
+  function removeProject(index) {
+    projects.splice(index, 1);
+    updateTodos();
     saveToLocalStorage();
   }
 
@@ -76,6 +85,7 @@ const APP = (function () {
     getTodos,
     getProjects,
     getProject,
+    removeTodo,
   };
 })();
 const DOM = (function () {
