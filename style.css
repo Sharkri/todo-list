@@ -124,7 +124,17 @@ svg {
   align-items: flex-start;
   gap: 12px;
   padding: 8px;
+  cursor: pointer;
+}
+
+.todo span {
+  max-width: 800px;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mark-todo-complete {
