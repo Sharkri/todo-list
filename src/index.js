@@ -9,7 +9,10 @@ import {
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
-  // On load, re adds function. JSON can't store functions
+  if (!projects.length) {
+    createProject("Inbox");
+  }
+  // On load, re adds function. Because JSON can't store functions
   for (const project of projects) {
     project.addTodo = getAddTodoFunction(project.todos);
   }
@@ -30,15 +33,6 @@ const APP = (function () {
     return { title, description, dueDate, priority };
   }
 
-  function updateTodos() {
-    todos.length = 0;
-    for (const project of projects) {
-      for (const todo of project.todos) {
-        todos.push(todo);
-      }
-    }
-  }
-
   function createProject(name) {
     const todos = [];
     const addTodo = getAddTodoFunction(todos);
@@ -55,24 +49,26 @@ const APP = (function () {
     };
   }
 
+  function removeProject(index) {
+    projects.splice(index, 1);
+    // Refresh todos to get rid of removed ones.
+    todos.length = 0;
+    for (const project of projects) {
+      for (const todo of project.todos) {
+        todos.push(todo);
+      }
+    }
+    saveToLocalStorage();
+  }
+
   function saveToLocalStorage() {
     setLocalStorageItem("projects", projects);
     setLocalStorageItem("todos", todos);
   }
 
-  function removeProject(index) {
-    projects.splice(index, 1);
-    updateTodos();
-    saveToLocalStorage();
-  }
-
   const getTodos = () => todos;
   const getProjects = () => projects;
-  const getProject = (index) => {
-    console.log("getproject func", index, projects);
-    return projects[index];
-  };
-
+  const getProject = (index) => projects[index];
   return {
     createTodo,
     createProject,
@@ -95,7 +91,8 @@ const DOM = (function () {
   const submitTodo = document.querySelector(".submit-todo");
   const deleteButton = document.querySelector(".delete");
   const svgArrow = document.querySelector(".open-project > svg");
-  const projects = document.querySelector(".projects");
+  const projects = document.getElementsByClassName("project");
+  const projectsContainer = document.querySelector(".projects");
   const addTodo = document.querySelector(".add-todo");
   const todosContainer = document.querySelector(".todos");
   const projectTab = document.querySelector(".projectTab");
@@ -103,7 +100,7 @@ const DOM = (function () {
   const menu = document.querySelector(".hamburger");
   const sidebar = document.querySelector(".sidebar");
   // Shows LocalStorage projects
-  for (let project of APP.getProjects()) displayProject(project.name);
+  for (let project of APP.getProjects().slice(1)) displayProject(project.name);
 
   function switchTab(title, todos = []) {
     const header = document.querySelector(".main-header");
@@ -113,7 +110,9 @@ const DOM = (function () {
       todosContainer.appendChild(createTodoElement(todo.title));
     }
   }
-  switchTab("Inbox");
+  // Initial Load
+  const inbox = APP.getProject(0);
+  switchTab("Inbox", inbox.todos);
 
   function displayProject(title) {
     const project = document.createElement("div");
@@ -142,17 +141,15 @@ const DOM = (function () {
     projectRight.appendChild(DELETE_SVG);
     project.appendChild(projectLeft);
     project.appendChild(projectRight);
-    projects.appendChild(project);
+    projectsContainer.appendChild(project);
   }
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
     modal.classList.add("open");
     addTodoModal.classList.add("open");
-
-    const selectProject = document.querySelector("#project");
-    selectProject.innerHTML = "<option value='Inbox'>Inbox</option";
-
+    const select = document.querySelector("#project");
+    select.textContent = "";
     for (const project of APP.getProjects()) {
       let projectName = project.name;
       // if name length is greater than 19 then truncate it
@@ -160,24 +157,28 @@ const DOM = (function () {
         projectName = projectName.substring(0, 19) + "...";
       }
       let option = createOption(projectName);
-      selectProject.appendChild(option);
+      select.appendChild(option);
     }
+    // Set selected option to current project
+    const selectedIndex = getActiveProjectIndex();
+    select.children[selectedIndex].selected = true;
   });
 
   links.forEach((link) => {
     link.addEventListener("click", () => {
       removeAllActiveClass();
       link.classList.toggle("active");
-      switchTab(link.textContent);
+      const headerTitle = link.innerText;
+      const todos = headerTitle == "Inbox" ? inbox.todos : [];
+      switchTab(headerTitle, todos);
     });
   });
-  projects.addEventListener("click", (e) => {
+  projectsContainer.addEventListener("click", (e) => {
     // if delete button clicked, show confirm modal
     if (e.target.closest(".project-right")) {
       modal.classList.add("open");
       deleteModal.classList.add("open");
     }
-    console.log(APP.getProjects());
     removeAllActiveClass();
     e.target.closest(".project").classList.add("active");
     const index = getActiveProjectIndex();
@@ -191,7 +192,7 @@ const DOM = (function () {
   projectTab.addEventListener("click", (e) => {
     if (e.target.contains(svgArrow)) {
       // toggle show project
-      projects.classList.toggle("closed");
+      projectsContainer.classList.toggle("closed");
       svgArrow.classList.toggle("rotated");
       return;
     }
@@ -227,16 +228,16 @@ const DOM = (function () {
   });
 
   deleteButton.addEventListener("click", () => {
-    let inbox = document.querySelector(".inbox");
     let projectIndex = getActiveProjectIndex();
-    let selectedProject = projects.children[projectIndex];
+    let selectedProject = projects[projectIndex];
     // Remove project from app and dom
     APP.removeProject(projectIndex);
-    projects.removeChild(selectedProject);
+    console.log(projectIndex, selectedProject);
+    projectsContainer.removeChild(selectedProject);
     closeAllModals();
     // default to inbox tab
-    switchTab("Inbox");
-    inbox.classList.add("active");
+    switchTab("Inbox", inbox.todos);
+    document.querySelector(".inbox").classList.add("active");
   });
 
   // Toggle sidebar showing
@@ -271,7 +272,7 @@ const DOM = (function () {
   function getActiveProjectIndex() {
     const project = document.querySelector(".project.active");
     // Search in projects the index of current active project
-    return Array.from(projects.children).indexOf(project);
+    return Array.from(projects).indexOf(project);
   }
 
   function createSVG(d, fill) {
