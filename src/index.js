@@ -28,17 +28,19 @@ const APP = (function () {
   }
 
   function createTodo(title, description, dueDate, priority) {
-    todos.push({ title, description, dueDate, priority });
+    const id = todos.length;
+    todos.push({ title, description, dueDate, priority, id });
     saveToLocalStorage();
-    return { title, description, dueDate, priority };
+    return { title, description, dueDate, priority, id };
   }
 
   function createProject(name) {
     const todos = [];
+    const id = projects.length;
     const addTodo = getAddTodoFunction(todos);
-    projects.push({ name, todos, addTodo });
+    projects.push({ name, todos, addTodo, id });
     saveToLocalStorage();
-    return { name, todos, addTodo };
+    return { name, todos, addTodo, id };
   }
 
   function getAddTodoFunction(todos) {
@@ -49,25 +51,33 @@ const APP = (function () {
     };
   }
 
-  function updateTodos() {
-    todos.length = 0;
-    for (const project of projects) {
-      for (const todo of project.todos) {
-        todos.push(todo);
-      }
-    }
-  }
+  // function updateTodos() {
+  //   todos.length = 0;
+  //   for (const project of projects) {
+  //     for (const todo of project.todos) {
+  //       todos.push(todo);
+  //     }
+  //   }
+  // }
 
-  function removeTodo(todos, index) {
-    todos.splice(index, 1);
-    updateTodos();
+  function removeTodo(todoId) {
+    const todoIndex = findIndex(todos, "id", todoId);
+    todos.splice(todoIndex, 1);
     saveToLocalStorage();
   }
 
-  function removeProject(index) {
-    projects.splice(index, 1);
-    updateTodos();
+  function removeProject(projectId) {
+    const projectIndex = findIndex(projects, "id", projectId);
+    const project = projects[projectIndex];
+    console.log({ project, projects, projectId });
+    projects.splice(projectIndex, 1);
+    // Remove all of project todos
+    for (const todo of project.todos) removeTodo(todo.id);
     saveToLocalStorage();
+  }
+
+  function findIndex(array, key, valueToFind) {
+    return array.findIndex((item) => item[key] == valueToFind);
   }
 
   function saveToLocalStorage() {
@@ -239,9 +249,11 @@ const DOM = (function () {
 
   deleteButton.addEventListener("click", () => {
     let projectIndex = getActiveProjectIndex();
+    let projectId = APP.getProject(projectIndex).id;
     let selectedProject = projects[projectIndex];
+    console.log(selectedProject, projectIndex);
     // Remove project from app and dom
-    APP.removeProject(projectIndex);
+    APP.removeProject(projectId);
     console.log(projectIndex, selectedProject);
     projectsContainer.removeChild(selectedProject);
     closeAllModals();
