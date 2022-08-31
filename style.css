@@ -90,9 +90,16 @@ svg {
 }
 
 .main-header {
+  margin: 16px 8px;
+  font-size: x-large;
+  max-width: 800px;
+  display: -webkit-box;
   overflow-wrap: anywhere;
-  margin: 8px 0;
-  padding: 8px;
+  /* Max line wrap is 3 */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .add-todo {
@@ -128,7 +135,7 @@ svg {
 }
 
 .todo span {
-  max-width: 800px;
+  max-width: 750px;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-line-clamp: 5;
