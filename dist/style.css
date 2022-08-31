@@ -17,7 +17,7 @@ body {
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: clamp(225px, 25%, 400px) 1fr;
   grid-template-rows: auto 2fr;
   background-color: var(--grey);
 }
@@ -38,8 +38,8 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  border: rgb(58, 96, 199) 1.5px solid;
-  transition: 0.3s;
+  border-color: #3a60c7;
+  transition: border 0.3s;
   outline: none;
   box-shadow: rgba(58, 96, 199, 0.2) 0px 7px 29px 0px;
 }
