@@ -9,12 +9,16 @@ import {
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
+  // if todo exists, get number to count up from
+  let todoIdCount = todos.length ? todos.at(-1).id : -1;
+  let projectIdCount = projects.length ? projects.at(-1).id : -1;
   if (!projects.length) {
     createProject("Inbox");
   }
   // On load, re adds function. Because JSON can't store functions
   for (const project of projects) {
     project.addTodo = getAddTodoFunction(project.todos);
+    project.removeTodo = getRemoveTodo();
   }
 
   function setLocalStorageItem(key, value) {
@@ -28,7 +32,8 @@ const APP = (function () {
   }
 
   function createTodo(title, description, dueDate, priority) {
-    const id = todos.length;
+    const id = ++todoIdCount;
+    console.log(todoIdCount);
     todos.push({ title, description, dueDate, priority, id });
     saveToLocalStorage();
     return { title, description, dueDate, priority, id };
@@ -36,11 +41,12 @@ const APP = (function () {
 
   function createProject(name) {
     const todos = [];
-    const id = projects.length;
+    const id = ++projectIdCount;
     const addTodo = getAddTodoFunction(todos);
-    projects.push({ name, todos, addTodo, id });
+    const removeTodo = getRemoveTodo();
+    projects.push({ name, todos, addTodo, removeTodo, id });
     saveToLocalStorage();
-    return { name, todos, addTodo, id };
+    return { name, todos, addTodo, removeTodo, id };
   }
 
   function getAddTodoFunction(todos) {
@@ -48,31 +54,26 @@ const APP = (function () {
       const todo = createTodo(title, description, dueDate, priority);
       todos.push(todo);
       saveToLocalStorage();
+      return todo;
     };
   }
 
-  // function updateTodos() {
-  //   todos.length = 0;
-  //   for (const project of projects) {
-  //     for (const todo of project.todos) {
-  //       todos.push(todo);
-  //     }
-  //   }
-  // }
-
-  function removeTodo(todoId) {
-    const todoIndex = findIndex(todos, "id", todoId);
-    todos.splice(todoIndex, 1);
-    saveToLocalStorage();
+  function getRemoveTodo() {
+    return function (todoId) {
+      const projectTodoIndex = findIndex(this.todos, "id", todoId);
+      const todoIndex = findIndex(todos, "id", todoId);
+      todos.splice(todoIndex, 1);
+      this.todos.splice(projectTodoIndex, 1);
+      saveToLocalStorage();
+    };
   }
 
   function removeProject(projectId) {
     const projectIndex = findIndex(projects, "id", projectId);
-    const project = projects[projectIndex];
-    console.log({ project, projects, projectId });
+    const project = getProject(projectIndex);
     projects.splice(projectIndex, 1);
     // Remove all of project todos
-    for (const todo of project.todos) removeTodo(todo.id);
+    for (const todo of project.todos) project.removeTodo(todo.id);
     saveToLocalStorage();
   }
 
@@ -95,7 +96,6 @@ const APP = (function () {
     getTodos,
     getProjects,
     getProject,
-    removeTodo,
   };
 })();
 const DOM = (function () {
@@ -119,6 +119,7 @@ const DOM = (function () {
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
   const sidebar = document.querySelector(".sidebar");
+  const mainContent = document.querySelector(".main-content");
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) displayProject(project.name);
 
@@ -126,9 +127,7 @@ const DOM = (function () {
     const header = document.querySelector(".main-header");
     header.textContent = title;
     todosContainer.textContent = "";
-    for (const todo of todos) {
-      todosContainer.appendChild(createTodoElement(todo.title));
-    }
+    for (const todo of todos) displayTodo(todo);
   }
   // Initial Load
   const inbox = APP.getProject(0);
@@ -163,6 +162,17 @@ const DOM = (function () {
     project.appendChild(projectRight);
     projectsContainer.appendChild(project);
   }
+
+  mainContent.addEventListener("click", (e) => {
+    if (e.target.className == "mark-todo-complete") {
+      console.log("marking complete..");
+      const project = APP.getProject(getActiveProjectIndex());
+      const todoId = e.target.getAttribute("data-index-number");
+      console.log({ todoId });
+      project.removeTodo(todoId);
+      switchTab(project.name, project.todos);
+    }
+  });
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
@@ -202,10 +212,9 @@ const DOM = (function () {
     removeAllActiveClass();
     e.target.closest(".project").classList.add("active");
     const index = getActiveProjectIndex();
-    console.log(index);
     const project = APP.getProject(index);
-    console.log({ project });
-
+    console.log(project.id);
+    console.log(APP.getTodos());
     switchTab(project.name, project.todos);
   });
 
@@ -241,9 +250,14 @@ const DOM = (function () {
     const priority = document.querySelector("#priority").value;
     const projectIndex = document.querySelector("#project").selectedIndex;
     const project = APP.getProject(projectIndex);
-    project.addTodo(title, description, dueDate, priority, project.todos);
-    const todoElement = createTodoElement(title, dueDate);
-    todosContainer.appendChild(todoElement);
+    const todo = project.addTodo(
+      title,
+      description,
+      dueDate,
+      priority,
+      project.todos
+    );
+    displayTodo(todo);
     closeAllModals();
   });
 
@@ -270,6 +284,11 @@ const DOM = (function () {
 
   // Helper Functions
 
+  function displayTodo(todo) {
+    const todoElement = createTodoElement(todo.title, todo.id);
+    todosContainer.appendChild(todoElement);
+  }
+
   function createOption(name) {
     let option = document.createElement("option");
     option.textContent = name;
@@ -279,9 +298,7 @@ const DOM = (function () {
 
   function removeAllActiveClass() {
     const active = document.querySelector(".active");
-    console.log(active);
     active.classList.remove("active");
-    console.log("err");
   }
 
   function closeAllModals() {
@@ -306,13 +323,14 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
-  function createTodoElement(title, dueDate) {
+  function createTodoElement(title, id, dueDate) {
     const todoContainer = document.createElement("div");
-    todoContainer.classList.add("todo");
     const todoTitle = document.createElement("span");
     todoTitle.textContent = title;
     const markComplete = document.createElement("button");
     markComplete.classList.add("mark-todo-complete");
+    todoContainer.classList.add("todo");
+    markComplete.setAttribute("data-index-number", id);
     todoContainer.appendChild(markComplete);
     todoContainer.appendChild(todoTitle);
     return todoContainer;
