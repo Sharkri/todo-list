@@ -119,6 +119,7 @@ const DOM = (function () {
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
   const sidebar = document.querySelector(".sidebar");
+  const mainContent = document.querySelector(".main-content");
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) displayProject(project.name);
 
