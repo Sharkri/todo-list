@@ -121,6 +121,12 @@ svg {
 
 .todos {
   width: calc(100vw - 306px);
+  max-width: 1200px;
+}
+
+/* if sidebar is hidden then more width can be used */
+.todos.sidebar-hidden {
+  width: calc(100vw - 56px);
 }
 
 .todo {
@@ -132,8 +138,21 @@ svg {
   border-bottom: 1px solid rgba(145, 134, 134, 0.3);
 }
 
-.todo span {
-  max-width: 750px;
+.todo-info {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.todo-date {
+  color: var(--main-theme-color);
+  font-weight: bold;
+}
+
+.todo-title {
+  max-width: 1200px;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-line-clamp: 5;
@@ -288,7 +307,7 @@ button,
   display: none;
   background-color: white;
   border-radius: 12px;
-  width: clamp(250px, 50%, 600px);
+  width: clamp(275px, 50%, 600px);
 }
 
 .modal > div.open {

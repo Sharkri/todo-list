@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, formatDistance, formatDistanceToNow } from "date-fns";
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
@@ -274,6 +274,7 @@ const DOM = (function () {
   menu.addEventListener("click", () => {
     document.querySelector("body").classList.toggle("sidebar-hidden");
     sidebar.classList.toggle("hidden");
+    document.querySelector(".todos").classList.toggle("sidebar-hidden");
   });
 
   // Helper Functions
@@ -322,18 +323,30 @@ const DOM = (function () {
     return SVG;
   }
   function createTodoElement(title, id, dueDate) {
-    dueDate = dueDate || "1984/10/10";
-    const test = new Date(dueDate);
-    console.log(test);
     const todoContainer = document.createElement("div");
+    const todoInfo = document.createElement("div");
+
+    if (dueDate) {
+      const formattedDate = formatDistanceToNow(new Date(dueDate));
+      const todoDueDate = document.createElement("span");
+      todoDueDate.textContent = formattedDate;
+      todoDueDate.classList.add("todo-date");
+      todoInfo.appendChild(todoDueDate);
+    }
+
     const todoTitle = document.createElement("span");
     todoTitle.textContent = title;
+    todoTitle.classList.add("todo-title");
+
     const markComplete = document.createElement("button");
-    markComplete.classList.add("mark-todo-complete");
-    todoContainer.classList.add("todo");
     markComplete.setAttribute("data-index-number", id);
+    markComplete.classList.add("mark-todo-complete");
+
+    todoContainer.classList.add("todo");
+    todoInfo.classList.add("todo-info");
     todoContainer.appendChild(markComplete);
-    todoContainer.appendChild(todoTitle);
+    todoInfo.prepend(todoTitle);
+    todoContainer.appendChild(todoInfo);
     return todoContainer;
   }
 })();
