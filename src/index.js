@@ -1,10 +1,4 @@
-import {
-  formatDistance,
-  subDays,
-  addDays,
-  formatDistanceStrict,
-  set,
-} from "date-fns";
+import { format } from "date-fns";
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
@@ -285,7 +279,11 @@ const DOM = (function () {
   // Helper Functions
 
   function displayTodo(todo) {
-    const todoElement = createTodoElement(todo.title, todo.id);
+    const todoElement = createTodoElement(
+      todo.title,
+      todo.id,
+      todo.dueDate || null
+    );
     todosContainer.appendChild(todoElement);
   }
 
@@ -324,6 +322,9 @@ const DOM = (function () {
     return SVG;
   }
   function createTodoElement(title, id, dueDate) {
+    dueDate = dueDate || "1984/10/10";
+    const test = new Date(dueDate);
+    console.log(test);
     const todoContainer = document.createElement("div");
     const todoTitle = document.createElement("span");
     todoTitle.textContent = title;
