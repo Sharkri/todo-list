@@ -35,6 +35,10 @@ select {
   padding: 6px;
 }
 
+select {
+  width: 100%;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
@@ -104,7 +108,13 @@ svg {
   text-overflow: ellipsis;
   margin-bottom: 16px;
 }
-
+.text {
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+  white-space: nowrap; /* Thanks to Herb Caudill comment */
+}
 .add-todo {
   border: none;
   background-color: transparent;
@@ -303,19 +313,17 @@ button,
   display: flex;
 }
 
-.modal > div {
+.add-project-modal,
+.delete-modal,
+.add-todo-modal {
   display: none;
   background-color: white;
   border-radius: 12px;
-  width: clamp(275px, 50%, 600px);
+  width: clamp(300px, 50%, 600px);
 }
 
 .modal > div.open {
   display: block;
-}
-
-.delete-text {
-  margin-bottom: 16px;
 }
 
 .modal-header {
@@ -324,6 +332,10 @@ button,
   width: 100%;
   border-radius: 12px 12px 0 0;
   border-bottom: 1px solid #ddd;
+}
+
+.delete-text {
+  margin-bottom: 16px;
 }
 
 .modal-form,
