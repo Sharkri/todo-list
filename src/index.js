@@ -198,8 +198,7 @@ const DOM = (function () {
 
   links.forEach((link) => {
     link.addEventListener("click", () => {
-      removeAllActiveClass();
-      link.classList.toggle("active");
+      setActiveClass(link);
       const headerTitle = link.innerText;
       const todos = headerTitle == "Inbox" ? inbox.todos : [];
       switchTab(headerTitle, todos);
@@ -208,9 +207,8 @@ const DOM = (function () {
   projectsContainer.addEventListener("click", (e) => {
     // if delete button clicked, show confirm modal
     if (e.target.closest(".project-right")) toggleModal(deleteModal);
-
-    removeAllActiveClass();
-    e.target.closest(".project").classList.add("active");
+    // highlight project clicked
+    setActiveClass(e.target.closest(".project"));
     const index = getActiveProjectIndex();
     const project = APP.getProject(index);
     console.log(project.id);
@@ -324,9 +322,11 @@ const DOM = (function () {
     return option;
   }
 
-  function removeAllActiveClass() {
+  function setActiveClass(element) {
     const active = document.querySelector(".active");
     active.classList.remove("active");
+
+    element.classList.add("active");
   }
 
   function resetInputStates() {
