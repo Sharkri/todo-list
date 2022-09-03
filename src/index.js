@@ -174,11 +174,11 @@ const DOM = (function () {
     addTodoModal.classList.add("open");
     const select = document.querySelector("#project");
     select.textContent = "";
+
     for (const project of APP.getProjects()) {
       let projectName = project.name;
-      // if name length is greater than 19 then truncate it
       let textWidth = getTextWidth(projectName);
-      console.log(textWidth);
+      // Truncate string if too long
       if (textWidth > 250) {
         if (textWidth > 1200) projectName = truncateStr(projectName, 4);
         else if (textWidth > 800) projectName = truncateStr(projectName, 12);
@@ -186,11 +186,9 @@ const DOM = (function () {
       }
 
       let option = createOption(projectName);
-      // if (getTextWidth(option.value) > 250) {
-      //   option.style.width = "250px";
-      // }
       select.appendChild(option);
     }
+
     // Set selected option to current project
     const selectedIndex = getActiveProjectIndex();
     select.children[selectedIndex].selected = true;
@@ -350,9 +348,19 @@ const DOM = (function () {
     const todoInfo = document.createElement("div");
 
     if (dueDate) {
-      const formattedDate = formatDistanceToNow(new Date(dueDate));
+      console.log(dueDate);
+      dueDate = new Date(dueDate);
+      console.log(dueDate);
+
+      const formattedDateToNow = formatDistanceToNow(dueDate, {
+        addSuffix: true,
+      });
+
+      const title = format(dueDate, "MM/dd/yyyy");
+
       const todoDueDate = document.createElement("span");
-      todoDueDate.textContent = formattedDate;
+      todoDueDate.textContent = formattedDateToNow;
+      todoDueDate.title = `Due date: ${title}`;
       todoDueDate.classList.add("todo-date");
       todoInfo.appendChild(todoDueDate);
     }
