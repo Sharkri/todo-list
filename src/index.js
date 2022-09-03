@@ -245,8 +245,10 @@ const DOM = (function () {
   submitTodo.addEventListener("click", () => {
     const title = document.querySelector("#todo-title").value;
     if (!title) return;
+    const dueDate = document.querySelector("#due-date").value || null;
+    if (dueDate && new Date(dueDate).toString() == "Invalid Date") return;
+
     const description = document.querySelector("#description").value || "";
-    const dueDate = document.querySelector("#due-date").value || "";
     const priority = document.querySelector("#priority").value;
     const projectIndex = document.querySelector("#project").selectedIndex;
     const project = APP.getProject(projectIndex);
@@ -286,6 +288,7 @@ const DOM = (function () {
   // Helper Functions
 
   function displayTodo(todo) {
+    console.log({ todo });
     const todoElement = createTodoElement(
       todo.title,
       todo.id,
@@ -346,11 +349,9 @@ const DOM = (function () {
   function createTodoElement(title, id, dueDate) {
     const todoContainer = document.createElement("div");
     const todoInfo = document.createElement("div");
-
+    console.log(dueDate);
     if (dueDate) {
-      console.log(dueDate);
       dueDate = new Date(dueDate);
-      console.log(dueDate);
 
       const formattedDateToNow = formatDistanceToNow(dueDate, {
         addSuffix: true,
