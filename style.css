@@ -108,13 +108,7 @@ svg {
   text-overflow: ellipsis;
   margin-bottom: 16px;
 }
-.text {
-  position: absolute;
-  visibility: hidden;
-  height: auto;
-  width: auto;
-  white-space: nowrap; /* Thanks to Herb Caudill comment */
-}
+
 .add-todo {
   border: none;
   background-color: transparent;
@@ -150,15 +144,19 @@ svg {
 
 .todo-info {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   flex-grow: 1;
   justify-content: space-between;
-  gap: 8px;
+  gap: 14px;
 }
 
 .todo-date {
   color: var(--main-theme-color);
-  font-weight: bold;
+}
+
+.todo-date::first-letter {
+  text-transform: uppercase;
 }
 
 .todo-title {
