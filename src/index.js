@@ -177,10 +177,18 @@ const DOM = (function () {
     for (const project of APP.getProjects()) {
       let projectName = project.name;
       // if name length is greater than 19 then truncate it
-      if (projectName.length > 19) {
-        projectName = projectName.substring(0, 19) + "...";
+      let textWidth = getTextWidth(projectName);
+      console.log(textWidth);
+      if (textWidth > 250) {
+        if (textWidth > 1200) projectName = truncateStr(projectName, 4);
+        else if (textWidth > 800) projectName = truncateStr(projectName, 12);
+        else projectName = truncateStr(projectName, 20);
       }
+
       let option = createOption(projectName);
+      // if (getTextWidth(option.value) > 250) {
+      //   option.style.width = "250px";
+      // }
       select.appendChild(option);
     }
     // Set selected option to current project
@@ -288,6 +296,10 @@ const DOM = (function () {
     todosContainer.appendChild(todoElement);
   }
 
+  function truncateStr(string, length) {
+    return string.substring(0, length) + "...";
+  }
+
   function createOption(name) {
     let option = document.createElement("option");
     option.textContent = name;
@@ -305,6 +317,17 @@ const DOM = (function () {
     for (let i = 0; i < modal.childElementCount; i++) {
       modal.children[i].classList.remove("open");
     }
+  }
+
+  function getTextWidth(text) {
+    // re-use canvas object for better performance
+    const canvas =
+      getTextWidth.canvas ||
+      (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
+    context.font = "14px Montserrat";
+    const metrics = context.measureText(text);
+    return metrics.width;
   }
 
   function getActiveProjectIndex() {
