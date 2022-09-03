@@ -27,12 +27,19 @@ body.sidebar-hidden {
   grid-template-columns: 1fr;
 }
 
+/* Prevent scrolling when in modal */
+body.modal-open {
+  overflow: hidden;
+}
+
 input,
 textarea,
 select {
-  border: #ddd 1.5px solid;
+  border: #ddd 1.7px solid;
   border-radius: 4px;
   padding: 6px;
+  transition: border 0.25s;
+  transition: box-shadow 0.25s;
 }
 
 select {
@@ -43,9 +50,29 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: #3a60c7;
-  transition: border 0.3s;
   outline: none;
-  box-shadow: rgba(58, 96, 199, 0.2) 0px 7px 29px 0px;
+  box-shadow: 0px 2.5px 5px 2.5px rgba(58, 96, 199, 0.2);
+}
+
+input.error {
+  border-color: #ef4444;
+}
+
+.title-error-text {
+  color: #ef4444;
+  font-size: small;
+}
+
+input.valid {
+  border-color: #22c55e;
+}
+
+input.error:focus {
+  box-shadow: 0px 2.5px 5px 2.5px rgba(239, 68, 68, 0.125);
+}
+
+input.valid:focus {
+  box-shadow: 0px 2px 4px 2px rgba(34, 197, 94, 0.125);
 }
 
 textarea {
@@ -379,6 +406,7 @@ button,
   border-radius: 4px;
   font-weight: bold;
 }
+
 .submit,
 .submit-todo {
   background-color: var(--main-theme-color);

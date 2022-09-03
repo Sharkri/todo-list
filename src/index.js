@@ -170,6 +170,8 @@ const DOM = (function () {
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
+    resetInputStates();
+
     modal.classList.add("open");
     addTodoModal.classList.add("open");
     const select = document.querySelector("#project");
@@ -205,10 +207,8 @@ const DOM = (function () {
   });
   projectsContainer.addEventListener("click", (e) => {
     // if delete button clicked, show confirm modal
-    if (e.target.closest(".project-right")) {
-      modal.classList.add("open");
-      deleteModal.classList.add("open");
-    }
+    if (e.target.closest(".project-right")) toggleModal(deleteModal);
+
     removeAllActiveClass();
     e.target.closest(".project").classList.add("active");
     const index = getActiveProjectIndex();
@@ -225,8 +225,8 @@ const DOM = (function () {
       svgArrow.classList.toggle("rotated");
       return;
     }
-    modal.classList.toggle("open");
-    addProjectModal.classList.toggle("open");
+    // Show add project modal
+    toggleModal(addProjectModal);
     modalForm.reset();
   });
 
@@ -242,9 +242,25 @@ const DOM = (function () {
     displayProject(name);
   });
 
+  const inputs = document.querySelector("#todo-title");
+  inputs.addEventListener("keyup", (e) => {
+    const isValid = e.target.checkValidity();
+    console.log(isValid);
+    if (isValid && e.target.classList.contains("error")) {
+      e.target.classList.add("valid");
+      e.target.classList.remove("error");
+    } else if (!isValid && e.target.classList.contains("valid")) {
+      e.target.classList.add("error");
+      e.target.classList.remove("valid");
+    }
+  });
+
   submitTodo.addEventListener("click", () => {
     const title = document.querySelector("#todo-title").value;
-    if (!title) return;
+    if (!title) {
+      inputs.classList.add("error");
+      return;
+    }
     const dueDate = document.querySelector("#due-date").value || null;
     if (dueDate && new Date(dueDate).toString() == "Invalid Date") return;
 
@@ -311,6 +327,17 @@ const DOM = (function () {
   function removeAllActiveClass() {
     const active = document.querySelector(".active");
     active.classList.remove("active");
+  }
+
+  function resetInputStates() {
+    inputs.classList.remove("valid");
+    inputs.classList.remove("error");
+  }
+
+  function toggleModal(modalElement) {
+    modal.classList.toggle("open");
+    modalElement.classList.toggle("open");
+    document.body.classList.toggle("modal-open");
   }
 
   function closeAllModals() {
