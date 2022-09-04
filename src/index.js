@@ -170,7 +170,7 @@ const DOM = (function () {
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
-    resetInputStates();
+    resetTitleInput();
 
     modal.classList.add("open");
     addTodoModal.classList.add("open");
@@ -240,23 +240,29 @@ const DOM = (function () {
     displayProject(name);
   });
 
-  const inputs = document.querySelector("#todo-title");
-  inputs.addEventListener("keyup", (e) => {
+  const titleInput = document.querySelector("#todo-title");
+  const titleErrorText = document.querySelector(".title-error-text");
+  titleInput.addEventListener("keyup", (e) => {
     const isValid = e.target.checkValidity();
-    console.log(isValid);
-    if (isValid && e.target.classList.contains("error")) {
-      e.target.classList.add("valid");
-      e.target.classList.remove("error");
-    } else if (!isValid && e.target.classList.contains("valid")) {
-      e.target.classList.add("error");
-      e.target.classList.remove("valid");
+    const classList = e.target.classList;
+    if (isValid && classList.contains("error")) {
+      classList.add("valid");
+      classList.remove("error");
+
+      titleErrorText.classList.remove("error");
+    } else if (!isValid && classList.contains("valid")) {
+      classList.remove("valid");
+      classList.add("error");
+
+      titleErrorText.classList.add("error");
     }
   });
 
   submitTodo.addEventListener("click", () => {
     const title = document.querySelector("#todo-title").value;
     if (!title) {
-      inputs.classList.add("error");
+      titleInput.classList.add("error");
+      titleErrorText.classList.add("error");
       return;
     }
     const dueDate = document.querySelector("#due-date").value || null;
@@ -329,9 +335,10 @@ const DOM = (function () {
     element.classList.add("active");
   }
 
-  function resetInputStates() {
-    inputs.classList.remove("valid");
-    inputs.classList.remove("error");
+  function resetTitleInput() {
+    titleInput.classList.remove("valid");
+    titleInput.classList.remove("error");
+    titleErrorText.classList.remove("error");
   }
 
   function toggleModal(modalElement) {
