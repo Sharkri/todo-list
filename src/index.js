@@ -269,8 +269,8 @@ const DOM = (function () {
     const dueDate = document.querySelector("#due-date").value || null;
     const description = document.querySelector("#description").value || "";
     const priority = document.querySelector("#priority").value;
-    const projectIndex = document.querySelector("#project").selectedIndex;
-    const project = APP.getProject(projectIndex);
+    const selectedIndex = document.querySelector("#project").selectedIndex;
+    const project = APP.getProject(selectedIndex);
     const todo = project.addTodo(
       title,
       description,
@@ -278,7 +278,8 @@ const DOM = (function () {
       priority,
       project.todos
     );
-    displayTodo(todo);
+    let activeIndex = getActiveProjectIndex();
+    if (activeIndex == selectedIndex) displayTodo(todo);
     closeAllModals();
   });
 
