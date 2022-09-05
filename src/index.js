@@ -383,15 +383,15 @@ const DOM = (function () {
   function createTodoElement(title, id, dueDate) {
     const todoContainer = document.createElement("div");
     const todoInfo = document.createElement("div");
-    console.log(dueDate);
     if (dueDate) {
       dueDate = new Date(dueDate);
-
-      const formattedDateToNow = formatDistanceToNowStrict(dueDate, {
-        addSuffix: true,
-      });
-
-      const title = format(dueDate, "MM/dd/yyyy");
+      let isCurrentYear = dueDate.getFullYear() == new Date().getFullYear();
+      // if isCurrentYear omit year, else show year
+      const formattedDateToNow = format(
+        dueDate,
+        `MMM d ${isCurrentYear ? "" : "yyyy"} h:mm a`
+      );
+      const title = formatDistanceToNowStrict(dueDate, { addSuffix: true });
 
       const todoDueDate = document.createElement("span");
       todoDueDate.textContent = formattedDateToNow;
