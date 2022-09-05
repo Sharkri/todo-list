@@ -1,4 +1,4 @@
-import { format, formatDistance, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
@@ -140,6 +140,7 @@ const DOM = (function () {
       "currentColor"
     );
     const projectTitle = document.createElement("span");
+    projectTitle.title = title;
     projectTitle.textContent = title;
     projectTitle.classList.add("project-title");
 
@@ -249,12 +250,12 @@ const DOM = (function () {
       classList.add("valid");
       classList.remove("error");
 
-      titleErrorText.classList.remove("error");
+      titleErrorText.classList.remove("visible");
     } else if (!isValid && classList.contains("valid")) {
       classList.remove("valid");
       classList.add("error");
 
-      titleErrorText.classList.add("error");
+      titleErrorText.classList.add("visible");
     }
   });
 
@@ -262,12 +263,10 @@ const DOM = (function () {
     const title = document.querySelector("#todo-title").value;
     if (!title) {
       titleInput.classList.add("error");
-      titleErrorText.classList.add("error");
+      titleErrorText.classList.add("visible");
       return;
     }
     const dueDate = document.querySelector("#due-date").value || null;
-    if (dueDate && new Date(dueDate).toString() == "Invalid Date") return;
-
     const description = document.querySelector("#description").value || "";
     const priority = document.querySelector("#priority").value;
     const projectIndex = document.querySelector("#project").selectedIndex;
@@ -338,7 +337,7 @@ const DOM = (function () {
   function resetTitleInput() {
     titleInput.classList.remove("valid");
     titleInput.classList.remove("error");
-    titleErrorText.classList.remove("error");
+    titleErrorText.classList.remove("visible");
   }
 
   function toggleModal(modalElement) {
@@ -387,7 +386,7 @@ const DOM = (function () {
     if (dueDate) {
       dueDate = new Date(dueDate);
 
-      const formattedDateToNow = formatDistanceToNow(dueDate, {
+      const formattedDateToNow = formatDistanceToNowStrict(dueDate, {
         addSuffix: true,
       });
 
@@ -401,6 +400,7 @@ const DOM = (function () {
     }
 
     const todoTitle = document.createElement("span");
+    todoTitle.title = title;
     todoTitle.textContent = title;
     todoTitle.classList.add("todo-title");
 
