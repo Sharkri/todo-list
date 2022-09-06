@@ -153,6 +153,20 @@ input.valid:focus {
   padding-top: 20px;
 }
 
+.priority {
+  padding: 16px 0;
+  display: none;
+}
+
+.priority.visible {
+  display: block;
+}
+
+.priority h4 {
+  border-bottom: 1px solid rgba(145, 134, 134, 0.3);
+  padding-bottom: 12px;
+}
+
 .add-todo:hover {
   color: var(--main-theme-color);
 }
