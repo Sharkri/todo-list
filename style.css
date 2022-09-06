@@ -182,19 +182,21 @@ input.valid:focus {
   flex-wrap: wrap;
   flex-grow: 1;
   justify-content: space-between;
-  gap: 12px;
+  gap: 4px;
 }
 
 .todo-date {
   color: var(--main-theme-color);
   font-size: 14px;
+  margin-top: 4px;
 }
 
 .todo-date::first-letter {
   text-transform: uppercase;
 }
 
-.todo-title {
+.todo-title,
+.todo-description {
   max-width: 1200px;
   overflow-wrap: anywhere;
   display: -webkit-box;
@@ -203,6 +205,11 @@ input.valid:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   width: fit-content;
+}
+
+.todo-description {
+  font-size: 13.5px;
+  color: gray;
 }
 
 .mark-todo-complete {
