@@ -119,13 +119,16 @@ const DOM = (function () {
   const projects = document.getElementsByClassName("project");
   const projectsContainer = document.querySelector(".projects");
   const addTodo = document.querySelector(".add-todo");
-  const todosContainer = document.querySelector(".todos");
   const todoElements = document.getElementsByClassName("todo");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
   const sidebar = document.querySelector(".sidebar");
   const mainContent = document.querySelector(".main-content");
+  const low = document.querySelector(".low");
+  const medium = document.querySelector(".medium");
+  const high = document.querySelector(".high");
+
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) displayProject(project.name);
 
@@ -150,6 +153,10 @@ const DOM = (function () {
   function refreshTodos(todos = []) {
     Array.from(todoElements).forEach((todo) => todo.remove());
     for (const todo of todos) displayTodo(todo);
+
+    if (high.children.length < 2) high.classList.remove("visible");
+    if (medium.children.length < 2) medium.classList.remove("visible");
+    if (low.children.length < 2) low.classList.remove("visible");
   }
 
   // Initial Load
@@ -366,9 +373,17 @@ const DOM = (function () {
       todo.dueDate,
       todo.description
     );
+
     if (todo.priority == "High") {
+      high.appendChild(todoElement);
+      high.classList.add("visible");
+    } else if (todo.priority == "Medium") {
+      medium.appendChild(todoElement);
+      medium.classList.add("visible");
+    } else {
+      low.appendChild(todoElement);
+      low.classList.add("visible");
     }
-    todosContainer.appendChild(todoElement);
   }
 
   function truncateStr(string, length) {
@@ -439,8 +454,6 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
-
-  function createPriority(priority) {}
 
   function createTodoElement(title, todoId, projectId, dueDate, description) {
     const todoContainer = document.createElement("div");
