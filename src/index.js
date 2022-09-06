@@ -1,4 +1,11 @@
-import { format, formatDistanceToNowStrict } from "date-fns";
+import {
+  format,
+  formatDistanceToNowStrict,
+  formatRelative,
+  isToday,
+  isTomorrow,
+  isYesterday,
+} from "date-fns";
 
 const APP = (function () {
   const todos = getLocalStorageItem("todos");
@@ -264,6 +271,7 @@ const DOM = (function () {
     if (!title) {
       titleInput.classList.add("error");
       titleErrorText.classList.add("visible");
+      titleInput.focus();
       return;
     }
     const dueDate = document.querySelector("#due-date").value || null;
@@ -385,16 +393,23 @@ const DOM = (function () {
     const todoInfo = document.createElement("div");
     if (dueDate) {
       dueDate = new Date(dueDate);
-      let isCurrentYear = dueDate.getFullYear() == new Date().getFullYear();
-      // if isCurrentYear omit year, else show year
-      const formattedDateToNow = format(
-        dueDate,
-        `MMM d ${isCurrentYear ? "" : "yyyy"} h:mm a`
-      );
+
+      let formattedDate;
+      if (isToday(dueDate) || isYesterday(dueDate) || isTomorrow(dueDate)) {
+        formattedDate = formatRelative(dueDate, new Date());
+      } else {
+        let isCurrentYear = dueDate.getFullYear() == new Date().getFullYear();
+        // if isCurrentYear omit year, else show year
+        formattedDate = format(
+          dueDate,
+          `MMM d ${isCurrentYear ? "" : "yyyy"} h:mm a`
+        );
+      }
+
       const title = formatDistanceToNowStrict(dueDate, { addSuffix: true });
 
       const todoDueDate = document.createElement("span");
-      todoDueDate.textContent = formattedDateToNow;
+      todoDueDate.textContent = formattedDate;
       todoDueDate.title = `Due date: ${title}`;
       todoDueDate.classList.add("todo-date");
       todoInfo.appendChild(todoDueDate);

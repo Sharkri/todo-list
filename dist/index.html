@@ -47,15 +47,13 @@
       <div class="add-todo-modal">
         <h3 class="modal-header">Add Todo</h3>
 
-        <form class="add-todo-form" onsubmit="return false;">
+        <form class="add-todo-form" onsubmit="return false;" novalidate>
           <div class="inputs-container">
             <div class="inputs">
               <div class="input">
                 <label for="todo-title">Title:</label>
                 <input
                   type="text"
-                  oninvalid="this.setCustomValidity('Title is required')"
-                  oninput="this.setCustomValidity('')"
                   title="Title is required"
                   id="todo-title"
                   maxlength="300"
