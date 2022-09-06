@@ -107,6 +107,8 @@ input.valid:focus {
   align-items: center;
   padding: 12px 18px;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.35);
+  position: sticky;
+  top: 0px;
 }
 
 .hamburger {
@@ -126,10 +128,8 @@ input.valid:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.main-content {
-  padding: 18px 28px;
+  overflow: auto;
+  padding: 18px;
 }
 
 .main-header {
@@ -152,7 +152,7 @@ input.valid:focus {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-top: 8px;
+  padding-top: 20px;
 }
 
 .add-todo:hover {
