@@ -191,8 +191,8 @@ const DOM = (function () {
       const todoId = e.target.getAttribute("todo-index-number");
       console.log({ todoId, project });
       project.removeTodo(todoId);
-      const active = getActive().textContent;
-      if (active == "Today") refreshTodos(getTodosToday());
+      const active = getActive();
+      if (active.classList.contains("today")) refreshTodos(getTodosToday());
       else refreshTodos(project.todos);
     }
   });
@@ -308,8 +308,13 @@ const DOM = (function () {
       priority,
       project.todos
     );
-    let activeIndex = getActiveProjectIndex();
-    if (activeIndex == selectedIndex) displayTodo(todo);
+    // if tab is on today, and date selected isToday then display.
+    if (getActive().classList.contains("today")) {
+      if (isToday(new Date(dueDate))) displayTodo(todo);
+    } else {
+      let activeIndex = getActiveProjectIndex();
+      if (activeIndex == selectedIndex) displayTodo(todo);
+    }
     closeAllModals();
   });
 
@@ -338,7 +343,6 @@ const DOM = (function () {
   // Helper Functions
 
   function displayTodo(todo) {
-    console.log({ todo });
     const todoElement = createTodoElement(
       todo.title,
       todo.id,
