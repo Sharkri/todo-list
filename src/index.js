@@ -90,6 +90,7 @@ const APP = (function () {
   const getTodos = () => todos;
   const getProjects = () => projects;
   const getProject = (index) => projects[index];
+  const getProjectById = (id) => projects.find((project) => project.id == id);
   return {
     createTodo,
     createProject,
@@ -97,6 +98,7 @@ const APP = (function () {
     getTodos,
     getProjects,
     getProject,
+    getProjectById,
   };
 })();
 const DOM = (function () {
@@ -185,11 +187,13 @@ const DOM = (function () {
   mainContent.addEventListener("click", (e) => {
     if (e.target.className == "mark-todo-complete") {
       console.log("marking complete..");
-      const project = APP.getProject(
+      console.log(APP.getProjects());
+
+      const project = APP.getProjectById(
         e.target.getAttribute("project-index-number")
       );
       const todoId = e.target.getAttribute("todo-index-number");
-      console.log({ todoId, project });
+      console.log({ todoId, project, e: e.target });
       project.removeTodo(todoId);
       const active = getActive();
       if (active.classList.contains("today")) refreshTodos(getTodosToday());
