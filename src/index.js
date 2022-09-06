@@ -73,8 +73,10 @@ const APP = (function () {
     const projectIndex = findIndex(projects, "id", projectId);
     const project = getProject(projectIndex);
     projects.splice(projectIndex, 1);
+    // need to copy todos cause splicing removes from original
+    let copiedTodos = [...project.todos];
     // Remove all of project todos
-    for (const todo of project.todos) project.removeTodo(todo.id);
+    for (const todo of copiedTodos) project.removeTodo(todo.id);
     saveToLocalStorage();
   }
 
@@ -118,6 +120,7 @@ const DOM = (function () {
   const projectsContainer = document.querySelector(".projects");
   const addTodo = document.querySelector(".add-todo");
   const todosContainer = document.querySelector(".todos");
+  const todoElements = document.getElementsByClassName("todo");
   const projectTab = document.querySelector(".projectTab");
   const links = document.querySelectorAll(".links div");
   const menu = document.querySelector(".hamburger");
@@ -145,7 +148,7 @@ const DOM = (function () {
   }
 
   function refreshTodos(todos = []) {
-    todosContainer.textContent = "";
+    Array.from(todoElements).forEach((todo) => todo.remove());
     for (const todo of todos) displayTodo(todo);
   }
 
@@ -335,7 +338,7 @@ const DOM = (function () {
     let projectIndex = getActiveProjectIndex();
     let projectId = APP.getProject(projectIndex).id;
     let selectedProject = projects[projectIndex];
-    console.log(selectedProject, projectIndex);
+    console.log(selectedProject, projectIndex, projectId);
     // Remove project from app and dom
     APP.removeProject(projectId);
     console.log(projectIndex, selectedProject);
@@ -363,6 +366,8 @@ const DOM = (function () {
       todo.dueDate,
       todo.description
     );
+    if (todo.priority == "High") {
+    }
     todosContainer.appendChild(todoElement);
   }
 
@@ -434,6 +439,9 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
+
+  function createPriority(priority) {}
+
   function createTodoElement(title, todoId, projectId, dueDate, description) {
     const todoContainer = document.createElement("div");
     const todoInfo = document.createElement("div");
