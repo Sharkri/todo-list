@@ -138,8 +138,8 @@ const DOM = (function () {
         let todoDueDate = new Date(todo.dueDate);
         if (isToday(todoDueDate)) todayTodos.push(todo);
       }
-      return todayTodos;
     }
+    return todayTodos;
   }
 
   function refreshTodos(todos = []) {
@@ -193,7 +193,9 @@ const DOM = (function () {
       project.removeTodo(todoId);
       const active = getActive();
       if (active.classList.contains("today")) refreshTodos(getTodosToday());
-      else refreshTodos(project.todos);
+      else if (active.classList.contains("upcoming")) {
+        refreshTodos(APP.getTodos());
+      } else refreshTodos(project.todos);
     }
   });
 
@@ -222,6 +224,8 @@ const DOM = (function () {
 
     // Set selected option to current project
     const selectedIndex = getActiveProjectIndex();
+    // if no selectedindex found return
+    if (selectedIndex == -1) return;
     select.children[selectedIndex].selected = true;
   });
 
@@ -229,9 +233,11 @@ const DOM = (function () {
     link.addEventListener("click", () => {
       setActiveClass(link);
       const title = link.innerText;
+      console.log(getTodosToday());
+
       if (title == "Inbox") switchTab(title, inbox.todos);
       else if (title == "Today") switchTab(title, getTodosToday());
-      else switchTab(title);
+      else switchTab(title, APP.getTodos());
     });
   });
   projectsContainer.addEventListener("click", (e) => {
