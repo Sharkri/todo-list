@@ -18,7 +18,7 @@ const APP = (function () {
   }
   // On load, re adds function. Because JSON can't store functions
   for (const project of projects) {
-    project.addTodo = getAddTodoFunction(project.todos);
+    project.addTodo = getAddTodoFunction(project.todos, project.id);
     project.removeTodo = getRemoveTodo();
   }
 
@@ -32,27 +32,27 @@ const APP = (function () {
     return item ? item : [];
   }
 
-  function createTodo(title, description, dueDate, priority) {
+  function createTodo(title, description, dueDate, priority, projectId) {
     const id = ++todoIdCount;
     console.log(todoIdCount);
-    todos.push({ title, description, dueDate, priority, id });
+    todos.push({ title, description, dueDate, priority, id, projectId });
     saveToLocalStorage();
-    return { title, description, dueDate, priority, id };
+    return { title, description, dueDate, priority, id, projectId };
   }
 
   function createProject(name) {
     const todos = [];
     const id = ++projectIdCount;
-    const addTodo = getAddTodoFunction(todos);
+    const addTodo = getAddTodoFunction(todos, id);
     const removeTodo = getRemoveTodo();
     projects.push({ name, todos, addTodo, removeTodo, id });
     saveToLocalStorage();
     return { name, todos, addTodo, removeTodo, id };
   }
 
-  function getAddTodoFunction(todos) {
+  function getAddTodoFunction(todos, id) {
     return function (title, description, dueDate, priority) {
-      const todo = createTodo(title, description, dueDate, priority);
+      const todo = createTodo(title, description, dueDate, priority, id);
       todos.push(todo);
       saveToLocalStorage();
       return todo;
@@ -127,9 +127,26 @@ const DOM = (function () {
   function switchTab(title, todos = []) {
     const header = document.querySelector(".main-header");
     header.textContent = title;
+    refreshTodos(todos);
+  }
+
+  function getTodosToday() {
+    const projects = APP.getProjects();
+    let todayTodos = [];
+    for (const project of projects) {
+      for (const todo of project.todos) {
+        let todoDueDate = new Date(todo.dueDate);
+        if (isToday(todoDueDate)) todayTodos.push(todo);
+      }
+      return todayTodos;
+    }
+  }
+
+  function refreshTodos(todos = []) {
     todosContainer.textContent = "";
     for (const todo of todos) displayTodo(todo);
   }
+
   // Initial Load
   const inbox = APP.getProject(0);
   switchTab("Inbox", inbox.todos);
@@ -168,11 +185,15 @@ const DOM = (function () {
   mainContent.addEventListener("click", (e) => {
     if (e.target.className == "mark-todo-complete") {
       console.log("marking complete..");
-      const project = APP.getProject(getActiveProjectIndex());
-      const todoId = e.target.getAttribute("data-index-number");
-      console.log({ todoId });
+      const project = APP.getProject(
+        e.target.getAttribute("project-index-number")
+      );
+      const todoId = e.target.getAttribute("todo-index-number");
+      console.log({ todoId, project });
       project.removeTodo(todoId);
-      switchTab(project.name, project.todos);
+      const active = getActive().textContent;
+      if (active == "Today") refreshTodos(getTodosToday());
+      else refreshTodos(project.todos);
     }
   });
 
@@ -207,9 +228,10 @@ const DOM = (function () {
   links.forEach((link) => {
     link.addEventListener("click", () => {
       setActiveClass(link);
-      const headerTitle = link.innerText;
-      const todos = headerTitle == "Inbox" ? inbox.todos : [];
-      switchTab(headerTitle, todos);
+      const title = link.innerText;
+      if (title == "Inbox") switchTab(title, inbox.todos);
+      else if (title == "Today") switchTab(title, getTodosToday());
+      else switchTab(title);
     });
   });
   projectsContainer.addEventListener("click", (e) => {
@@ -320,6 +342,7 @@ const DOM = (function () {
     const todoElement = createTodoElement(
       todo.title,
       todo.id,
+      todo.projectId,
       todo.dueDate || null
     );
     todosContainer.appendChild(todoElement);
@@ -373,6 +396,11 @@ const DOM = (function () {
     return metrics.width;
   }
 
+  function getActive() {
+    const active = document.querySelector(".active");
+    return active;
+  }
+
   function getActiveProjectIndex() {
     const project = document.querySelector(".project.active");
     // Search in projects the index of current active project
@@ -388,12 +416,11 @@ const DOM = (function () {
     SVG.appendChild(path);
     return SVG;
   }
-  function createTodoElement(title, id, dueDate) {
+  function createTodoElement(title, todoId, projectId, dueDate) {
     const todoContainer = document.createElement("div");
     const todoInfo = document.createElement("div");
     if (dueDate) {
       dueDate = new Date(dueDate);
-
       let formattedDate;
       if (isToday(dueDate) || isYesterday(dueDate) || isTomorrow(dueDate)) {
         formattedDate = formatRelative(dueDate, new Date());
@@ -421,7 +448,8 @@ const DOM = (function () {
     todoTitle.classList.add("todo-title");
 
     const markComplete = document.createElement("button");
-    markComplete.setAttribute("data-index-number", id);
+    markComplete.setAttribute("todo-index-number", todoId);
+    markComplete.setAttribute("project-index-number", projectId);
     markComplete.classList.add("mark-todo-complete");
 
     todoContainer.classList.add("todo");
