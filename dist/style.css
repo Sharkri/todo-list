@@ -3,6 +3,16 @@
   src: url(fonts/static/Montserrat-Medium.ttf);
 }
 
+@font-face {
+  font-family: "Montserrat-bold";
+  src: url(fonts/static/Montserrat-Bold.ttf);
+}
+
+@font-face {
+  font-family: "Montserrat-semibold";
+  src: url(fonts/static/Montserrat-SemiBold.ttf);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -20,6 +30,18 @@ body {
   grid-template-columns: /*clamp(225px, 25%, 400px)*/ 250px 1fr;
   grid-template-rows: auto 2fr;
   background-color: var(--grey);
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Montserrat-bold";
+}
+
+h4,
+h5,
+h6 {
+  font-family: "Montserrat-semibold";
 }
 
 /* change to 1 column if sidebar is hidden */
@@ -74,7 +96,7 @@ input.error {
 .error-text {
   color: #ef4444;
   font-size: small;
-  font-weight: bold;
+  font-family: "Montserrat-semibold";
   visibility: hidden;
 }
 
@@ -163,7 +185,7 @@ input.valid:focus {
 }
 
 .priority h4 {
-  border-bottom: 1px solid rgba(145, 134, 134, 0.3);
+  border-bottom: 1.25px solid rgba(145, 134, 134, 0.3);
   padding-bottom: 12px;
 }
 
@@ -187,7 +209,7 @@ input.valid:focus {
   gap: 12px;
   padding: 16px 0;
   cursor: pointer;
-  border-bottom: 1px solid rgba(145, 134, 134, 0.3);
+  border-bottom: 1.25px solid rgba(145, 134, 134, 0.3);
 }
 
 .todo-info {
