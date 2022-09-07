@@ -176,7 +176,7 @@ input.valid:focus {
 }
 
 .priority {
-  padding: 16px 0;
+  padding: 12px 0;
   display: none;
 }
 
@@ -185,8 +185,8 @@ input.valid:focus {
 }
 
 .priority h4 {
-  border-bottom: 1.25px solid rgba(145, 134, 134, 0.3);
-  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(145, 134, 134, 0.3);
+  padding-bottom: 16px;
 }
 
 .add-todo:hover {
@@ -194,22 +194,25 @@ input.valid:focus {
 }
 
 .todos {
-  width: calc(100vw - 306px);
+  width: calc(100vw - 286px);
   max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* if sidebar is hidden then more width can be used */
 .todos.sidebar-hidden {
-  width: calc(100vw - 56px);
+  width: calc(100vw - 36px);
 }
 
 .todo {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 16px 0;
+  gap: 10px;
+  padding: 12px 0;
   cursor: pointer;
-  border-bottom: 1.25px solid rgba(145, 134, 134, 0.3);
+  border-bottom: 1px solid rgba(145, 134, 134, 0.3);
 }
 
 .todo-info {
@@ -236,7 +239,7 @@ input.valid:focus {
   max-width: 1200px;
   overflow-wrap: anywhere;
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -251,8 +254,21 @@ input.valid:focus {
 .mark-todo-complete {
   border-radius: 50%;
   border: 2px solid var(--main-theme-color);
-  min-height: 24px;
-  min-width: 24px;
+  min-height: 28px;
+  min-width: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkmark {
+  opacity: 0;
+  height: 20px;
+  transition: 0.3s;
+}
+
+.mark-todo-complete:hover > .checkmark {
+  opacity: 1;
 }
 
 /* SIDEBAR */

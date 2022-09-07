@@ -195,22 +195,23 @@ const DOM = (function () {
   }
 
   mainContent.addEventListener("click", (e) => {
-    if (e.target.className == "mark-todo-complete") {
-      console.log("marking complete..");
-      console.log(APP.getProjects());
-
+    if (e.target.closest(".mark-todo-complete")) {
+      const markComplete = e.target.closest(".mark-todo-complete");
       const project = APP.getProjectById(
-        e.target.getAttribute("project-index-number")
+        markComplete.getAttribute("project-index-number")
       );
-      const todoId = e.target.getAttribute("todo-index-number");
-      console.log({ todoId, project, e: e.target });
+      const todoId = markComplete.getAttribute("todo-index-number");
       project.removeTodo(todoId);
+
       const active = getActive();
       if (active.classList.contains("today")) refreshTodos(getTodosToday());
       else if (active.classList.contains("upcoming")) {
         refreshTodos(APP.getTodos());
       } else refreshTodos(project.todos);
+      return;
     }
+    if (!e.target.closest(".todo")) return;
+    console.log("SHOW DETAILS");
   });
 
   addTodo.addEventListener("click", (e) => {
@@ -374,18 +375,14 @@ const DOM = (function () {
       todo.description
     );
 
-    if (todo.priority == "High") {
-      high.appendChild(todoElement);
-      high.classList.add("visible");
-    } else if (todo.priority == "Medium") {
-      medium.appendChild(todoElement);
-      medium.classList.add("visible");
-    } else {
-      low.appendChild(todoElement);
-      low.classList.add("visible");
-    }
-  }
+    let priority;
+    if (todo.priority == "High") priority = high;
+    else if (todo.priority == "Medium") priority = medium;
+    else priority = low;
 
+    priority.appendChild(todoElement);
+    priority.classList.add("visible");
+  }
   function truncateStr(string, length) {
     return string.substring(0, length) + "...";
   }
@@ -489,6 +486,12 @@ const DOM = (function () {
     markComplete.setAttribute("todo-index-number", todoId);
     markComplete.setAttribute("project-index-number", projectId);
     markComplete.classList.add("mark-todo-complete");
+    const check = createSVG(
+      "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
+      "currentColor"
+    );
+    check.classList.add("checkmark");
+    markComplete.appendChild(check);
 
     todoContainer.classList.add("todo");
     todoInfo.classList.add("todo-info");
