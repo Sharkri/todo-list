@@ -194,6 +194,8 @@ const DOM = (function () {
     projectsContainer.appendChild(project);
   }
 
+  function expandTodoDetails(todo) {}
+
   mainContent.addEventListener("click", (e) => {
     if (e.target.closest(".mark-todo-complete")) {
       const markComplete = e.target.closest(".mark-todo-complete");
