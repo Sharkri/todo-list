@@ -129,6 +129,7 @@ const DOM = (function () {
   const medium = document.querySelector(".medium");
   const high = document.querySelector(".high");
   const search = document.querySelector("#search-input");
+  const searchResults = document.querySelector(".search-results");
 
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) displayProject(project.name);
@@ -165,7 +166,6 @@ const DOM = (function () {
   switchTab("Inbox", inbox.todos);
 
   function query(search) {
-    if (!search) return;
     search = search.toLowerCase();
     let occurrences = [];
     let projects = APP.getProjects();
@@ -215,9 +215,18 @@ const DOM = (function () {
   function expandTodoDetails(todo) {}
 
   search.addEventListener("keyup", (e) => {
-    if (!e.target.value) return;
+    if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
     console.log(occurrences);
+    if (!occurrences.length) return searchResults.classList.remove("found");
+
+    searchResults.textContent = "";
+    for (const occurrence of occurrences) {
+      const li = document.createElement("li");
+      li.textContent = occurrence.title || occurrence.name;
+      searchResults.appendChild(li);
+    }
+    searchResults.classList.add("found");
   });
 
   mainContent.addEventListener("click", (e) => {
