@@ -128,6 +128,7 @@ const DOM = (function () {
   const low = document.querySelector(".low");
   const medium = document.querySelector(".medium");
   const high = document.querySelector(".high");
+  const search = document.querySelector("#search-input");
 
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) displayProject(project.name);
@@ -163,6 +164,23 @@ const DOM = (function () {
   const inbox = APP.getProject(0);
   switchTab("Inbox", inbox.todos);
 
+  function query(search) {
+    if (!search) return;
+    search = search.toLowerCase();
+    let occurrences = [];
+    let projects = APP.getProjects();
+    let todos = APP.getTodos();
+    for (const project of projects) {
+      if (project.name.toLowerCase().includes(search)) {
+        occurrences.push(project);
+      }
+    }
+    for (const todo of todos) {
+      if (todo.title.toLowerCase().includes(search)) occurrences.push(todo);
+    }
+    return occurrences;
+  }
+
   function displayProject(title) {
     const project = document.createElement("div");
     const projectLeft = document.createElement("div");
@@ -195,6 +213,12 @@ const DOM = (function () {
   }
 
   function expandTodoDetails(todo) {}
+
+  search.addEventListener("keyup", (e) => {
+    if (!e.target.value) return;
+    const occurrences = query(e.target.value);
+    console.log(occurrences);
+  });
 
   mainContent.addEventListener("click", (e) => {
     if (e.target.closest(".mark-todo-complete")) {
@@ -365,8 +389,6 @@ const DOM = (function () {
     sidebar.classList.toggle("hidden");
     document.querySelector(".todos").classList.toggle("sidebar-hidden");
   });
-
-  // Helper Functions
 
   function displayTodo(todo) {
     const todoElement = createTodoElement(
