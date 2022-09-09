@@ -433,7 +433,6 @@ const DOM = (function () {
         );
         refreshTodos(project.todos);
       }
-
       return closeAllModals();
     }
     const todo = project.addTodo(
@@ -481,11 +480,17 @@ const DOM = (function () {
   function editTodo(todoId, projectId, title, description, dueDate, priority) {
     let todo = APP.getTodoById(todoId);
     let project = APP.getProjectById(projectId);
-    todo.setTodoProperty("title", title);
-    todo.setTodoProperty("description", description || "");
-    todo.setTodoProperty("dueDate", dueDate);
-    todo.setTodoProperty("priority", priority);
+    // check if actually setting to another value
+    if (todo.title !== title) todo.setTodoProperty("title", title);
+    if (todo.description !== description)
+      todo.setTodoProperty("description", description || "");
+    if (todo.dueDate !== dueDate) todo.setTodoProperty("dueDate", dueDate);
+    if (todo.priority !== priority) todo.setTodoProperty("priority", priority);
+
+    // check if same projectid selected
+    if (todo.projectId === projectId) return;
     todo.setTodoProperty("projectId", projectId);
+
     // Remove todo from original project
     for (const project of APP.getProjects()) {
       for (const todo of project.todos) {
