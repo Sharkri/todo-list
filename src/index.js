@@ -221,15 +221,17 @@ const DOM = (function () {
     if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
     console.log(occurrences);
-    if (!occurrences.length) return searchResults.classList.remove("found");
-
     searchResults.textContent = "";
+    if (!occurrences.length) {
+      addSearchOption("No results found.", false, false, "search-result");
+      searchResults.classList.add("found");
+      return;
+    }
+
     for (const occurrence of occurrences) {
-      const li = document.createElement("li");
-      li.classList.add("search-result");
-      li.textContent = occurrence.title || occurrence.name;
-      li.setAttribute("project-index-number", occurrence.id);
-      searchResults.appendChild(li);
+      let text = occurrence.title || occurrence.name;
+      let projectId = occurrence.id;
+      addSearchOption(text, "project-index-number", projectId, "search-result");
     }
     searchResults.classList.add("found");
   });
@@ -237,6 +239,7 @@ const DOM = (function () {
   searchResults.addEventListener("click", (e) => {
     const name = e.target.textContent;
     const id = e.target.getAttribute("project-index-number");
+    if (!id) return;
     const todos = APP.getProjectById(id).todos;
     const project = document.querySelector(
       `.project[project-index-number="${id}"]`
@@ -491,6 +494,15 @@ const DOM = (function () {
     const project = document.querySelector(".project.active");
     // Search in projects the index of current active project
     return Array.from(projects).indexOf(project);
+  }
+
+  function addSearchOption(text, attributeName, attributeValue, className) {
+    console.log(text, className);
+    const searchResult = document.createElement("li");
+    searchResult.textContent = text;
+    if (className) searchResult.classList.add(className);
+    if (attributeName) searchResult.setAttribute(attributeName, attributeValue);
+    searchResults.appendChild(searchResult);
   }
 
   function createSVG(d, fill) {
