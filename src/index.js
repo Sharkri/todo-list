@@ -8,6 +8,16 @@ import {
 } from "date-fns";
 
 const APP = (function () {
+  function getSetTodoValue(projectId) {
+    return function (key, value) {
+      const project = getProjectById(projectId);
+      const todoIndex = findIndex(project.todos, "id", this.id);
+      project["todos"][todoIndex][key] = value;
+      this[key] = value;
+      saveToLocalStorage();
+    };
+  }
+
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
   // if todo exists, get number to count up from
@@ -22,6 +32,11 @@ const APP = (function () {
     project.removeTodo = getRemoveTodo();
   }
 
+  if (todos.length) {
+    for (const todo of todos) {
+      todo.setTodoValue = getSetTodoValue(todo.projectId);
+    }
+  }
   function setLocalStorageItem(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   }
@@ -35,9 +50,26 @@ const APP = (function () {
   function createTodo(title, description, dueDate, priority, projectId) {
     const id = ++todoIdCount;
     console.log(todoIdCount);
-    todos.push({ title, description, dueDate, priority, id, projectId });
+    const setTodoValue = getSetTodoValue(projectId);
+    todos.push({
+      title,
+      description,
+      dueDate,
+      priority,
+      id,
+      projectId,
+      setTodoValue,
+    });
     saveToLocalStorage();
-    return { title, description, dueDate, priority, id, projectId };
+    return {
+      title,
+      description,
+      dueDate,
+      priority,
+      id,
+      projectId,
+      setTodoValue,
+    };
   }
 
   function createProject(name) {
@@ -157,7 +189,6 @@ const DOM = (function () {
   function refreshTodos(todos = []) {
     Array.from(todoElements).forEach((todo) => todo.remove());
     for (const todo of todos) displayTodo(todo);
-
     if (high.children.length < 2) high.classList.remove("visible");
     if (medium.children.length < 2) medium.classList.remove("visible");
     if (low.children.length < 2) low.classList.remove("visible");
@@ -274,15 +305,13 @@ const DOM = (function () {
       return;
     }
     if (!e.target.closest(".todo")) return;
-    console.log("SHOW DETAILS");
   });
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
     resetTitleInput();
 
-    modal.classList.add("open");
-    addTodoModal.classList.add("open");
+    toggleModal(addTodoModal);
     const select = document.querySelector("#project");
     select.textContent = "";
 
@@ -394,13 +423,12 @@ const DOM = (function () {
     );
     const currentClass = getActive().classList;
     // if tab is on today, and date selected isToday then display.
-    if (currentClass.contains("today")) {
-      if (isToday(new Date(dueDate))) displayTodo(todo);
-    } else {
-      let activeIndex = getActiveProjectIndex();
-      if (activeIndex == selectedIndex || currentClass.contains("upcoming")) {
-        displayTodo(todo);
-      }
+    if (currentClass.contains("today") && isToday(new Date(dueDate))) {
+      return displayTodo(todo);
+    }
+    let activeIndex = getActiveProjectIndex();
+    if (activeIndex == selectedIndex || currentClass.contains("upcoming")) {
+      displayTodo(todo);
     }
     closeAllModals();
   });
