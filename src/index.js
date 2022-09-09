@@ -217,6 +217,13 @@ const DOM = (function () {
 
   function expandTodoDetails(todo) {}
 
+  document.onclick = (e) => {
+    // if clicked off close search results
+    if (!e.target.closest(".search-container")) {
+      searchResults.classList.remove("found");
+    }
+  };
+
   search.addEventListener("input", (e) => {
     if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
