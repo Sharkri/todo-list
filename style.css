@@ -252,7 +252,7 @@ input.valid:focus {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-top: 20px;
+  margin-top: 20px;
 }
 
 .priority {
@@ -349,6 +349,24 @@ input.valid:focus {
 
 .mark-todo-complete:hover > .checkmark {
   opacity: 1;
+}
+
+.edit-todo {
+  background-color: transparent;
+  border: none;
+  opacity: 0;
+  padding: 2px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.todo:hover > .edit-todo {
+  opacity: 1;
+}
+
+.edit-todo:hover > svg > path {
+  fill: var(--main-theme-color);
+  transition: 0.2s;
 }
 
 /* SIDEBAR */
