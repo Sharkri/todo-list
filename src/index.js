@@ -132,7 +132,9 @@ const DOM = (function () {
   const searchResults = document.querySelector(".search-results");
 
   // Shows LocalStorage projects
-  for (let project of APP.getProjects().slice(1)) displayProject(project.name);
+  for (let project of APP.getProjects().slice(1)) {
+    displayProject(project.name, project.id);
+  }
 
   function switchTab(title, todos = []) {
     const header = document.querySelector(".main-header");
@@ -181,8 +183,9 @@ const DOM = (function () {
     return occurrences;
   }
 
-  function displayProject(title) {
+  function displayProject(title, id) {
     const project = document.createElement("div");
+    project.setAttribute("project-index-number", id);
     const projectLeft = document.createElement("div");
     const projectRight = document.createElement("button");
     project.classList.add("project");
@@ -214,7 +217,7 @@ const DOM = (function () {
 
   function expandTodoDetails(todo) {}
 
-  search.addEventListener("keyup", (e) => {
+  search.addEventListener("input", (e) => {
     if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
     console.log(occurrences);
@@ -223,10 +226,25 @@ const DOM = (function () {
     searchResults.textContent = "";
     for (const occurrence of occurrences) {
       const li = document.createElement("li");
+      li.classList.add("search-result");
       li.textContent = occurrence.title || occurrence.name;
+      li.setAttribute("project-index-number", occurrence.id);
       searchResults.appendChild(li);
     }
     searchResults.classList.add("found");
+  });
+
+  searchResults.addEventListener("click", (e) => {
+    const name = e.target.textContent;
+    const id = e.target.getAttribute("project-index-number");
+    const todos = APP.getProjectById(id).todos;
+    const project = document.querySelector(
+      `.project[project-index-number="${id}"]`
+    );
+    setActiveClass(project);
+    switchTab(name, todos);
+    searchResults.classList.remove("found");
+    search.value = "";
   });
 
   mainContent.addEventListener("click", (e) => {
@@ -322,8 +340,8 @@ const DOM = (function () {
     const name = document.querySelector("#name").value;
     if (!name) return;
     closeAllModals();
-    APP.createProject(name);
-    displayProject(name);
+    const project = APP.createProject(name);
+    displayProject(name, project.id);
   });
 
   const titleInput = document.querySelector("#todo-title");
