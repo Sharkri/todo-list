@@ -135,6 +135,7 @@ const APP = (function () {
     getProject,
     getProjectById,
     getTodoById,
+    findIndex,
   };
 })();
 const DOM = (function () {
@@ -309,6 +310,8 @@ const DOM = (function () {
     todoForm.reset();
     resetTitleInput();
     toggleModal(addTodoModal);
+    const header = document.querySelector(".add-todo-modal > .modal-header");
+    header.textContent = "Edit Todo";
     const title = document.querySelector("#todo-title");
     const dueDate = document.querySelector("#due-date");
     const description = document.querySelector("#description");
@@ -319,7 +322,9 @@ const DOM = (function () {
     description.value = todo.description;
     if (todo.priority == "High") setSelectedOption(priority, 2);
     else if (todo.priority == "Medium") setSelectedOption(priority, 1);
-    addProjectOptions();
+    const projects = APP.getProjects();
+    const selectedIndex = APP.findIndex(projects, "id", todo.projectId);
+    addProjectOptions(selectedIndex);
     addTodoModal.classList.add("editing");
     addTodoModal.setAttribute("todo-index-number", todoId);
   });
@@ -328,7 +333,10 @@ const DOM = (function () {
     todoForm.reset();
     resetTitleInput();
     toggleModal(addTodoModal);
-    addProjectOptions();
+    const selectedIndex = getActiveProjectIndex();
+    addProjectOptions(selectedIndex);
+    const header = document.querySelector(".add-todo-modal > .modal-header");
+    header.textContent = "Add Todo";
   });
 
   links.forEach((link) => {
@@ -408,15 +416,23 @@ const DOM = (function () {
     const selectedIndex = document.querySelector("#project").selectedIndex;
     const project = APP.getProject(selectedIndex);
     let isEditingTodo = addTodoModal.classList.contains("editing");
-    const currentClass = getActive().classList;
+    const active = getActive();
+    const currentClass = active.classList;
     if (isEditingTodo) {
+      console.log(project, selectedIndex);
       let todoId = addTodoModal.getAttribute("todo-index-number");
-      editTodo(todoId, title, description, dueDate, priority);
+      editTodo(todoId, project.id, title, description, dueDate, priority);
       // if tab is today refresh with todays todo
       if (currentClass.contains("today")) refreshTodos(getTodosToday());
       // if tab is view all refresh with all todos
       else if (currentClass.contains("view-all")) refreshTodos(APP.getTodos());
-      else refreshTodos(project.todos);
+      else {
+        // get current active project todo
+        let project = APP.getProjectById(
+          active.getAttribute("project-index-number")
+        );
+        refreshTodos(project.todos);
+      }
 
       return closeAllModals();
     }
@@ -462,21 +478,30 @@ const DOM = (function () {
     document.querySelector(".todos").classList.toggle("sidebar-hidden");
   });
 
-  function editTodo(todoId, title, description, dueDate, priority) {
+  function editTodo(todoId, projectId, title, description, dueDate, priority) {
     let todo = APP.getTodoById(todoId);
+    let project = APP.getProjectById(projectId);
     todo.setTodoProperty("title", title);
-    todo.setTodoProperty("description", description);
+    todo.setTodoProperty("description", description || "");
     todo.setTodoProperty("dueDate", dueDate);
     todo.setTodoProperty("priority", priority);
+    todo.setTodoProperty("projectId", projectId);
+    // Remove todo from original project
+    for (const project of APP.getProjects()) {
+      for (const todo of project.todos) {
+        if (todo.id == todoId) project.removeTodo(todo.id);
+      }
+    }
+    console.log(todo);
+    project.addTodo(title, description, dueDate, priority);
   }
 
-  function addProjectOptions() {
+  function addProjectOptions(selected) {
     selectProject.textContent = "";
     for (const project of APP.getProjects()) {
       addProjectOption(getTruncatedString(project.name));
     }
-    const selectedIndex = getActiveProjectIndex();
-    setSelectedOption(selectProject, selectedIndex);
+    setSelectedOption(selectProject, selected);
   }
 
   function setSelectedOption(element, index) {
