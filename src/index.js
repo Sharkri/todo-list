@@ -8,7 +8,7 @@ import {
 } from "date-fns";
 
 const APP = (function () {
-  function getSetTodoValue(projectId) {
+  function getSetTodoProperty(projectId) {
     return function (key, value) {
       const project = getProjectById(projectId);
       const todoIndex = findIndex(project.todos, "id", this.id);
@@ -34,7 +34,7 @@ const APP = (function () {
 
   if (todos.length) {
     for (const todo of todos) {
-      todo.setTodoValue = getSetTodoValue(todo.projectId);
+      todo.setTodoProperty = getSetTodoProperty(todo.projectId);
     }
   }
   function setLocalStorageItem(key, value) {
@@ -50,7 +50,7 @@ const APP = (function () {
   function createTodo(title, description, dueDate, priority, projectId) {
     const id = ++todoIdCount;
     console.log(todoIdCount);
-    const setTodoValue = getSetTodoValue(projectId);
+    const setTodoProperty = getSetTodoProperty(projectId);
     todos.push({
       title,
       description,
@@ -58,7 +58,7 @@ const APP = (function () {
       priority,
       id,
       projectId,
-      setTodoValue,
+      setTodoProperty,
     });
     saveToLocalStorage();
     return {
@@ -68,7 +68,7 @@ const APP = (function () {
       priority,
       id,
       projectId,
-      setTodoValue,
+      setTodoProperty,
     };
   }
 
@@ -122,6 +122,7 @@ const APP = (function () {
   }
 
   const getTodos = () => todos;
+  const getTodoById = (id) => todos.find((todo) => todo.id == id);
   const getProjects = () => projects;
   const getProject = (index) => projects[index];
   const getProjectById = (id) => projects.find((project) => project.id == id);
@@ -133,6 +134,7 @@ const APP = (function () {
     getProjects,
     getProject,
     getProjectById,
+    getTodoById,
   };
 })();
 const DOM = (function () {
@@ -162,6 +164,7 @@ const DOM = (function () {
   const high = document.querySelector(".high");
   const search = document.querySelector("#search-input");
   const searchResults = document.querySelector(".search-results");
+  const selectProject = document.querySelector("#project");
 
   // Shows LocalStorage projects
   for (let project of APP.getProjects().slice(1)) {
@@ -246,8 +249,6 @@ const DOM = (function () {
     projectsContainer.appendChild(project);
   }
 
-  function expandTodoDetails(todo) {}
-
   document.onclick = (e) => {
     // if clicked off close search results
     if (!e.target.closest(".search-container")) {
@@ -289,51 +290,45 @@ const DOM = (function () {
   });
 
   mainContent.addEventListener("click", (e) => {
+    const todoElement = e.target.closest(".todo");
+    if (!todoElement) return;
+    const projectId = todoElement.getAttribute("project-index-number");
+    const todoId = todoElement.getAttribute("todo-index-number");
+
     if (e.target.closest(".mark-todo-complete")) {
-      const markComplete = e.target.closest(".mark-todo-complete");
-      const project = APP.getProjectById(
-        markComplete.getAttribute("project-index-number")
-      );
-      const todoId = markComplete.getAttribute("todo-index-number");
+      const project = APP.getProjectById(projectId);
       project.removeTodo(todoId);
 
-      const active = getActive();
-      if (active.classList.contains("today")) refreshTodos(getTodosToday());
-      else if (active.classList.contains("upcoming")) {
-        refreshTodos(APP.getTodos());
-      } else refreshTodos(project.todos);
+      const activeClass = getActive().classList;
+      if (activeClass.contains("today")) refreshTodos(getTodosToday());
+      else if (activeClass.contains("view-all")) refreshTodos(APP.getTodos());
+      else refreshTodos(project.todos);
       return;
     }
-    if (!e.target.closest(".todo")) return;
+    // Edit Todo
+    todoForm.reset();
+    resetTitleInput();
+    toggleModal(addTodoModal);
+    const title = document.querySelector("#todo-title");
+    const dueDate = document.querySelector("#due-date");
+    const description = document.querySelector("#description");
+    const priority = document.querySelector("#priority");
+    let todo = APP.getTodoById(todoId);
+    title.value = todo.title;
+    dueDate.value = todo.dueDate;
+    description.value = todo.description;
+    if (todo.priority == "High") setSelectedOption(priority, 2);
+    else if (todo.priority == "Medium") setSelectedOption(priority, 1);
+    addProjectOptions();
+    addTodoModal.classList.add("editing");
+    addTodoModal.setAttribute("todo-index-number", todoId);
   });
 
   addTodo.addEventListener("click", (e) => {
     todoForm.reset();
     resetTitleInput();
-
     toggleModal(addTodoModal);
-    const select = document.querySelector("#project");
-    select.textContent = "";
-
-    for (const project of APP.getProjects()) {
-      let projectName = project.name;
-      let textWidth = getTextWidth(projectName);
-      // Truncate string if too long
-      if (textWidth > 250) {
-        if (textWidth > 1200) projectName = truncateStr(projectName, 4);
-        else if (textWidth > 800) projectName = truncateStr(projectName, 12);
-        else projectName = truncateStr(projectName, 20);
-      }
-
-      let option = createOption(projectName);
-      select.appendChild(option);
-    }
-
-    // Set selected option to current project
-    const selectedIndex = getActiveProjectIndex();
-    // if no selectedindex found return
-    if (selectedIndex == -1) return;
-    select.children[selectedIndex].selected = true;
+    addProjectOptions();
   });
 
   links.forEach((link) => {
@@ -371,9 +366,7 @@ const DOM = (function () {
     modalForm.reset();
   });
 
-  cancel.forEach((btn) => {
-    btn.addEventListener("click", closeAllModals);
-  });
+  cancel.forEach((btn) => btn.addEventListener("click", closeAllModals));
   // Adds project to localstorage and displays it.
   submit.addEventListener("click", () => {
     const name = document.querySelector("#name").value;
@@ -414,6 +407,19 @@ const DOM = (function () {
     const priority = document.querySelector("#priority").value;
     const selectedIndex = document.querySelector("#project").selectedIndex;
     const project = APP.getProject(selectedIndex);
+    let isEditingTodo = addTodoModal.classList.contains("editing");
+    const currentClass = getActive().classList;
+    if (isEditingTodo) {
+      let todoId = addTodoModal.getAttribute("todo-index-number");
+      editTodo(todoId, title, description, dueDate, priority);
+      // if tab is today refresh with todays todo
+      if (currentClass.contains("today")) refreshTodos(getTodosToday());
+      // if tab is view all refresh with all todos
+      else if (currentClass.contains("view-all")) refreshTodos(APP.getTodos());
+      else refreshTodos(project.todos);
+
+      return closeAllModals();
+    }
     const todo = project.addTodo(
       title,
       description,
@@ -421,13 +427,14 @@ const DOM = (function () {
       priority,
       project.todos
     );
-    const currentClass = getActive().classList;
+
     // if tab is on today, and date selected isToday then display.
-    if (currentClass.contains("today") && isToday(new Date(dueDate))) {
-      return displayTodo(todo);
-    }
-    let activeIndex = getActiveProjectIndex();
-    if (activeIndex == selectedIndex || currentClass.contains("upcoming")) {
+    if (currentClass.contains("today")) {
+      if (isToday(new Date(dueDate))) displayTodo(todo);
+    } else if (
+      getActiveProjectIndex() == selectedIndex ||
+      currentClass.contains("view-all")
+    ) {
       displayTodo(todo);
     }
     closeAllModals();
@@ -455,6 +462,35 @@ const DOM = (function () {
     document.querySelector(".todos").classList.toggle("sidebar-hidden");
   });
 
+  function editTodo(todoId, title, description, dueDate, priority) {
+    let todo = APP.getTodoById(todoId);
+    todo.setTodoProperty("title", title);
+    todo.setTodoProperty("description", description);
+    todo.setTodoProperty("dueDate", dueDate);
+    todo.setTodoProperty("priority", priority);
+  }
+
+  function addProjectOptions() {
+    selectProject.textContent = "";
+    for (const project of APP.getProjects()) {
+      addProjectOption(getTruncatedString(project.name));
+    }
+    const selectedIndex = getActiveProjectIndex();
+    setSelectedOption(selectProject, selectedIndex);
+  }
+
+  function setSelectedOption(element, index) {
+    if (index == -1) return;
+    element.children[index].selected = true;
+  }
+
+  function addProjectOption(name) {
+    let option = document.createElement("option");
+    option.textContent = name;
+    option.value = name;
+    selectProject.appendChild(option);
+  }
+
   function displayTodo(todo) {
     const todoElement = createTodoElement(
       todo.title,
@@ -472,15 +508,20 @@ const DOM = (function () {
     priority.appendChild(todoElement);
     priority.classList.add("visible");
   }
-  function truncateStr(string, length) {
-    return string.substring(0, length) + "...";
+
+  function getTruncatedString(string) {
+    let textWidth = getTextWidth(string);
+    if (textWidth > 250) {
+      // Truncate string if too long
+      if (textWidth > 1200) string = truncateStr(string, 4);
+      else if (textWidth > 800) string = truncateStr(string, 12);
+      else string = truncateStr(string, 20);
+    }
+    return string;
   }
 
-  function createOption(name) {
-    let option = document.createElement("option");
-    option.textContent = name;
-    option.value = name;
-    return option;
+  function truncateStr(string, length) {
+    return string.substring(0, length) + "...";
   }
 
   function setActiveClass(element) {
@@ -504,6 +545,7 @@ const DOM = (function () {
 
   function closeAllModals() {
     modal.classList.remove("open");
+    addTodoModal.classList.remove("editing");
     for (let i = 0; i < modal.childElementCount; i++) {
       modal.children[i].classList.remove("open");
     }
@@ -552,6 +594,8 @@ const DOM = (function () {
 
   function createTodoElement(title, todoId, projectId, dueDate, description) {
     const todoContainer = document.createElement("div");
+    todoContainer.setAttribute("todo-index-number", todoId);
+    todoContainer.setAttribute("project-index-number", projectId);
     const todoInfo = document.createElement("div");
 
     if (description) {
@@ -581,8 +625,6 @@ const DOM = (function () {
     todoTitle.classList.add("todo-title");
 
     const markComplete = document.createElement("button");
-    markComplete.setAttribute("todo-index-number", todoId);
-    markComplete.setAttribute("project-index-number", projectId);
     markComplete.classList.add("mark-todo-complete");
     const check = createSVG(
       "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",

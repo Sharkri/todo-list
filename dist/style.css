@@ -493,7 +493,8 @@ button,
   display: none;
   background-color: white;
   border-radius: 12px;
-  width: clamp(300px, 50%, 600px);
+  width: 85%;
+  max-width: 800px;
 }
 
 .modal > div.open {
