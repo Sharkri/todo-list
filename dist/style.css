@@ -402,30 +402,75 @@ button,
 .project-right {
   background-color: transparent;
   border: none;
+}
+
+.project-options {
   opacity: 0;
 }
+
 .project-left {
   flex-grow: 1;
   padding: 8px 0 8px 8px;
 }
 
 .project-right {
-  padding: 8px 8px 8px 0;
+  padding: 8px 8px 8px 1px;
 }
 
-.project-left:hover ~ .project-right,
-.project-right:hover {
+.project-left:hover ~ .project-right > .project-options,
+.project-right:hover > .project-options {
   opacity: 1;
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
-.delete-svg:hover path {
+.project-options:hover path {
+  fill: #0369a1;
+}
+
+/* .delete-svg:hover path {
   fill: #dc2626;
-  transition: 0.3s;
+  transition: 0.2s;
+} */
+
+.dropdown svg {
+  min-width: 22.5px;
+  height: 22.5px;
 }
 
 .project-left {
   overflow: hidden;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 2px;
+  width: 165px;
+}
+
+.dropdown button {
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  gap: 6px;
+  width: 100%;
+}
+
+.dropdown span {
+  font-family: "Montserrat-semibold";
+}
+
+.dropdown button:hover {
+  background-color: var(--grey);
+}
+
+.dropdown.open {
+  display: block;
 }
 
 .project-title {
@@ -512,6 +557,10 @@ button,
   background-color: white;
   border-radius: 12px;
   width: 85%;
+  max-width: 650px;
+}
+
+.add-todo-modal {
   max-width: 800px;
 }
 

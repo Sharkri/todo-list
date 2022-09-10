@@ -227,6 +227,41 @@ const DOM = (function () {
     projectLeft.classList.add("project-left");
     projectRight.classList.add("project-right");
 
+    const DELETE_SVG = createSVG(
+      "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
+      "currentColor"
+    );
+    const deleteButton = document.createElement("button");
+    let deleteProject = document.createElement("span");
+    deleteProject.textContent = "Delete Project";
+    deleteButton.appendChild(DELETE_SVG);
+    deleteButton.appendChild(deleteProject);
+
+    deleteButton.classList.add("delete-project");
+
+    const EDIT_SVG = createSVG(
+      "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z",
+      "currentColor"
+    );
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit-project");
+    const editText = document.createElement("span");
+    editText.textContent = "Edit Project";
+    editButton.appendChild(EDIT_SVG);
+    editButton.appendChild(editText);
+
+    const dropdown = document.createElement("div");
+    dropdown.classList.add("dropdown");
+    dropdown.appendChild(deleteButton);
+    dropdown.appendChild(editButton);
+
+    const DOTS_SVG = createSVG(
+      "M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z",
+      "currentColor"
+    );
+    DOTS_SVG.classList.add("project-options");
+    DOTS_SVG.onclick = () => toggleDropdown(dropdown);
+
     const LIST_SVG = createSVG(
       "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z",
       "currentColor"
@@ -236,24 +271,38 @@ const DOM = (function () {
     projectTitle.textContent = title;
     projectTitle.classList.add("project-title");
 
-    const DELETE_SVG = createSVG(
-      "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
-      "currentColor"
-    );
-    DELETE_SVG.classList.add("delete-svg");
-
     projectLeft.appendChild(LIST_SVG);
     projectLeft.appendChild(projectTitle);
-    projectRight.appendChild(DELETE_SVG);
+    projectRight.appendChild(DOTS_SVG);
+    projectRight.appendChild(dropdown);
     project.appendChild(projectLeft);
     project.appendChild(projectRight);
     projectsContainer.appendChild(project);
+  }
+
+  function toggleDropdown(dropdownClicked) {
+    // if dropdown already open, close it.
+    if (dropdownClicked.classList.contains("open")) {
+      dropdownClicked.classList.remove("open");
+      return;
+    }
+    let dropdowns = document.getElementsByClassName("dropdown");
+    // close all dropdowns to avoid multiple open at same time
+    for (const dropdown of dropdowns)
+      if (dropdown) dropdown.classList.remove("open");
+
+    // Toggle the dropdown on the element clicked
+    dropdownClicked.classList.toggle("open");
   }
 
   document.onclick = (e) => {
     // if clicked off close search results
     if (!e.target.closest(".search-container")) {
       searchResults.classList.remove("found");
+    }
+    if (!e.target.closest(".project-options")) {
+      let dropdowns = document.getElementsByClassName("dropdown");
+      for (const dropdown of dropdowns) dropdown.classList.remove("open");
     }
   };
 
@@ -330,7 +379,7 @@ const DOM = (function () {
     const selectedIndex = APP.findIndex(projects, "id", todo.projectId);
     addProjectOptions(selectedIndex);
     // true because editing todo instead of adding
-    updateTodoModalEditing(true);
+    updateModalEditing(true, "add-todo-modal", "Edit Todo", "Update Todo");
     addTodoModal.setAttribute("todo-index-number", todoId);
   });
 
@@ -341,7 +390,7 @@ const DOM = (function () {
     const selectedIndex = getActiveProjectIndex();
     addProjectOptions(selectedIndex);
     // false because adding todo instead of editing
-    updateTodoModalEditing(false);
+    updateModalEditing(false, "add-todo-modal", "Add Todo", "Add Todo");
   });
 
   links.forEach((link) => {
@@ -357,7 +406,17 @@ const DOM = (function () {
   });
   projectsContainer.addEventListener("click", (e) => {
     // if delete button clicked, show confirm modal
-    if (e.target.closest(".project-right")) toggleModal(deleteModal);
+    if (e.target.closest(".delete-project")) toggleModal(deleteModal);
+    else if (e.target.closest(".edit-project")) {
+      console.log(e.target.closest(".project"));
+      toggleModal(addProjectModal);
+      updateModalEditing(
+        true,
+        "add-project-modal",
+        "Edit Project",
+        "Update Project"
+      );
+    }
     // highlight project clicked
     setActiveClass(e.target.closest(".project"));
     const index = getActiveProjectIndex();
@@ -374,6 +433,13 @@ const DOM = (function () {
     }
     // Show add project modal
     toggleModal(addProjectModal);
+    // change status to not editing
+    updateModalEditing(
+      false,
+      "add-project-modal",
+      "Add Project",
+      "Add Project"
+    );
     modalForm.reset();
   });
 
@@ -480,13 +546,14 @@ const DOM = (function () {
     document.querySelector(".todos").classList.toggle("sidebar-hidden");
   });
 
-  function updateTodoModalEditing(isEditing) {
-    const header = document.querySelector(".add-todo-modal > .modal-header");
-    header.textContent = isEditing ? "Edit Todo" : "Add Todo";
-    submitTodo.textContent = isEditing ? "Update Todo" : "Add Todo";
+  function updateModalEditing(isEditing, modalName, headerText, btnText) {
+    const modal = document.querySelector(`.${modalName}`);
+    const header = document.querySelector(`.${modalName} > .modal-header`);
+    header.textContent = headerText;
+    submitTodo.textContent = btnText;
     isEditing
-      ? addTodoModal.classList.add("editing")
-      : addTodoModal.classList.remove("editing");
+      ? modal.classList.add("editing")
+      : modal.classList.remove("editing");
   }
 
   function editTodo(todoId, projectId, title, description, dueDate, priority) {
