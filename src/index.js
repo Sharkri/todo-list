@@ -182,9 +182,13 @@ const DOM = (function () {
   }
 
   function switchTab(title, todos = []) {
+    setMainHeader(title);
+    refreshTodos(todos);
+  }
+
+  function setMainHeader(title) {
     const header = document.querySelector(".main-header");
     header.textContent = title;
-    refreshTodos(todos);
   }
 
   function getTodosToday() {
@@ -215,14 +219,10 @@ const DOM = (function () {
     search = search.toLowerCase();
     let occurrences = [];
     let projects = APP.getProjects();
-    let todos = APP.getTodos();
     for (const project of projects) {
       if (project.name.toLowerCase().includes(search)) {
         occurrences.push(project);
       }
-    }
-    for (const todo of todos) {
-      if (todo.title.toLowerCase().includes(search)) occurrences.push(todo);
     }
     return occurrences;
   }
@@ -318,7 +318,6 @@ const DOM = (function () {
   search.addEventListener("input", (e) => {
     if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
-    console.log(occurrences);
     searchResults.textContent = "";
     if (!occurrences.length) {
       addSearchOption("No results found.", false, false, "search-result");
@@ -327,7 +326,7 @@ const DOM = (function () {
     }
 
     for (const occurrence of occurrences) {
-      let text = occurrence.title || occurrence.name;
+      let text = occurrence.name;
       let projectId = occurrence.id;
       addSearchOption(text, "project-index-number", projectId, "search-result");
     }
@@ -467,6 +466,7 @@ const DOM = (function () {
       // need to show on dom / screen as well
       const projectTitles = document.getElementsByClassName("project-title");
       projectTitles[index].textContent = name;
+      setMainHeader(name);
       return;
     }
     // else create a new project
