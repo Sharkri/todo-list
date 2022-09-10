@@ -18,6 +18,13 @@ const APP = (function () {
     };
   }
 
+  function getSetProjectName() {
+    return function (name) {
+      this.name = name;
+      saveToLocalStorage();
+    };
+  }
+
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
   // if todo exists, get number to count up from
@@ -30,6 +37,7 @@ const APP = (function () {
   for (const project of projects) {
     project.addTodo = getAddTodoFunction(project.todos, project.id);
     project.removeTodo = getRemoveTodo();
+    project.setProjectName = getSetProjectName();
   }
 
   if (todos.length) {
@@ -77,9 +85,10 @@ const APP = (function () {
     const id = ++projectIdCount;
     const addTodo = getAddTodoFunction(todos, id);
     const removeTodo = getRemoveTodo();
-    projects.push({ name, todos, addTodo, removeTodo, id });
+    const setProjectName = getSetProjectName();
+    projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
     saveToLocalStorage();
-    return { name, todos, addTodo, removeTodo, id };
+    return { name, todos, addTodo, removeTodo, id, setProjectName };
   }
 
   function getAddTodoFunction(todos, id) {
@@ -408,14 +417,14 @@ const DOM = (function () {
     // if delete button clicked, show confirm modal
     if (e.target.closest(".delete-project")) toggleModal(deleteModal);
     else if (e.target.closest(".edit-project")) {
-      console.log(e.target.closest(".project"));
+      const projectId = e.target
+        .closest(".project")
+        .getAttribute("project-index-number");
+      addProjectModal.setAttribute("project-index-number", projectId);
       toggleModal(addProjectModal);
-      updateModalEditing(
-        true,
-        "add-project-modal",
-        "Edit Project",
-        "Update Project"
-      );
+      updateModalEditing(true, "add-project-modal", "Edit Project", "Update");
+      const name = document.querySelector("#name");
+      name.value = APP.getProjectById(projectId).name;
     }
     // highlight project clicked
     setActiveClass(e.target.closest(".project"));
@@ -434,12 +443,7 @@ const DOM = (function () {
     // Show add project modal
     toggleModal(addProjectModal);
     // change status to not editing
-    updateModalEditing(
-      false,
-      "add-project-modal",
-      "Add Project",
-      "Add Project"
-    );
+    updateModalEditing(false, "add-project-modal", "Add Project", "Add");
     modalForm.reset();
   });
 
@@ -449,6 +453,23 @@ const DOM = (function () {
     const name = document.querySelector("#name").value;
     if (!name) return;
     closeAllModals();
+    // check if editing project name
+    if (addProjectModal.classList.contains("editing")) {
+      let id = addProjectModal.getAttribute("project-index-number");
+      let project = APP.getProjectById(id);
+      // return if new name is same as current
+      if (project.name == name) return;
+      project.setProjectName(name);
+      // find index from project id matching id
+      let index = Array.from(projectsContainer.children).findIndex(
+        (project) => project.getAttribute("project-index-number") == id
+      );
+      // need to show on dom / screen as well
+      const projectTitles = document.getElementsByClassName("project-title");
+      projectTitles[index].textContent = name;
+      return;
+    }
+    // else create a new project
     const project = APP.createProject(name);
     displayProject(name, project.id);
   });
@@ -549,8 +570,11 @@ const DOM = (function () {
   function updateModalEditing(isEditing, modalName, headerText, btnText) {
     const modal = document.querySelector(`.${modalName}`);
     const header = document.querySelector(`.${modalName} > .modal-header`);
+    const button = document.querySelector(
+      `.${modalName} button[type='submit']`
+    );
     header.textContent = headerText;
-    submitTodo.textContent = btnText;
+    button.textContent = btnText;
     isEditing
       ? modal.classList.add("editing")
       : modal.classList.remove("editing");
