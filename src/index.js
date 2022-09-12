@@ -6,6 +6,12 @@ import {
   isTomorrow,
   isYesterday,
 } from "date-fns";
+import {
+  saveTodos,
+  saveProjects,
+  getLocalStorageItem,
+  saveProjectsAndTodos,
+} from "./Storage";
 
 const APP = (function () {
   function getSetTodoProperty(projectId) {
@@ -14,14 +20,14 @@ const APP = (function () {
       const todoIndex = findIndex(project.todos, "id", this.id);
       project["todos"][todoIndex][key] = value;
       this[key] = value;
-      saveToLocalStorage();
+      saveProjectsAndTodos();
     };
   }
 
   function getSetProjectName() {
     return function (name) {
       this.name = name;
-      saveToLocalStorage();
+      saveProjects(projects);
     };
   }
 
@@ -45,15 +51,6 @@ const APP = (function () {
       todo.setTodoProperty = getSetTodoProperty(todo.projectId);
     }
   }
-  function setLocalStorageItem(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  function getLocalStorageItem(key) {
-    const item = JSON.parse(localStorage.getItem(key));
-    // if item exists in the local storage, return it. else empty array.
-    return item ? item : [];
-  }
 
   function createTodo(title, description, dueDate, priority, projectId) {
     const id = ++todoIdCount;
@@ -68,7 +65,7 @@ const APP = (function () {
       projectId,
       setTodoProperty,
     });
-    saveToLocalStorage();
+    saveTodos();
     return {
       title,
       description,
@@ -87,7 +84,7 @@ const APP = (function () {
     const removeTodo = getRemoveTodo();
     const setProjectName = getSetProjectName();
     projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
-    saveToLocalStorage();
+    saveProjectsAndTodos();
     return { name, todos, addTodo, removeTodo, id, setProjectName };
   }
 
@@ -95,7 +92,7 @@ const APP = (function () {
     return function (title, description, dueDate, priority) {
       const todo = createTodo(title, description, dueDate, priority, id);
       todos.push(todo);
-      saveToLocalStorage();
+      saveProjects();
       return todo;
     };
   }
@@ -106,7 +103,7 @@ const APP = (function () {
       const todoIndex = findIndex(todos, "id", todoId);
       todos.splice(todoIndex, 1);
       this.todos.splice(projectTodoIndex, 1);
-      saveToLocalStorage();
+      saveProjectsAndTodos();
     };
   }
 
@@ -118,16 +115,11 @@ const APP = (function () {
     let copiedTodos = [...project.todos];
     // Remove all of project todos
     for (const todo of copiedTodos) project.removeTodo(todo.id);
-    saveToLocalStorage();
+    saveProjectsAndTodos();
   }
 
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] == valueToFind);
-  }
-
-  function saveToLocalStorage() {
-    setLocalStorageItem("projects", projects);
-    setLocalStorageItem("todos", todos);
   }
 
   const getTodos = () => todos;
@@ -224,7 +216,8 @@ const DOM = (function () {
         occurrences.push(project);
       }
     }
-    return occurrences;
+    // Sort occurences from A-Z
+    return occurrences.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   function displayProject(title, id) {
@@ -261,8 +254,8 @@ const DOM = (function () {
 
     const dropdown = document.createElement("div");
     dropdown.classList.add("dropdown");
-    dropdown.appendChild(deleteButton);
     dropdown.appendChild(editButton);
+    dropdown.appendChild(deleteButton);
 
     const DOTS_SVG = createSVG(
       "M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z",
@@ -792,3 +785,4 @@ const DOM = (function () {
     return format(date, `MMM d ${isCurrentYear ? "" : "yyyy"} h:mm a`);
   }
 })();
+export { APP };
