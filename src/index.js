@@ -20,7 +20,7 @@ const APP = (function () {
       const todoIndex = findIndex(project.todos, "id", this.id);
       project["todos"][todoIndex][key] = value;
       this[key] = value;
-      saveProjectsAndTodos();
+      saveProjectsAndTodos(projects, todos);
     };
   }
 
@@ -33,6 +33,7 @@ const APP = (function () {
 
   const todos = getLocalStorageItem("todos");
   const projects = getLocalStorageItem("projects");
+
   // if todo exists, get number to count up from
   let todoIdCount = todos.length ? todos.at(-1).id : -1;
   let projectIdCount = projects.length ? projects.at(-1).id : -1;
@@ -65,7 +66,7 @@ const APP = (function () {
       projectId,
       setTodoProperty,
     });
-    saveTodos();
+    saveTodos(todos);
     return {
       title,
       description,
@@ -84,7 +85,7 @@ const APP = (function () {
     const removeTodo = getRemoveTodo();
     const setProjectName = getSetProjectName();
     projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
-    saveProjectsAndTodos();
+    saveProjectsAndTodos(projects, todos);
     return { name, todos, addTodo, removeTodo, id, setProjectName };
   }
 
@@ -92,7 +93,7 @@ const APP = (function () {
     return function (title, description, dueDate, priority) {
       const todo = createTodo(title, description, dueDate, priority, id);
       todos.push(todo);
-      saveProjects();
+      saveProjects(projects);
       return todo;
     };
   }
@@ -103,7 +104,7 @@ const APP = (function () {
       const todoIndex = findIndex(todos, "id", todoId);
       todos.splice(todoIndex, 1);
       this.todos.splice(projectTodoIndex, 1);
-      saveProjectsAndTodos();
+      saveProjectsAndTodos(projects, todos);
     };
   }
 
@@ -115,7 +116,7 @@ const APP = (function () {
     let copiedTodos = [...project.todos];
     // Remove all of project todos
     for (const todo of copiedTodos) project.removeTodo(todo.id);
-    saveProjectsAndTodos();
+    saveProjectsAndTodos(projects, todos);
   }
 
   function findIndex(array, key, valueToFind) {
@@ -139,6 +140,7 @@ const APP = (function () {
     findIndex,
   };
 })();
+
 const DOM = (function () {
   // declare selector
   const modal = document.querySelector(".modal");
@@ -785,4 +787,3 @@ const DOM = (function () {
     return format(date, `MMM d ${isCurrentYear ? "" : "yyyy"} h:mm a`);
   }
 })();
-export { APP };

@@ -1,5 +1,3 @@
-import { APP } from ".";
-
 function setLocalStorageItem(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
@@ -10,16 +8,17 @@ function getLocalStorageItem(key) {
   return item ? item : [];
 }
 
-const saveTodos = () => setLocalStorageItem("todos", APP.getTodos());
-const saveProjects = () => setLocalStorageItem("projects", APP.getProjects());
-function saveProjectsAndTodos() {
-  saveTodos();
-  saveProjects();
+function saveTodos(todos) {
+  setLocalStorageItem("todos", todos);
 }
-export {
-  setLocalStorageItem,
-  getLocalStorageItem,
-  saveProjectsAndTodos,
-  saveTodos,
-  saveProjects,
-};
+
+function saveProjects(projects) {
+  setLocalStorageItem("projects", projects);
+}
+
+function saveProjectsAndTodos(projects, todos) {
+  saveTodos(todos);
+  saveProjects(projects);
+}
+
+export { getLocalStorageItem, saveTodos, saveProjects, saveProjectsAndTodos };
