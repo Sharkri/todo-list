@@ -6,140 +6,8 @@ import {
   isTomorrow,
   isYesterday,
 } from "date-fns";
-import {
-  saveTodos,
-  saveProjects,
-  getLocalStorageItem,
-  saveProjectsAndTodos,
-} from "./Storage";
 
-const APP = (function () {
-  function getSetTodoProperty(projectId) {
-    return function (key, value) {
-      const project = getProjectById(projectId);
-      const todoIndex = findIndex(project.todos, "id", this.id);
-      project["todos"][todoIndex][key] = value;
-      this[key] = value;
-      saveProjectsAndTodos(projects, todos);
-    };
-  }
-
-  function getSetProjectName() {
-    return function (name) {
-      this.name = name;
-      saveProjects(projects);
-    };
-  }
-
-  const todos = getLocalStorageItem("todos");
-  const projects = getLocalStorageItem("projects");
-
-  // if todo exists, get number to count up from
-  let todoIdCount = todos.length ? todos.at(-1).id : -1;
-  let projectIdCount = projects.length ? projects.at(-1).id : -1;
-  if (!projects.length) {
-    createProject("Inbox");
-  }
-  // On load, re adds function. Because JSON can't store functions
-  for (const project of projects) {
-    project.addTodo = getAddTodoFunction(project.todos, project.id);
-    project.removeTodo = getRemoveTodo();
-    project.setProjectName = getSetProjectName();
-  }
-
-  if (todos.length) {
-    for (const todo of todos) {
-      todo.setTodoProperty = getSetTodoProperty(todo.projectId);
-    }
-  }
-
-  function createTodo(title, description, dueDate, priority, projectId) {
-    const id = ++todoIdCount;
-    console.log(todoIdCount);
-    const setTodoProperty = getSetTodoProperty(projectId);
-    todos.push({
-      title,
-      description,
-      dueDate,
-      priority,
-      id,
-      projectId,
-      setTodoProperty,
-    });
-    saveTodos(todos);
-    return {
-      title,
-      description,
-      dueDate,
-      priority,
-      id,
-      projectId,
-      setTodoProperty,
-    };
-  }
-
-  function createProject(name) {
-    const todos = [];
-    const id = ++projectIdCount;
-    const addTodo = getAddTodoFunction(todos, id);
-    const removeTodo = getRemoveTodo();
-    const setProjectName = getSetProjectName();
-    projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
-    saveProjectsAndTodos(projects, todos);
-    return { name, todos, addTodo, removeTodo, id, setProjectName };
-  }
-
-  function getAddTodoFunction(todos, id) {
-    return function (title, description, dueDate, priority) {
-      const todo = createTodo(title, description, dueDate, priority, id);
-      todos.push(todo);
-      saveProjects(projects);
-      return todo;
-    };
-  }
-
-  function getRemoveTodo() {
-    return function (todoId) {
-      const projectTodoIndex = findIndex(this.todos, "id", todoId);
-      const todoIndex = findIndex(todos, "id", todoId);
-      todos.splice(todoIndex, 1);
-      this.todos.splice(projectTodoIndex, 1);
-      saveProjectsAndTodos(projects, todos);
-    };
-  }
-
-  function removeProject(projectId) {
-    const projectIndex = findIndex(projects, "id", projectId);
-    const project = getProject(projectIndex);
-    projects.splice(projectIndex, 1);
-    // need to copy todos cause splicing removes from original
-    let copiedTodos = [...project.todos];
-    // Remove all of project todos
-    for (const todo of copiedTodos) project.removeTodo(todo.id);
-    saveProjectsAndTodos(projects, todos);
-  }
-
-  function findIndex(array, key, valueToFind) {
-    return array.findIndex((item) => item[key] == valueToFind);
-  }
-
-  const getTodos = () => todos;
-  const getTodoById = (id) => todos.find((todo) => todo.id == id);
-  const getProjects = () => projects;
-  const getProject = (index) => projects[index];
-  const getProjectById = (id) => projects.find((project) => project.id == id);
-  return {
-    createTodo,
-    createProject,
-    removeProject,
-    getTodos,
-    getProjects,
-    getProject,
-    getProjectById,
-    getTodoById,
-    findIndex,
-  };
-})();
+import { APP } from "./app";
 
 const DOM = (function () {
   // declare selector
@@ -170,7 +38,7 @@ const DOM = (function () {
   const searchResults = document.querySelector(".search-results");
   const selectProject = document.querySelector("#project");
 
-  // Shows LocalStorage projects
+  // Shows LocalStorage projects excluding first project (inbox)
   for (let project of APP.getProjects().slice(1)) {
     displayProject(project.name, project.id);
   }
@@ -223,39 +91,30 @@ const DOM = (function () {
   }
 
   function displayProject(title, id) {
-    const project = document.createElement("div");
+    const project = createElement("div", "project");
     project.setAttribute("project-index-number", id);
-    const projectLeft = document.createElement("div");
-    const projectRight = document.createElement("button");
-    project.classList.add("project");
-    projectLeft.classList.add("project-left");
-    projectRight.classList.add("project-right");
+    const projectLeft = createElement("div", "project-left");
+    const projectRight = createElement("button", "project-right");
 
     const DELETE_SVG = createSVG(
       "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
       "currentColor"
     );
-    const deleteButton = document.createElement("button");
-    let deleteProject = document.createElement("span");
-    deleteProject.textContent = "Delete Project";
+    const deleteButton = createElement("button", "delete-project");
+    let deleteProject = createElement("span", undefined, "Delete Project");
     deleteButton.appendChild(DELETE_SVG);
     deleteButton.appendChild(deleteProject);
-
-    deleteButton.classList.add("delete-project");
 
     const EDIT_SVG = createSVG(
       "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z",
       "currentColor"
     );
-    const editButton = document.createElement("button");
-    editButton.classList.add("edit-project");
-    const editText = document.createElement("span");
-    editText.textContent = "Edit Project";
+    const editButton = createElement("button", "edit-project");
+    const editText = createElement("span", undefined, "Edit Project");
     editButton.appendChild(EDIT_SVG);
     editButton.appendChild(editText);
 
-    const dropdown = document.createElement("div");
-    dropdown.classList.add("dropdown");
+    const dropdown = createElement("div", "dropdown");
     dropdown.appendChild(editButton);
     dropdown.appendChild(deleteButton);
 
@@ -270,10 +129,8 @@ const DOM = (function () {
       "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z",
       "currentColor"
     );
-    const projectTitle = document.createElement("span");
+    const projectTitle = createElement("span", "project-title", title);
     projectTitle.title = title;
-    projectTitle.textContent = title;
-    projectTitle.classList.add("project-title");
 
     projectLeft.appendChild(LIST_SVG);
     projectLeft.appendChild(projectTitle);
@@ -682,8 +539,7 @@ const DOM = (function () {
   function getTextWidth(text) {
     // re-use canvas object for better performance
     const canvas =
-      getTextWidth.canvas ||
-      (getTextWidth.canvas = document.createElement("canvas"));
+      getTextWidth.canvas || (getTextWidth.canvas = createElement("canvas"));
     const context = canvas.getContext("2d");
     context.font = "14px Montserrat";
     const metrics = context.measureText(text);
@@ -703,9 +559,7 @@ const DOM = (function () {
 
   function addSearchOption(text, attributeName, attributeValue, className) {
     console.log(text, className);
-    const searchResult = document.createElement("li");
-    searchResult.textContent = text;
-    if (className) searchResult.classList.add(className);
+    const searchResult = createElement("li", className, text);
     if (attributeName) searchResult.setAttribute(attributeName, attributeValue);
     searchResults.appendChild(searchResult);
   }
@@ -720,40 +574,22 @@ const DOM = (function () {
     return SVG;
   }
 
+  function createElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+    if (text !== undefined) element.textContent = text;
+    if (className !== undefined) element.classList.add(className);
+    return element;
+  }
+
   function createTodoElement(title, todoId, projectId, dueDate, description) {
-    const todoContainer = document.createElement("div");
+    const todoContainer = createElement("div", "todo");
     todoContainer.setAttribute("todo-index-number", todoId);
     todoContainer.setAttribute("project-index-number", projectId);
-    const todoInfo = document.createElement("div");
+    // todo info. contains title, description and due date
+    const todoInfo = createElement("div", "todo-info");
 
-    if (description) {
-      const todoDescription = document.createElement("span");
-      todoDescription.textContent = description;
-      todoDescription.title = description;
-      todoDescription.classList.add("todo-description");
-      todoInfo.appendChild(todoDescription);
-    }
-
-    if (dueDate) {
-      dueDate = new Date(dueDate);
-      const todoDueDate = document.createElement("span");
-
-      let formattedDate = getFormattedDate(dueDate);
-      // Show additional info for todo title
-      const title = formatDistanceToNowStrict(dueDate, { addSuffix: true });
-      todoDueDate.textContent = formattedDate;
-      todoDueDate.title = `Due date: ${title}`;
-      todoDueDate.classList.add("todo-date");
-      todoInfo.appendChild(todoDueDate);
-    }
-
-    const todoTitle = document.createElement("span");
-    todoTitle.title = title;
-    todoTitle.textContent = title;
-    todoTitle.classList.add("todo-title");
-
-    const markComplete = document.createElement("button");
-    markComplete.classList.add("mark-todo-complete");
+    // mark todo complete button
+    const markComplete = createElement("button", "mark-todo-complete");
     const check = createSVG(
       "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
       "currentColor"
@@ -761,18 +597,42 @@ const DOM = (function () {
     check.classList.add("checkmark");
     markComplete.appendChild(check);
 
-    const edit = document.createElement("button");
-    const editSVG = createSVG(
+    // todo title / name
+    const todoTitle = createElement("span", "todo-title", title);
+    todoTitle.title = title;
+    todoInfo.appendChild(todoTitle);
+
+    // if description exists show description
+    if (description) {
+      const todoDescription = createElement(
+        "span",
+        "todo-description",
+        description
+      );
+      todoDescription.title = description;
+      todoInfo.appendChild(todoDescription);
+    }
+
+    // if duedate exists show duedate
+    if (dueDate) {
+      dueDate = new Date(dueDate);
+      let formattedDate = getFormattedDate(dueDate);
+      const todoDueDate = createElement("span", "todo-date", formattedDate);
+      // Show time left in title e.g. "in 4 hours"
+      const timeLeft = formatDistanceToNowStrict(dueDate, { addSuffix: true });
+      todoDueDate.title = `Due date: ${timeLeft}`;
+      todoInfo.appendChild(todoDueDate);
+    }
+
+    // edit todo button
+    const edit = createElement("button", "edit-todo");
+    const editIcon = createSVG(
       "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
       "currentColor"
     );
-    edit.appendChild(editSVG);
-    edit.classList.add("edit-todo");
+    edit.appendChild(editIcon);
 
-    todoContainer.classList.add("todo");
-    todoInfo.classList.add("todo-info");
     todoContainer.appendChild(markComplete);
-    todoInfo.prepend(todoTitle);
     todoContainer.appendChild(todoInfo);
     todoContainer.appendChild(edit);
     return todoContainer;
