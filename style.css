@@ -163,7 +163,7 @@ input.valid:focus {
   padding-left: 30px;
   padding-right: 3.5px;
   height: 27px;
-  width: clamp(175px, 50vw, 485px);
+  width: clamp(175px, 50vw, 500px);
 }
 
 .search-results {
@@ -175,7 +175,7 @@ input.valid:focus {
   border-radius: 6px;
   margin-top: 6px;
   width: 100%;
-  width: clamp(175px, 50vw, 485px);
+  width: clamp(175px, 50vw, 500px);
 }
 
 .search-results.found {
@@ -231,7 +231,7 @@ input.valid:focus {
   flex-direction: column;
   align-items: center;
   overflow: auto;
-  padding: 18px;
+  padding-top: 18px;
 }
 
 .main-header {
@@ -245,6 +245,7 @@ input.valid:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 16px;
+  padding-left: 4px;
 }
 
 .add-todo {
@@ -276,16 +277,18 @@ input.valid:focus {
 }
 
 .todos {
-  width: calc(100vw - 286px);
+  width: calc(100vw - 265px);
   max-width: 1200px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 /* if sidebar is hidden then more width can be used */
 .todos.sidebar-hidden {
-  width: calc(100vw - 36px);
+  width: calc(100vw - 4px);
 }
 
 .todo {
