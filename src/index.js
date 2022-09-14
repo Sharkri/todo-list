@@ -7,7 +7,8 @@ import {
   isYesterday,
 } from "date-fns";
 
-import { APP } from "./app";
+import { Projects } from "./projects";
+import { Todos } from "./todos";
 
 const DOM = (function () {
   // declare selector
@@ -39,7 +40,7 @@ const DOM = (function () {
   const selectProject = document.querySelector("#project");
 
   // Shows LocalStorage projects excluding first project (inbox)
-  for (let project of APP.getProjects().slice(1)) {
+  for (let project of Projects.getProjects().slice(1)) {
     displayProject(project.name, project.id);
   }
 
@@ -54,7 +55,7 @@ const DOM = (function () {
   }
 
   function getTodosToday() {
-    const projects = APP.getProjects();
+    const projects = Projects.getProjects();
     let todayTodos = [];
     for (const project of projects) {
       for (const todo of project.todos) {
@@ -75,13 +76,13 @@ const DOM = (function () {
   }
 
   // Initial Load
-  const inbox = APP.getProject(0);
+  const inbox = Projects.getProject(0);
   switchTab("Inbox", inbox.todos);
 
   function query(search) {
     search = search.toLowerCase();
     let occurrences = [];
-    let projects = APP.getProjects();
+    let projects = Projects.getProjects();
     for (const project of projects) {
       if (project.name.toLowerCase().includes(search)) {
         occurrences.push(project);
@@ -97,10 +98,25 @@ const DOM = (function () {
     const projectLeft = createElement("div", "project-left");
     const projectRight = createElement("button", "project-right");
 
+    const LIST_SVG = createSVG(
+      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z",
+      "currentColor"
+    );
+    const projectTitle = createElement("span", "project-title", title);
+    projectTitle.title = title;
+
     const DELETE_SVG = createSVG(
       "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
       "currentColor"
     );
+
+    const DOTS_SVG = createSVG(
+      "M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z",
+      "currentColor"
+    );
+    DOTS_SVG.classList.add("project-options");
+    DOTS_SVG.onclick = () => toggleDropdown(dropdown);
+
     const deleteButton = createElement("button", "delete-project");
     let deleteProject = createElement("span", undefined, "Delete Project");
     deleteButton.appendChild(DELETE_SVG);
@@ -115,23 +131,10 @@ const DOM = (function () {
     editButton.appendChild(EDIT_SVG);
     editButton.appendChild(editText);
 
+    // Append edit and delete options to dropdown
     const dropdown = createElement("div", "dropdown");
     dropdown.appendChild(editButton);
     dropdown.appendChild(deleteButton);
-
-    const DOTS_SVG = createSVG(
-      "M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z",
-      "currentColor"
-    );
-    DOTS_SVG.classList.add("project-options");
-    DOTS_SVG.onclick = () => toggleDropdown(dropdown);
-
-    const LIST_SVG = createSVG(
-      "M5,9.5L7.5,14H2.5L5,9.5M3,4H7V8H3V4M5,20A2,2 0 0,0 7,18A2,2 0 0,0 5,16A2,2 0 0,0 3,18A2,2 0 0,0 5,20M9,5V7H21V5H9M9,19H21V17H9V19M9,13H21V11H9V13Z",
-      "currentColor"
-    );
-    const projectTitle = createElement("span", "project-title", title);
-    projectTitle.title = title;
 
     projectLeft.appendChild(LIST_SVG);
     projectLeft.appendChild(projectTitle);
@@ -172,26 +175,27 @@ const DOM = (function () {
   search.addEventListener("input", (e) => {
     if (!e.target.value) return searchResults.classList.remove("found");
     const occurrences = query(e.target.value);
+    // Reset search results found.
     searchResults.textContent = "";
+    searchResults.classList.add("found");
+
     if (!occurrences.length) {
       addSearchOption("No results found.", false, false, "search-result");
-      searchResults.classList.add("found");
       return;
     }
-
+    // re-add found search results.
     for (const occurrence of occurrences) {
       let text = occurrence.name;
       let projectId = occurrence.id;
       addSearchOption(text, "project-index-number", projectId, "search-result");
     }
-    searchResults.classList.add("found");
   });
 
   searchResults.addEventListener("click", (e) => {
     const name = e.target.textContent;
     const id = e.target.getAttribute("project-index-number");
     if (!id) return;
-    const todos = APP.getProjectById(id).todos;
+    const todos = Projects.getProjectById(id).todos;
     const project = document.querySelector(
       `.project[project-index-number="${id}"]`
     );
@@ -206,24 +210,25 @@ const DOM = (function () {
     if (!todoElement) return;
     const projectId = todoElement.getAttribute("project-index-number");
     const todoId = todoElement.getAttribute("todo-index-number");
-
+    // Mark Complete
     if (e.target.closest(".mark-todo-complete")) {
-      const project = APP.getProjectById(projectId);
+      const project = Projects.getProjectById(projectId);
       project.removeTodo(todoId);
 
       const activeClass = getActive().classList;
       if (activeClass.contains("today")) refreshTodos(getTodosToday());
-      else if (activeClass.contains("view-all")) refreshTodos(APP.getTodos());
+      else if (activeClass.contains("view-all")) refreshTodos(Todos.getTodos());
       else refreshTodos(project.todos);
       return;
     }
     // Edit Todo
     if (!e.target.closest(".edit-todo")) return;
-    const projects = APP.getProjects();
-    const todo = APP.getTodoById(todoId);
-    const selectedIndex = APP.findIndex(projects, "id", todo.projectId);
+    const projects = Projects.getProjects();
+    const todo = Todos.getTodoById(todoId);
+    const selectedIndex = Projects.findIndex(projects, "id", todo.projectId);
     openTodoModal(selectedIndex);
     updateModalEditing(true, "add-todo-modal", "Edit Todo", "Update Todo");
+    addTodoModal.setAttribute("todo-index-number", todoId);
 
     const title = document.querySelector("#todo-title");
     const dueDate = document.querySelector("#due-date");
@@ -238,8 +243,6 @@ const DOM = (function () {
     // Set selected to current todo priority selected
     if (todo.priority == "High") setSelectedOption(priority, 2);
     else if (todo.priority == "Medium") setSelectedOption(priority, 1);
-
-    addTodoModal.setAttribute("todo-index-number", todoId);
   });
 
   addTodo.addEventListener("click", (e) => {
@@ -256,13 +259,14 @@ const DOM = (function () {
 
       if (title == "Inbox") switchTab(title, inbox.todos);
       else if (title == "Today") switchTab(title, getTodosToday());
-      else switchTab(title, APP.getTodos());
+      else switchTab(title, Todos.getTodos());
     });
   });
   projectsContainer.addEventListener("click", (e) => {
     // if delete button clicked, show confirm modal
     if (e.target.closest(".delete-project")) toggleModal(deleteModal);
     else if (e.target.closest(".edit-project")) {
+      // Find the closest project clicked then get its attribute projectId
       const projectId = e.target
         .closest(".project")
         .getAttribute("project-index-number");
@@ -270,12 +274,12 @@ const DOM = (function () {
       toggleModal(addProjectModal);
       updateModalEditing(true, "add-project-modal", "Edit Project", "Update");
       const name = document.querySelector("#name");
-      name.value = APP.getProjectById(projectId).name;
+      name.value = Projects.getProjectById(projectId).name;
     }
     // highlight project clicked
     setActiveClass(e.target.closest(".project"));
     const index = getActiveProjectIndex();
-    const project = APP.getProject(index);
+    const project = Projects.getProject(index);
     switchTab(project.name, project.todos);
   });
 
@@ -294,15 +298,16 @@ const DOM = (function () {
   });
 
   cancel.forEach((btn) => btn.addEventListener("click", closeAllModals));
-  // Adds project to localstorage and displays it.
+
   submit.addEventListener("click", () => {
     const name = document.querySelector("#name").value;
     if (!name) return;
+
     closeAllModals();
     // check if editing project name
     if (addProjectModal.classList.contains("editing")) {
       let id = addProjectModal.getAttribute("project-index-number");
-      let project = APP.getProjectById(id);
+      let project = Projects.getProjectById(id);
       // return if new name is same as current
       if (project.name == name) return;
       project.setProjectName(name);
@@ -310,14 +315,15 @@ const DOM = (function () {
       let index = Array.from(projectsContainer.children).findIndex(
         (project) => project.getAttribute("project-index-number") == id
       );
-      // need to show on dom / screen as well
+      // show project name on screen
       const projectTitles = document.getElementsByClassName("project-title");
       projectTitles[index].textContent = name;
+      // show on header too
       setMainHeader(name);
       return;
     }
-    // else create a new project
-    const project = APP.createProject(name);
+    // if not editing, else create a new project
+    const project = Projects.createProject(name);
     displayProject(name, project.id);
   });
 
@@ -326,15 +332,14 @@ const DOM = (function () {
   titleInput.addEventListener("keyup", (e) => {
     const isValid = e.target.checkValidity();
     const classList = e.target.classList;
+    // if input is in error state and changed to valid, add valid class
     if (isValid && classList.contains("error")) {
       classList.add("valid");
       classList.remove("error");
-
       titleErrorText.classList.remove("visible");
     } else if (!isValid && classList.contains("valid")) {
       classList.remove("valid");
       classList.add("error");
-
       titleErrorText.classList.add("visible");
     }
   });
@@ -351,27 +356,27 @@ const DOM = (function () {
     const description = document.querySelector("#description").value || "";
     const priority = document.querySelector("#priority").value;
     const selectedIndex = document.querySelector("#project").selectedIndex;
-    const project = APP.getProject(selectedIndex);
+    const project = Projects.getProject(selectedIndex);
     let isEditingTodo = addTodoModal.classList.contains("editing");
     const active = getActive();
     const currentClass = active.classList;
+
     if (isEditingTodo) {
-      console.log(project, selectedIndex);
       let todoId = addTodoModal.getAttribute("todo-index-number");
       editTodo(todoId, project.id, title, description, dueDate, priority);
       // if tab is today refresh with todays todo
       if (currentClass.contains("today")) refreshTodos(getTodosToday());
-      // if tab is view all refresh with all todos
-      else if (currentClass.contains("view-all")) refreshTodos(APP.getTodos());
+      // else if tab is view all, get ALL todos
+      else if (currentClass.contains("view-all"))
+        refreshTodos(Todos.getTodos());
       else {
-        // get current active project todo
-        let project = APP.getProjectById(
-          active.getAttribute("project-index-number")
-        );
+        let projectId = active.getAttribute("project-index-number");
+        let project = Projects.getProjectById(projectId);
         refreshTodos(project.todos);
       }
       return closeAllModals();
     }
+    // if not editing todo then create todo instead
     const todo = project.addTodo(
       title,
       description,
@@ -394,11 +399,11 @@ const DOM = (function () {
 
   deleteButton.addEventListener("click", () => {
     let projectIndex = getActiveProjectIndex();
-    let projectId = APP.getProject(projectIndex).id;
+    let projectId = Projects.getProject(projectIndex).id;
     let selectedProject = projects[projectIndex];
     console.log(selectedProject, projectIndex, projectId);
     // Remove project from app and dom
-    APP.removeProject(projectId);
+    Projects.removeProject(projectId);
     console.log(projectIndex, selectedProject);
     projectsContainer.removeChild(selectedProject);
     closeAllModals();
@@ -428,8 +433,8 @@ const DOM = (function () {
   }
 
   function editTodo(todoId, projectId, title, description, dueDate, priority) {
-    let todo = APP.getTodoById(todoId);
-    let project = APP.getProjectById(projectId);
+    let todo = Todos.getTodoById(todoId);
+    let project = Projects.getProjectById(projectId);
     // check if todo value is not the same
     if (todo.title !== title) todo.setTodoProperty("title", title);
     if (todo.description !== description)
@@ -442,7 +447,7 @@ const DOM = (function () {
     todo.setTodoProperty("projectId", projectId);
 
     // Remove todo from original project
-    for (const project of APP.getProjects()) {
+    for (const project of Projects.getProjects()) {
       for (const todo of project.todos) {
         if (todo.id == todoId) project.removeTodo(todo.id);
       }
@@ -452,7 +457,7 @@ const DOM = (function () {
 
   function addProjectOptions(selected) {
     selectProject.textContent = "";
-    for (const project of APP.getProjects()) {
+    for (const project of Projects.getProjects()) {
       let name = getTruncatedString(project.name);
       let option = document.createElement("option");
       option.textContent = name;
@@ -553,7 +558,6 @@ const DOM = (function () {
   }
 
   function addSearchOption(text, attributeName, attributeValue, className) {
-    console.log(text, className);
     const searchResult = createElement("li", className, text);
     if (attributeName) searchResult.setAttribute(attributeName, attributeValue);
     searchResults.appendChild(searchResult);
