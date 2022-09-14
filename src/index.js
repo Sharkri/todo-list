@@ -68,6 +68,7 @@ const DOM = (function () {
   function refreshTodos(todos = []) {
     Array.from(todoElements).forEach((todo) => todo.remove());
     for (const todo of todos) displayTodo(todo);
+    // If no todos in high/medium/low priority todos then remove visible
     if (high.children.length < 2) high.classList.remove("visible");
     if (medium.children.length < 2) medium.classList.remove("visible");
     if (low.children.length < 2) low.classList.remove("visible");
@@ -136,6 +137,7 @@ const DOM = (function () {
     projectLeft.appendChild(projectTitle);
     projectRight.appendChild(DOTS_SVG);
     projectRight.appendChild(dropdown);
+
     project.appendChild(projectLeft);
     project.appendChild(projectRight);
     projectsContainer.appendChild(project);
@@ -217,39 +219,32 @@ const DOM = (function () {
     }
     // Edit Todo
     if (!e.target.closest(".edit-todo")) return;
+    const projects = APP.getProjects();
+    const todo = APP.getTodoById(todoId);
+    const selectedIndex = APP.findIndex(projects, "id", todo.projectId);
+    openTodoModal(selectedIndex);
+    updateModalEditing(true, "add-todo-modal", "Edit Todo", "Update Todo");
 
-    todoForm.reset();
-    resetTitleInput();
-    toggleModal(addTodoModal);
     const title = document.querySelector("#todo-title");
     const dueDate = document.querySelector("#due-date");
     const description = document.querySelector("#description");
     const priority = document.querySelector("#priority");
 
-    let todo = APP.getTodoById(todoId);
-
+    // Set all input values to corresponding todo value
     title.value = todo.title;
     dueDate.value = todo.dueDate;
     description.value = todo.description;
 
+    // Set selected to current todo priority selected
     if (todo.priority == "High") setSelectedOption(priority, 2);
     else if (todo.priority == "Medium") setSelectedOption(priority, 1);
 
-    const projects = APP.getProjects();
-    const selectedIndex = APP.findIndex(projects, "id", todo.projectId);
-    addProjectOptions(selectedIndex);
-    // true because editing todo instead of adding
-    updateModalEditing(true, "add-todo-modal", "Edit Todo", "Update Todo");
     addTodoModal.setAttribute("todo-index-number", todoId);
   });
 
   addTodo.addEventListener("click", (e) => {
-    todoForm.reset();
-    resetTitleInput();
-    toggleModal(addTodoModal);
     const selectedIndex = getActiveProjectIndex();
-    addProjectOptions(selectedIndex);
-    // false because adding todo instead of editing
+    openTodoModal(selectedIndex);
     updateModalEditing(false, "add-todo-modal", "Add Todo", "Add Todo");
   });
 
@@ -452,14 +447,18 @@ const DOM = (function () {
         if (todo.id == todoId) project.removeTodo(todo.id);
       }
     }
-    console.log(todo);
     project.addTodo(title, description, dueDate, priority);
   }
 
   function addProjectOptions(selected) {
     selectProject.textContent = "";
     for (const project of APP.getProjects()) {
-      addProjectOption(getTruncatedString(project.name));
+      let name = getTruncatedString(project.name);
+      let option = document.createElement("option");
+      option.textContent = name;
+      option.value = name;
+
+      selectProject.appendChild(option);
     }
     setSelectedOption(selectProject, selected);
   }
@@ -467,13 +466,6 @@ const DOM = (function () {
   function setSelectedOption(element, index) {
     if (index == -1) return;
     element.children[index].selected = true;
-  }
-
-  function addProjectOption(name) {
-    let option = document.createElement("option");
-    option.textContent = name;
-    option.value = name;
-    selectProject.appendChild(option);
   }
 
   function displayTodo(todo) {
@@ -485,13 +477,14 @@ const DOM = (function () {
       todo.description
     );
 
+    // Find which priority to append to and show
     let priority;
     if (todo.priority == "High") priority = high;
     else if (todo.priority == "Medium") priority = medium;
     else priority = low;
 
-    priority.appendChild(todoElement);
     priority.classList.add("visible");
+    priority.appendChild(todoElement);
   }
 
   function getTruncatedString(string) {
@@ -505,21 +498,24 @@ const DOM = (function () {
     return string;
   }
 
-  function truncateStr(string, length) {
-    return string.substring(0, length) + "...";
-  }
+  const truncateStr = (string, length) => string.substring(0, length) + "...";
 
   function setActiveClass(element) {
     const active = document.querySelector(".active");
     active.classList.remove("active");
-
     element.classList.add("active");
   }
 
-  function resetTitleInput() {
+  function openTodoModal(selected) {
+    todoForm.reset();
+    toggleModal(addTodoModal);
+    // Resets to title input default state
     titleInput.classList.remove("valid");
     titleInput.classList.remove("error");
     titleErrorText.classList.remove("visible");
+
+    addProjectOptions(selected);
+    setSelectedOption(selectProject, selected);
   }
 
   function toggleModal(modalElement) {
@@ -535,7 +531,6 @@ const DOM = (function () {
       modal.children[i].classList.remove("open");
     }
   }
-
   function getTextWidth(text) {
     // re-use canvas object for better performance
     const canvas =
@@ -618,7 +613,7 @@ const DOM = (function () {
       dueDate = new Date(dueDate);
       let formattedDate = getFormattedDate(dueDate);
       const todoDueDate = createElement("span", "todo-date", formattedDate);
-      // Show time left in title e.g. "in 4 hours"
+      // Show time left in title e.g. "Due date: in 4 hours"
       const timeLeft = formatDistanceToNowStrict(dueDate, { addSuffix: true });
       todoDueDate.title = `Due date: ${timeLeft}`;
       todoInfo.appendChild(todoDueDate);
