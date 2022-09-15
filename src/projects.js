@@ -2,32 +2,48 @@ import {
   saveProjects,
   getLocalStorageItem,
   saveProjectsAndTodos,
-} from "./Storage";
+} from './Storage';
 
-import { Todos } from "./todos";
+import Todos from './todos';
 
-const Projects = (function () {
+const Projects = (function Projects() {
+  const projects = getLocalStorageItem('projects');
+  function findIndex(array, key, valueToFind) {
+    return array.findIndex((item) => item[key] === valueToFind);
+  }
+  const getProjects = () => projects;
+  const getProject = (index) => projects[index];
+  const getProjectById = (id) => projects.find((project) => project.id === id);
+  let projectIdCount = projects.length ? projects.at(-1).id : -1;
+
   function getSetProjectName() {
-    return function (name) {
+    return function setProjectName(name) {
       this.name = name;
       saveProjects(projects);
     };
   }
-
-  const projects = getLocalStorageItem("projects");
-  let projectIdCount = projects.length ? projects.at(-1).id : -1;
-
-  if (!projects.length) createProject("Inbox");
-  // On load, re adds function. Because JSON can't store functions
-  for (const project of projects) {
-    project.addTodo = getAddTodoFunction(project.todos, project.id);
-    project.removeTodo = getRemoveTodo();
-    project.setProjectName = getSetProjectName();
+  function getAddTodoFunction(todos, id) {
+    return function addTodo(title, description, dueDate, priority) {
+      const todo = Todos.createTodo(title, description, dueDate, priority, id);
+      todos.push(todo);
+      saveProjects(projects);
+      return todo;
+    };
+  }
+  function getRemoveTodo() {
+    return function removeTodo(todoId) {
+      const projectTodoIndex = findIndex(this.todos, 'id', todoId);
+      const todoIndex = findIndex(Todos.getTodos(), 'id', todoId);
+      Todos.deleteTodo(todoIndex);
+      this.todos.splice(projectTodoIndex, 1);
+      saveProjectsAndTodos(projects, Todos.getTodos());
+    };
   }
 
   function createProject(name) {
     const todos = [];
-    const id = ++projectIdCount;
+    projectIdCount += 1;
+    const id = projectIdCount.toString();
     const addTodo = getAddTodoFunction(todos, id);
     const removeTodo = getRemoveTodo();
     const setProjectName = getSetProjectName();
@@ -36,43 +52,25 @@ const Projects = (function () {
     return { name, todos, addTodo, removeTodo, id, setProjectName };
   }
 
-  function getAddTodoFunction(todos, id) {
-    return function (title, description, dueDate, priority) {
-      const todo = Todos.createTodo(title, description, dueDate, priority, id);
-      todos.push(todo);
-      saveProjects(projects);
-      return todo;
-    };
-  }
-
-  function getRemoveTodo() {
-    return function (todoId) {
-      const projectTodoIndex = findIndex(this.todos, "id", todoId);
-      const todoIndex = findIndex(Todos.getTodos(), "id", todoId);
-      Todos.deleteTodo(todoIndex);
-      this.todos.splice(projectTodoIndex, 1);
-      saveProjectsAndTodos(projects, Todos.getTodos());
-    };
-  }
+  if (!projects.length) createProject('Inbox');
+  // On load, re adds function. Because JSON can't store functions
+  projects.forEach((project) => {
+    project.addTodo = getAddTodoFunction(project.todos, project.id);
+    project.removeTodo = getRemoveTodo();
+    project.setProjectName = getSetProjectName();
+  });
 
   function removeProject(projectId) {
-    const projectIndex = findIndex(projects, "id", projectId);
+    const projectIndex = findIndex(projects, 'id', projectId);
     const project = getProject(projectIndex);
     projects.splice(projectIndex, 1);
     // need to copy todos cause splicing removes from original
-    let copiedTodos = [...project.todos];
+    const copiedTodos = [...project.todos];
     // Remove all of project todos
-    for (const todo of copiedTodos) project.removeTodo(todo.id);
+    copiedTodos.forEach((todo) => project.removeTodo(todo.id));
     saveProjectsAndTodos(projects, Todos.getTodos());
   }
 
-  function findIndex(array, key, valueToFind) {
-    return array.findIndex((item) => item[key] == valueToFind);
-  }
-
-  const getProjects = () => projects;
-  const getProject = (index) => projects[index];
-  const getProjectById = (id) => projects.find((project) => project.id == id);
   return {
     createProject,
     removeProject,
@@ -82,4 +80,4 @@ const Projects = (function () {
     findIndex,
   };
 })();
-export { Projects };
+export default Projects;

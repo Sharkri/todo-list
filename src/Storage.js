@@ -5,15 +5,15 @@ function setLocalStorageItem(key, value) {
 function getLocalStorageItem(key) {
   const item = JSON.parse(localStorage.getItem(key));
   // if item exists in the local storage, return it. else empty array.
-  return item ? item : [];
+  return item || [];
 }
 
 function saveTodos(todos) {
-  setLocalStorageItem("todos", todos);
+  setLocalStorageItem('todos', todos);
 }
 
 function saveProjects(projects) {
-  setLocalStorageItem("projects", projects);
+  setLocalStorageItem('projects', projects);
 }
 
 function saveProjectsAndTodos(projects, todos) {
