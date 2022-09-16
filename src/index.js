@@ -406,6 +406,7 @@ searchInput.addEventListener('input', (e) => {
 });
 
 searchResults.addEventListener('click', (e) => {
+  searchResults.classList.remove('found');
   const name = e.target.textContent;
   const id = e.target.getAttribute('project-index-number');
   if (!id) return;
@@ -415,7 +416,6 @@ searchResults.addEventListener('click', (e) => {
   );
   setActiveClass(project);
   switchTab(name, todos);
-  searchResults.classList.remove('found');
   searchInput.value = '';
 });
 
