@@ -1,15 +1,15 @@
 @font-face {
-  font-family: "Montserrat";
+  font-family: 'Montserrat';
   src: url(fonts/static/Montserrat-Medium.ttf);
 }
 
 @font-face {
-  font-family: "Montserrat-bold";
+  font-family: 'Montserrat-bold';
   src: url(fonts/static/Montserrat-Bold.ttf);
 }
 
 @font-face {
-  font-family: "Montserrat-semibold";
+  font-family: 'Montserrat-semibold';
   src: url(fonts/static/Montserrat-SemiBold.ttf);
 }
 
@@ -17,13 +17,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 body {
   --grey: #e5e7eb;
   --light-grey: #f9fafb;
   --main-theme-color: #0369a1;
+  --main-theme-lighter: #0f7cb6cb;
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -35,13 +36,13 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Montserrat-bold";
+  font-family: 'Montserrat-bold';
 }
 
 h4,
 h5,
 h6 {
-  font-family: "Montserrat-semibold";
+  font-family: 'Montserrat-semibold';
 }
 
 /* change to 1 column if sidebar is hidden */
@@ -99,7 +100,7 @@ input.error {
 .error-text {
   color: #ef4444;
   font-size: small;
-  font-family: "Montserrat-semibold";
+  font-family: 'Montserrat-semibold';
   visibility: hidden;
 }
 
@@ -151,19 +152,58 @@ input.valid:focus {
 }
 
 .search-container {
+  position: relative;
   padding-left: 8px;
 }
 
 .search-bar {
   position: relative;
+  transition: 0.2s;
+}
+
+.search-icon {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  min-width: 20px;
+  height: 19px;
 }
 
 #search-input {
   padding: 0px;
   padding-left: 30px;
   padding-right: 3.5px;
-  height: 27px;
-  width: clamp(175px, 50vw, 500px);
+  height: 30px;
+  width: clamp(175px, 50vw, 650px);
+  background: hsla(0, 0%, 100%, 0.2);
+  border: transparent;
+  color: white;
+  caret-color: black;
+  background-color: var(--main-theme-lighter);
+  transition: 0.2s;
+}
+
+#search-input::placeholder {
+  color: rgba(223, 213, 213, 0.8);
+}
+/* Change colors on focus and hover */
+#search-input:focus,
+.search-bar:hover #search-input {
+  background-color: white;
+  color: black;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+}
+
+#search-input:focus::placeholder,
+.search-bar:hover #search-input::placeholder {
+  color: #9c9c9c;
+}
+
+#search-input:focus + .search-icon path,
+.search-bar:hover .search-icon path {
+  fill: #9c9c9c;
 }
 
 .search-results {
@@ -174,8 +214,7 @@ input.valid:focus {
   border: 1px solid rgba(163, 157, 157, 0.788);
   border-radius: 6px;
   margin-top: 6px;
-  width: 100%;
-  width: clamp(175px, 50vw, 500px);
+  width: clamp(175px, 50vw, 650px);
 }
 
 .search-results.found {
@@ -203,7 +242,7 @@ input.valid:focus {
   background-color: var(--grey);
 }
 
-[type="search"]::-webkit-search-cancel-button {
+[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
   height: 11px;
@@ -211,17 +250,6 @@ input.valid:focus {
   background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjEyMy4wNXB4IiBoZWlnaHQ9IjEyMy4wNXB4IiB2aWV3Qm94PSIwIDAgMTIzLjA1IDEyMy4wNSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTIzLjA1IDEyMy4wNTsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPHBhdGggZD0iTTEyMS4zMjUsMTAuOTI1bC04LjUtOC4zOTljLTIuMy0yLjMtNi4xLTIuMy04LjUsMGwtNDIuNCw0Mi4zOTlMMTguNzI2LDEuNzI2Yy0yLjMwMS0yLjMwMS02LjEwMS0yLjMwMS04LjUsMGwtOC41LDguNQ0KCQljLTIuMzAxLDIuMy0yLjMwMSw2LjEsMCw4LjVsNDMuMSw0My4xbC00Mi4zLDQyLjVjLTIuMywyLjMtMi4zLDYuMSwwLDguNWw4LjUsOC41YzIuMywyLjMsNi4xLDIuMyw4LjUsMGw0Mi4zOTktNDIuNGw0Mi40LDQyLjQNCgkJYzIuMywyLjMsNi4xLDIuMyw4LjUsMGw4LjUtOC41YzIuMy0yLjMsMi4zLTYuMSwwLTguNWwtNDIuNS00Mi40bDQyLjQtNDIuMzk5QzEyMy42MjUsMTcuMTI1LDEyMy42MjUsMTMuMzI1LDEyMS4zMjUsMTAuOTI1eiIvPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=);
   background-size: 11px;
   margin-left: 5.5px;
-}
-
-.search-bar::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 0;
-  bottom: 0;
-  width: 20px;
-  background: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' style='width: 24px; height: 24px' viewBox='0 0 24 24' class='search-icon' %3E%3Cpath fill='rgb(142, 142, 142)' d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z' /%3E%3C/svg%3E")
-    center / contain no-repeat;
 }
 
 /* MAIN */
@@ -232,6 +260,7 @@ input.valid:focus {
   align-items: center;
   overflow: auto;
   padding-top: 18px;
+  background-color: var(--grey);
 }
 
 .main-header {
@@ -288,7 +317,7 @@ input.valid:focus {
 
 /* if sidebar is hidden then more width can be used */
 .todos.sidebar-hidden {
-  width: calc(100vw - 4px);
+  width: calc(100vw - 6px);
 }
 
 .todo {
@@ -432,11 +461,6 @@ button,
   fill: #0369a1;
 }
 
-/* .delete-svg:hover path {
-  fill: #dc2626;
-  transition: 0.2s;
-} */
-
 .dropdown svg {
   min-width: 22.5px;
   height: 22.5px;
@@ -467,7 +491,7 @@ button,
 }
 
 .dropdown span {
-  font-family: "Montserrat-semibold";
+  font-family: 'Montserrat-semibold';
 }
 
 .dropdown button:hover {
@@ -517,6 +541,11 @@ button,
 .open-project svg {
   transition: 250ms;
 }
+
+.open-project {
+  font-family: 'Montserrat-semibold';
+}
+
 .open-project svg.rotated {
   transform: rotate(-90deg);
 }
@@ -541,7 +570,7 @@ button,
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  content: " ";
+  content: ' ';
   width: 100%;
   height: 100%;
   position: fixed;
