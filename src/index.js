@@ -28,7 +28,7 @@ const todoElements = document.getElementsByClassName('todo');
 const projectTab = document.querySelector('.projectTab');
 const links = document.querySelectorAll('.links div');
 const menu = document.querySelector('.hamburger');
-const sidebar = document.querySelector('.sidebar');
+const nav = document.querySelector('nav');
 const mainContent = document.querySelector('.main-content');
 const low = document.querySelector('.low');
 const medium = document.querySelector('.medium');
@@ -626,6 +626,6 @@ confirmDeleteButton.addEventListener('click', () => {
 // Toggle sidebar showing
 menu.addEventListener('click', () => {
   document.querySelector('body').classList.toggle('sidebar-hidden');
-  sidebar.classList.toggle('hidden');
+  nav.classList.toggle('hidden');
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
