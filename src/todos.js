@@ -18,7 +18,7 @@ const Todos = (function Todos() {
     };
   }
 
-  let todoIdCount = todos.length ? todos.at(-1).id : -1;
+  let todoIdCount = todos.length ? +todos[todos.length - 1].id : -1;
   // Re-add functions. LocalStorage doesn't save functions
   if (todos.length) {
     todos.forEach((todo) => {

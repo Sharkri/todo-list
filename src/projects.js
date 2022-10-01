@@ -14,7 +14,7 @@ const Projects = (function Projects() {
   const getProjects = () => projects;
   const getProject = (index) => projects[index];
   const getProjectById = (id) => projects.find((project) => project.id === id);
-  let projectIdCount = projects.length ? projects.at(-1).id : -1;
+  let projectIdCount = projects.length ? +projects[projects.length - 1].id : -1;
 
   function getSetProjectName() {
     return function setProjectName(name) {
