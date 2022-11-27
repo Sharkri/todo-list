@@ -6,9 +6,9 @@ import {
   isTomorrow,
   isYesterday,
 } from 'date-fns';
-
 import Projects from './projects';
 import Todos from './todos';
+import { signOutUser, signIn } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
@@ -629,3 +629,7 @@ menu.addEventListener('click', () => {
   nav.classList.toggle('hidden');
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
+
+const signInButton = document.querySelector('.sign-in');
+
+signInButton.addEventListener('click', signIn);
