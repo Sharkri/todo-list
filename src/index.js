@@ -8,7 +8,7 @@ import {
 } from 'date-fns';
 import Projects from './projects';
 import Todos from './todos';
-import { signOutUser, signIn } from './backend';
+import { signOutUser, signIn, listenForAuthChange } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
@@ -633,3 +633,17 @@ menu.addEventListener('click', () => {
 const signInButton = document.querySelector('.sign-in');
 
 signInButton.addEventListener('click', signIn);
+
+function onAuthChange(user) {
+  console.log(user);
+  // if user is signed in
+  if (user) {
+    const username = document.querySelector('.user-name');
+    const userPic = document.querySelector('.user-pic');
+    username.textContent = user.displayName;
+    userPic.src = user.photoURL;
+  }
+}
+
+// Listen for auth state change
+listenForAuthChange(onAuthChange);

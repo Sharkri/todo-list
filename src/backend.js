@@ -8,18 +8,10 @@ import {
 } from 'firebase/auth';
 import getFirebaseConfig from './firebase-config';
 
-function authStateObserver(user) {
-  if (user) {
-    // Get user's profile picture and name
-    const profilePictureURL = getAuth().currentUser.photoURL;
-    const username = getAuth().currentUser.displayName;
-  }
-}
-
 // Initialize firebase auth
-function initFirebaseAuth() {
+function listenForAuthChange(fn) {
   // Listen to auth state changes.
-  onAuthStateChanged(getAuth(), authStateObserver);
+  onAuthStateChanged(getAuth(), fn);
 }
 
 async function signIn() {
@@ -31,6 +23,5 @@ async function signIn() {
 const signOutUser = () => signOut(getAuth());
 
 initializeApp(getFirebaseConfig());
-initFirebaseAuth();
 
-export { signIn, signOutUser };
+export { signIn, signOutUser, listenForAuthChange };
