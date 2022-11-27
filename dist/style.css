@@ -276,9 +276,7 @@ header {
 .user {
   display: flex;
   align-items: center;
-  justify-content: space-around;
   flex-wrap: wrap;
-  flex-grow: 1;
   max-width: 300px;
   gap: 16px;
 }
@@ -300,7 +298,8 @@ header {
   text-align: center;
 }
 
-.sign-out {
+.sign-out,
+.sign-in {
   border: none;
   background-color: transparent;
   color: white;
@@ -309,6 +308,18 @@ header {
   font-family: 'Montserrat-Bold', sans-serif;
   font-size: 14px;
   text-align: center;
+}
+
+.sign-in {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.account-circle-svg {
+  width: 26px;
+  height: 26px;
 }
 
 /* MAIN */
