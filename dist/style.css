@@ -92,7 +92,7 @@ select:focus {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* Input Validation */
