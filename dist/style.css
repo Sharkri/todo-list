@@ -91,6 +91,10 @@ select:focus {
   box-shadow: 0px 2.5px 5px 2.5px rgba(58, 96, 199, 0.2);
 }
 
+.hidden {
+  display: none;
+}
+
 /* Input Validation */
 
 input.error {
@@ -418,10 +422,6 @@ nav {
   flex-direction: column;
   gap: 28px;
   overflow: auto;
-}
-
-nav.hidden {
-  display: none;
 }
 
 button,

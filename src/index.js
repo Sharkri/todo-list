@@ -631,17 +631,26 @@ menu.addEventListener('click', () => {
 });
 
 const signInButton = document.querySelector('.sign-in');
+const signOutButton = document.querySelector('.sign-out');
+// user's profile pic, username and sign out button
+const userInfo = document.querySelector('.user');
 
 signInButton.addEventListener('click', signIn);
+signOutButton.addEventListener('click', signOutUser);
 
 function onAuthChange(user) {
-  console.log(user);
   // if user is signed in
   if (user) {
-    const username = document.querySelector('.user-name');
-    const userPic = document.querySelector('.user-pic');
+    const username = userInfo.querySelector('.user-name');
+    const userPic = userInfo.querySelector('.user-pic');
     username.textContent = user.displayName;
     userPic.src = user.photoURL;
+
+    userInfo.classList.remove('hidden');
+    signInButton.classList.add('hidden');
+  } else {
+    userInfo.classList.add('hidden');
+    signInButton.classList.remove('hidden');
   }
 }
 
