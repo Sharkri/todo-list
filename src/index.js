@@ -643,8 +643,9 @@ function onAuthChange(user) {
   if (user) {
     const username = userInfo.querySelector('.user-name');
     const userPic = userInfo.querySelector('.user-pic');
+
     username.textContent = user.displayName;
-    userPic.src = user.photoURL;
+    userPic.src = user.photoURL || '/images/profile_placeholder.png';
 
     userInfo.classList.remove('hidden');
     signInButton.classList.add('hidden');
