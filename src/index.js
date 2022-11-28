@@ -8,7 +8,13 @@ import {
 } from 'date-fns';
 import Projects from './projects';
 import Todos from './todos';
-import { signOutUser, signIn, listenForAuthChange } from './backend';
+import {
+  signOutUser,
+  signIn,
+  listenForAuthChange,
+  addToDatabase,
+  listenForCollectionChange,
+} from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');

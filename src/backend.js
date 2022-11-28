@@ -6,7 +6,31 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  onSnapshot,
+} from 'firebase/firestore';
 import getFirebaseConfig from './firebase-config';
+
+// Saves a new message to Cloud Firestore.
+async function addToDatabase(key, value) {
+  // Add a new message entry to the Firebase database.
+  try {
+    await addDoc(collection(getFirestore(), key), value);
+  } catch (error) {
+    console.error('Error writing to Firebase Database', error);
+  }
+}
+// Loads chat messages history and listens for upcoming ones.
+function listenForCollectionChange(collectionName, onChange) {
+  const recentQuery = query(collection(getFirestore(), collectionName));
+
+  // Start listening to the query.
+  onSnapshot(recentQuery, onChange);
+}
 
 // Initialize firebase auth
 function listenForAuthChange(fn) {
@@ -23,5 +47,10 @@ async function signIn() {
 const signOutUser = () => signOut(getAuth());
 
 initializeApp(getFirebaseConfig());
-
-export { signIn, signOutUser, listenForAuthChange };
+export {
+  signIn,
+  signOutUser,
+  listenForAuthChange,
+  addToDatabase,
+  listenForCollectionChange,
+};
