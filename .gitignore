@@ -1,2 +1,4 @@
 node_modules
 firebase-debug.log
+/dist/main.js
+/dist/main.js.LICENSE.txt
