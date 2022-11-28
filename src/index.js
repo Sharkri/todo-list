@@ -14,6 +14,7 @@ import {
   listenForAuthChange,
   addToDatabase,
   listenForCollectionChange,
+  updateDatabase,
 } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
@@ -663,3 +664,7 @@ function onAuthChange(user) {
 
 // Listen for auth state change
 listenForAuthChange(onAuthChange);
+updateDatabase('todos', 'LcRWFxi4hO3TTcaoIdEE', {
+  name: 'test',
+  dueDate: 'october 8, 5555',
+});

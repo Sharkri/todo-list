@@ -10,6 +10,8 @@ import {
   getFirestore,
   collection,
   addDoc,
+  updateDoc,
+  doc,
   query,
   onSnapshot,
 } from 'firebase/firestore';
@@ -24,6 +26,17 @@ async function addToDatabase(key, value) {
     console.error('Error writing to Firebase Database', error);
   }
 }
+
+async function updateDatabase(path, id, value) {
+  // Add a new message entry to the Firebase database.
+  try {
+    const reference = doc(getFirestore(), path, id);
+    await updateDoc(reference, value);
+  } catch (error) {
+    console.error('Error writing to Firebase Database', error);
+  }
+}
+
 // Loads chat messages history and listens for upcoming ones.
 function listenForCollectionChange(collectionName, onChange) {
   const recentQuery = query(collection(getFirestore(), collectionName));
@@ -52,5 +65,6 @@ export {
   signOutUser,
   listenForAuthChange,
   addToDatabase,
+  updateDatabase,
   listenForCollectionChange,
 };
