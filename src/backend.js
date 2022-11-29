@@ -17,9 +17,9 @@ import {
 } from 'firebase/firestore';
 import getFirebaseConfig from './firebase-config';
 
-// Saves a new message to Cloud Firestore.
+// Saves a new value to Cloud Firestore.
 async function addToDatabase(key, value) {
-  // Add a new message entry to the Firebase database.
+  // Add a new entry to the Firebase database.
   try {
     await addDoc(collection(getFirestore(), key), value);
   } catch (error) {
@@ -28,7 +28,7 @@ async function addToDatabase(key, value) {
 }
 
 async function updateDatabase(path, id, value) {
-  // Add a new message entry to the Firebase database.
+  // Update an entry in the Firebase database.
   try {
     const reference = doc(getFirestore(), path, id);
     await updateDoc(reference, value);
@@ -37,7 +37,7 @@ async function updateDatabase(path, id, value) {
   }
 }
 
-// Loads chat messages history and listens for upcoming ones.
+// Queries for a given collection name and listens for new changes on it.
 function listenForCollectionChange(collectionName, onChange) {
   const recentQuery = query(collection(getFirestore(), collectionName));
 
