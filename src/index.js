@@ -646,10 +646,11 @@ signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
 
 function onTodoCollectionChange(snapshot) {
-  snapshot.docChanges().forEach((change) => {
-    const todo = change.doc.data();
-    displayTodo(todo);
-  });
+  console.log(snapshot.docChanges());
+  // snapshot.docChanges().forEach((change) => {
+  //   const todo = change.doc.data();
+  //   displayTodo(todo);
+  // });
 }
 
 function onAuthChange(user) {
@@ -663,7 +664,7 @@ function onAuthChange(user) {
     userInfo.classList.remove('hidden');
     signInButton.classList.add('hidden');
     listenForCollectionChange(
-      `users/${user.uid}/todos`,
+      `users/${user.uid}/projects`,
       onTodoCollectionChange
     );
   } else {
