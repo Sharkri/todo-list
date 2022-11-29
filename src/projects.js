@@ -1,4 +1,4 @@
-import { addToDatabase, getUser } from './backend';
+import { addToDatabase, deleteInDatabase, getUser } from './backend';
 import {
   saveProjects,
   getLocalStorageItem,
@@ -63,14 +63,16 @@ const Projects = (function Projects() {
   });
 
   function removeProject(projectId) {
-    const projectIndex = findIndex(projects, 'id', projectId);
-    const project = getProject(projectIndex);
-    projects.splice(projectIndex, 1);
-    // need to copy todos cause splicing removes from original
-    const copiedTodos = [...project.todos];
-    // Remove all of project todos
-    copiedTodos.forEach((todo) => project.removeTodo(todo.id));
-    saveProjectsAndTodos(projects, Todos.getTodos());
+    // const projectIndex = findIndex(projects, 'id', projectId);
+    // const project = getProject(projectIndex);
+    // projects.splice(projectIndex, 1);
+    // // need to copy todos cause splicing removes from original
+    // const copiedTodos = [...project.todos];
+    // // Remove all of project todos
+    // copiedTodos.forEach((todo) => project.removeTodo(todo.id));
+    // saveProjectsAndTodos(projects, Todos.getTodos());
+    const user = getUser();
+    deleteInDatabase(`users/${user.uid}/projects`, projectId);
   }
 
   return {
