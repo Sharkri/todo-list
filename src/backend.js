@@ -13,6 +13,7 @@ import {
   updateDoc,
   doc,
   query,
+  getDocs,
   onSnapshot,
   deleteDoc,
 } from 'firebase/firestore';
@@ -56,6 +57,14 @@ function listenForCollectionChange(collectionName, onChange) {
   onSnapshot(recentQuery, onChange);
 }
 
+async function getCollectionData(collectionName) {
+  const querySnapshot = await getDocs(
+    collection(getFirestore(), collectionName)
+  );
+
+  return querySnapshot.docs.map((x) => x.data());
+}
+
 // Initialize firebase auth
 function listenForAuthChange(fn) {
   // Listen to auth state changes.
@@ -81,4 +90,5 @@ export {
   listenForCollectionChange,
   getUser,
   deleteInDatabase,
+  getCollectionData,
 };
