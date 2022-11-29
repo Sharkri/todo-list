@@ -202,6 +202,7 @@ function displayProject(title, id) {
 }
 
 function displayTodo(todo) {
+  if (todo == null) return;
   const todoElement = createTodoElement(
     todo.title,
     todo.id,
@@ -209,13 +210,11 @@ function displayTodo(todo) {
     todo.dueDate,
     todo.description
   );
-
   // Find which priority to append to and show
   let priority;
   if (todo.priority === 'High') priority = high;
   else if (todo.priority === 'Medium') priority = medium;
   else priority = low;
-
   priority.classList.add('visible');
   priority.appendChild(todoElement);
 }
@@ -374,9 +373,10 @@ const inbox = Projects.getProject(0);
 switchTab('Inbox', inbox.todos);
 
 // Shows LocalStorage projects excluding first project (inbox)
-Projects.getProjects()
-  .slice(1)
-  .forEach((project) => displayProject(project.name, project.id));
+// FIX LATER
+// Projects.getProjects()
+//   .slice(1)
+//   .forEach((project) => displayProject(project.name, project.id));
 
 document.onclick = (e) => {
   // if clicked off close search results
@@ -645,6 +645,13 @@ const userInfo = document.querySelector('.user');
 signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
 
+function onTodoCollectionChange(snapshot) {
+  snapshot.docChanges().forEach((change) => {
+    const todo = change.doc.data();
+    displayTodo(todo);
+  });
+}
+
 function onAuthChange(user) {
   // if user is signed in
   if (user) {
@@ -653,9 +660,12 @@ function onAuthChange(user) {
 
     username.textContent = user.displayName;
     userPic.src = user.photoURL || '/images/profile_placeholder.png';
-
     userInfo.classList.remove('hidden');
     signInButton.classList.add('hidden');
+    listenForCollectionChange(
+      `users/${user.uid}/todos`,
+      onTodoCollectionChange
+    );
   } else {
     userInfo.classList.add('hidden');
     signInButton.classList.remove('hidden');
@@ -664,7 +674,3 @@ function onAuthChange(user) {
 
 // Listen for auth state change
 listenForAuthChange(onAuthChange);
-updateDatabase('todos', 'LcRWFxi4hO3TTcaoIdEE', {
-  name: 'test',
-  dueDate: 'october 8, 5555',
-});

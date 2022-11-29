@@ -18,7 +18,6 @@ const Todos = (function Todos() {
     };
   }
 
-  let todoIdCount = todos.length ? +todos[todos.length - 1].id : -1;
   // Re-add functions. LocalStorage doesn't save functions
   if (todos.length) {
     todos.forEach((todo) => {
@@ -27,27 +26,12 @@ const Todos = (function Todos() {
   }
 
   function createTodo(title, description, dueDate, priority, projectId) {
-    todoIdCount += 1;
-    const id = todoIdCount.toString();
-    const setTodoProperty = getSetTodoProperty(projectId);
-    todos.push({
-      title,
-      description,
-      dueDate,
-      priority,
-      id,
-      projectId,
-      setTodoProperty,
-    });
-    saveTodos(todos);
     return {
       title,
       description,
       dueDate,
       priority,
-      id,
       projectId,
-      setTodoProperty,
     };
   }
   const getTodos = () => todos;
