@@ -80,8 +80,8 @@ function getFormattedDate(date) {
 
 function createTodoElement(title, todoId, projectId, dueDate, description) {
   const todoContainer = createElement('div', 'todo');
-  todoContainer.setAttribute('todo-index-number', todoId);
-  todoContainer.setAttribute('project-index-number', projectId);
+  todoContainer.setAttribute('todo-id', todoId);
+  todoContainer.setAttribute('project-id', projectId);
   // todo info. contains title, description and due date
   const todoInfo = createElement('div', 'todo-info');
 
@@ -150,7 +150,7 @@ function toggleDropdown(dropdownClicked) {
 
 function displayProject(title, id) {
   const project = createElement('div', 'project');
-  project.setAttribute('project-index-number', id);
+  project.setAttribute('project-id', id);
   const projectLeft = createElement('div', 'project-left');
   const projectRight = createElement('button', 'project-right');
 
@@ -409,19 +409,17 @@ searchInput.addEventListener('input', (e) => {
   occurrences.forEach((occurrence) => {
     const text = occurrence.name;
     const projectId = occurrence.id;
-    addSearchOption(text, 'project-index-number', projectId, 'search-result');
+    addSearchOption(text, 'project-id', projectId, 'search-result');
   });
 });
 
 searchResults.addEventListener('click', (e) => {
   searchResults.classList.remove('found');
   const name = e.target.textContent;
-  const id = e.target.getAttribute('project-index-number');
+  const id = e.target.getAttribute('project-id');
   if (!id) return;
   const { todos } = Projects.getProjectById(id);
-  const project = document.querySelector(
-    `.project[project-index-number="${id}"]`
-  );
+  const project = document.querySelector(`.project[project-id="${id}"]`);
   setActiveClass(project);
   switchTab(name, todos);
   searchInput.value = '';
@@ -430,8 +428,8 @@ searchResults.addEventListener('click', (e) => {
 mainContent.addEventListener('click', (e) => {
   const todoElement = e.target.closest('.todo');
   if (!todoElement) return;
-  const projectId = todoElement.getAttribute('project-index-number');
-  const todoId = todoElement.getAttribute('todo-index-number');
+  const projectId = todoElement.getAttribute('project-id');
+  const todoId = todoElement.getAttribute('todo-id');
   // Mark Complete
   if (e.target.closest('.mark-todo-complete')) {
     const project = Projects.getProjectById(projectId);
@@ -450,7 +448,7 @@ mainContent.addEventListener('click', (e) => {
   const selectedIndex = Projects.findIndex(projects, 'id', todo.projectId);
   openTodoModal(selectedIndex);
   updateModalEditing(true, 'add-todo-modal', 'Edit Todo', 'Update Todo');
-  addTodoModal.setAttribute('todo-index-number', todoId);
+  addTodoModal.setAttribute('todo-id', todoId);
 
   const title = document.querySelector('#todo-title');
   const dueDate = document.querySelector('#due-date');
@@ -489,10 +487,8 @@ projectsContainer.addEventListener('click', (e) => {
   if (e.target.closest('.delete-project')) toggleModal(deleteModal);
   else if (e.target.closest('.edit-project')) {
     // Find the closest project clicked then get its attribute projectId
-    const projectId = e.target
-      .closest('.project')
-      .getAttribute('project-index-number');
-    addProjectModal.setAttribute('project-index-number', projectId);
+    const projectId = e.target.closest('.project').getAttribute('project-id');
+    addProjectModal.setAttribute('project-id', projectId);
     toggleModal(addProjectModal);
     updateModalEditing(true, 'add-project-modal', 'Edit Project', 'Update');
     const name = document.querySelector('#name');
@@ -528,14 +524,14 @@ submit.addEventListener('click', () => {
   closeAllModals();
   // check if editing project name
   if (addProjectModal.classList.contains('editing')) {
-    const id = addProjectModal.getAttribute('project-index-number');
+    const id = addProjectModal.getAttribute('project-id');
     const selectedProject = Projects.getProjectById(id);
     // return if new name is same as current
     if (selectedProject.name === name) return;
     selectedProject.setProjectName(name);
     // Search all projects id to find matching id
     const index = Array.from(projectsContainer.children).findIndex(
-      (project) => project.getAttribute('project-index-number') === id
+      (project) => project.getAttribute('project-id') === id
     );
     // show project name on screen
     const projectTitles = document.getElementsByClassName('project-title');
@@ -582,7 +578,7 @@ submitTodo.addEventListener('click', () => {
   const currentClass = active.classList;
 
   if (isEditingTodo) {
-    const todoId = addTodoModal.getAttribute('todo-index-number');
+    const todoId = addTodoModal.getAttribute('todo-id');
     editTodo(todoId, project.id, title, description, dueDate, priority);
     // if tab is today refresh with todays todo
     if (currentClass.contains('today')) refreshTodos(getTodosToday());
@@ -590,7 +586,7 @@ submitTodo.addEventListener('click', () => {
     else if (currentClass.contains('view-all')) refreshTodos(Todos.getTodos());
     else {
       // else show activeProject todos
-      const projectId = active.getAttribute('project-index-number');
+      const projectId = active.getAttribute('project-id');
       const activeProject = Projects.getProjectById(projectId);
       refreshTodos(activeProject.todos);
     }
@@ -647,11 +643,12 @@ signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
 
 function onTodoCollectionChange(snapshot) {
-  console.log(snapshot.docChanges());
-  // snapshot.docChanges().forEach((change) => {
-  //   const todo = change.doc.data();
-  //   displayTodo(todo);
-  // });
+  snapshot.docChanges().forEach((change) => {
+    const project = change.doc.data();
+    if (change.type === 'added') {
+      displayProject(project.name, change.doc.id);
+    }
+  });
 }
 
 function onAuthChange(user) {
