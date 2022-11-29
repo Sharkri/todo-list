@@ -14,6 +14,7 @@ import {
   doc,
   query,
   onSnapshot,
+  deleteDoc,
 } from 'firebase/firestore';
 import getFirebaseConfig from './firebase-config';
 
@@ -34,6 +35,16 @@ async function updateDatabase(path, id, value) {
     await updateDoc(reference, value);
   } catch (error) {
     console.error('Error writing to Firebase Database', error);
+  }
+}
+
+async function deleteInDatabase(path, id) {
+  // Delete an entry in the Firebase database.
+  try {
+    const reference = doc(getFirestore(), path, id);
+    await deleteDoc(reference);
+  } catch (error) {
+    console.error('Error deleting to Firebase Database', error);
   }
 }
 
@@ -69,4 +80,5 @@ export {
   updateDatabase,
   listenForCollectionChange,
   getUser,
+  deleteInDatabase,
 };
