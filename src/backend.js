@@ -58,6 +58,7 @@ async function signIn() {
 }
 
 const signOutUser = () => signOut(getAuth());
+const getUser = () => getAuth().currentUser;
 
 initializeApp(getFirebaseConfig());
 export {
@@ -67,4 +68,5 @@ export {
   addToDatabase,
   updateDatabase,
   listenForCollectionChange,
+  getUser,
 };

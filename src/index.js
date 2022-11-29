@@ -15,6 +15,7 @@ import {
   addToDatabase,
   listenForCollectionChange,
   updateDatabase,
+  getUser,
 } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');

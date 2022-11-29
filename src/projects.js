@@ -1,3 +1,4 @@
+import { addToDatabase, getUser } from './backend';
 import {
   saveProjects,
   getLocalStorageItem,
@@ -14,7 +15,6 @@ const Projects = (function Projects() {
   const getProjects = () => projects;
   const getProject = (index) => projects[index];
   const getProjectById = (id) => projects.find((project) => project.id === id);
-  let projectIdCount = projects.length ? +projects[projects.length - 1].id : -1;
 
   function getSetProjectName() {
     return function setProjectName(name) {
@@ -28,6 +28,7 @@ const Projects = (function Projects() {
       todos.push(todo);
       saveProjects(projects);
       return todo;
+      // ADD TO DATABASE INSTEAD
     };
   }
   function getRemoveTodo() {
@@ -41,15 +42,16 @@ const Projects = (function Projects() {
   }
 
   function createProject(name) {
-    const todos = [];
-    projectIdCount += 1;
-    const id = projectIdCount.toString();
-    const addTodo = getAddTodoFunction(todos, id);
-    const removeTodo = getRemoveTodo();
-    const setProjectName = getSetProjectName();
-    projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
-    saveProjectsAndTodos(projects, Todos.getTodos());
-    return { name, todos, addTodo, removeTodo, id, setProjectName };
+    // projectIdCount += 1;
+    // const id = projectIdCount.toString();
+    // const addTodo = getAddTodoFunction(todos, id);
+    // const removeTodo = getRemoveTodo();
+    // const setProjectName = getSetProjectName();
+    // projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
+    // saveProjectsAndTodos(projects, Todos.getTodos());
+    // return { name, todos, addTodo, removeTodo, id, setProjectName };
+    const user = getUser();
+    addToDatabase(`users/${user.uid}/projects`, { name, todos: [] });
   }
 
   if (!projects.length) createProject('Inbox');
