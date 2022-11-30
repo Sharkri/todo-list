@@ -4,6 +4,12 @@ import Todos from './todos';
 
 const Projects = (function Projects() {
   const projects = [];
+  let userId = null;
+
+  function setUserId(id) {
+    userId = id;
+  }
+
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] === valueToFind);
   }
@@ -46,6 +52,7 @@ const Projects = (function Projects() {
     if (type) project.type = type;
     // Add to database
     const user = getUser();
+    projects.push(project);
     addToDatabase(`users/${user.uid}/projects`, project);
   }
 
@@ -57,7 +64,6 @@ const Projects = (function Projects() {
   });
 
   function removeProject(projectId) {
-    // const projectIndex = findIndex(projects, 'id', projectId);
     // const project = getProject(projectIndex);
     // projects.splice(projectIndex, 1);
     // // need to copy todos cause splicing removes from original
@@ -67,6 +73,8 @@ const Projects = (function Projects() {
     // saveProjectsAndTodos(projects, Todos.getTodos());
     const user = getUser();
     deleteInDatabase(`users/${user.uid}/projects`, projectId);
+    const projectIndex = findIndex(projects, 'id', projectId);
+    projects.splice(projectIndex, 1);
   }
 
   return {
@@ -76,6 +84,8 @@ const Projects = (function Projects() {
     getProject,
     getProjectById,
     findIndex,
+    setUserId,
   };
 })();
+
 export default Projects;
