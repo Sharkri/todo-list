@@ -1,14 +1,9 @@
 import { addToDatabase, deleteInDatabase, getUser } from './backend';
-import {
-  saveProjects,
-  getLocalStorageItem,
-  saveProjectsAndTodos,
-} from './Storage';
 
 import Todos from './todos';
 
 const Projects = (function Projects() {
-  const projects = getLocalStorageItem('projects');
+  const projects = [];
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] === valueToFind);
   }
@@ -19,14 +14,12 @@ const Projects = (function Projects() {
   function getSetProjectName() {
     return function setProjectName(name) {
       this.name = name;
-      saveProjects(projects);
     };
   }
   function getAddTodoFunction(todos, id) {
     return function addTodo(title, description, dueDate, priority) {
       const todo = Todos.createTodo(title, description, dueDate, priority, id);
       todos.push(todo);
-      saveProjects(projects);
       return todo;
       // ADD TO DATABASE INSTEAD
     };
@@ -37,11 +30,10 @@ const Projects = (function Projects() {
       const todoIndex = findIndex(Todos.getTodos(), 'id', todoId);
       Todos.deleteTodo(todoIndex);
       this.todos.splice(projectTodoIndex, 1);
-      saveProjectsAndTodos(projects, Todos.getTodos());
     };
   }
 
-  function createProject(name) {
+  function createProject(name, type) {
     // projectIdCount += 1;
     // const id = projectIdCount.toString();
     // const addTodo = getAddTodoFunction(todos, id);
@@ -50,11 +42,13 @@ const Projects = (function Projects() {
     // projects.push({ name, todos, addTodo, removeTodo, id, setProjectName });
     // saveProjectsAndTodos(projects, Todos.getTodos());
     // return { name, todos, addTodo, removeTodo, id, setProjectName };
+    const project = { name, todos: [] };
+    if (type) project.type = type;
+    // Add to database
     const user = getUser();
-    addToDatabase(`users/${user.uid}/projects`, { name, todos: [] });
+    addToDatabase(`users/${user.uid}/projects`, project);
   }
 
-  if (!projects.length) createProject('Inbox');
   // On load, re adds function. Because JSON can't store functions
   projects.forEach((project) => {
     project.addTodo = getAddTodoFunction(project.todos, project.id);
