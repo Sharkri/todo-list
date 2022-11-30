@@ -651,14 +651,19 @@ function onTodoCollectionChange(snapshot) {
 
   docChanges.forEach((change) => {
     const project = change.doc.data();
-    //  On Initial Load
+    // if inbox was just added (initial load), switch to inbox tab
     if (project.type === 'inbox' && change.type === 'added') {
       switchTab(project.name, project.todos);
-      return;
-    }
-
-    if (change.type === 'added') {
+    } else if (change.type === 'added') {
       displayProject(project.name, change.doc.id);
+    }
+    // if doc was modified and newIndex is equal to active project's index
+    else if (
+      change.type === 'modified' &&
+      change.newIndex === getActiveProjectIndex()
+    ) {
+      // re-render project name and todos
+      switchTab(project.name, project.todos);
     }
   });
 }
