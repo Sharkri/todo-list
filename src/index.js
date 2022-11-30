@@ -15,7 +15,6 @@ import {
   addToDatabase,
   listenForCollectionChange,
   updateDatabase,
-  getUser,
 } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
@@ -369,10 +368,6 @@ function switchTab(title, todos = []) {
   refreshTodos(todos);
 }
 
-// Initial Load
-const inbox = Projects.getProject(0);
-switchTab('Inbox', inbox.todos);
-
 // Shows LocalStorage projects excluding first project (inbox)
 // FIX LATER
 // Projects.getProjects()
@@ -477,7 +472,7 @@ links.forEach((link) => {
     // Use innerText instead of textContent because of whitespace
     const title = link.innerText;
 
-    if (title === 'Inbox') switchTab(title, inbox.todos);
+    if (title === 'Inbox') switchTab(title, getInbox());
     else if (title === 'Today') switchTab(title, getTodosToday());
     else switchTab(title, Todos.getTodos());
   });
@@ -623,7 +618,7 @@ confirmDeleteButton.addEventListener('click', () => {
   projectsContainer.removeChild(selectedProject);
   closeAllModals();
   // default to inbox tab
-  switchTab('Inbox', inbox.todos);
+  switchTab('Inbox', getInbox());
   document.querySelector('.inbox').classList.add('active');
 });
 
@@ -642,9 +637,26 @@ const userInfo = document.querySelector('.user');
 signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
 
+const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
+
+// Fix later
+const getInbox = () => null;
+
 function onTodoCollectionChange(snapshot) {
-  snapshot.docChanges().forEach((change) => {
+  const docChanges = snapshot.docChanges();
+  if (!docChanges.length) {
+    initializeInbox();
+    return;
+  }
+
+  docChanges.forEach((change) => {
     const project = change.doc.data();
+    //  On Initial Load
+    if (project.type === 'inbox' && change.type === 'added') {
+      switchTab(project.name, project.todos);
+      return;
+    }
+
     if (change.type === 'added') {
       displayProject(project.name, change.doc.id);
     }
@@ -661,9 +673,8 @@ function onAuthChange(user) {
     userPic.src = user.photoURL || '/images/profile_placeholder.png';
     userInfo.classList.remove('hidden');
     signInButton.classList.add('hidden');
-    listenForCollectionChange(
-      `users/${user.uid}/projects`,
-      onTodoCollectionChange
+    listenForCollectionChange(`users/${user.uid}/projects`, (snapshot) =>
+      onTodoCollectionChange(snapshot)
     );
   } else {
     userInfo.classList.add('hidden');
