@@ -415,12 +415,12 @@ searchInput.addEventListener('input', async (e) => {
   });
 });
 
-searchResults.addEventListener('click', (e) => {
+searchResults.addEventListener('click', async (e) => {
   searchResults.classList.remove('found');
   const name = e.target.textContent;
   const id = e.target.getAttribute('project-id');
   if (!id) return;
-  const { todos } = Projects.getProjectById(id);
+  const { todos } = (await Projects.getProjectById(id)).project;
   const project = document.querySelector(`.project[project-id="${id}"]`);
   setActiveClass(project);
   switchTab(name, todos);
@@ -479,7 +479,7 @@ links.forEach((link) => {
     // Use innerText instead of textContent because of whitespace
     const title = link.innerText;
 
-    if (title === 'Inbox') switchTab(title, getInbox());
+    if (title === 'Inbox') switchTab(title, await getInbox());
     else if (title === 'Today') switchTab(title, await getTodosToday());
     else switchTab(title, Todos.getTodos());
   });
@@ -644,9 +644,7 @@ signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
 
 const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
-
-// Fix later
-const getInbox = () => null;
+const getInbox = () => Projects.getProject(0);
 
 function onProjectCollectionChange(snapshot) {
   const docChanges = snapshot.docChanges();
@@ -659,6 +657,9 @@ function onProjectCollectionChange(snapshot) {
     const project = change.doc.data();
     // if inbox was just added (initial load), switch to inbox tab
     if (project.type === 'inbox' && change.type === 'added') {
+      const inbox = document.querySelector('.inbox');
+      inbox.setAttribute('project-id', project.id);
+
       switchTab(project.name, project.todos);
     } else if (change.type === 'added') {
       displayProject(project.name, change.doc.id);
