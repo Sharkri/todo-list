@@ -280,13 +280,15 @@ function getTruncatedString(string) {
   return truncateStr(string, 20);
 }
 
-function addProjectOptions(selected) {
+async function addProjectOptions(selected) {
   selectProject.textContent = '';
-  Projects.getProjects().forEach((project) => {
-    const name = getTruncatedString(project.name);
+
+  const projects = await Projects.getProjects();
+  projects.forEach((project) => {
+    const truncatedProjectName = getTruncatedString(project.name);
     const option = document.createElement('option');
-    option.textContent = name;
-    option.value = name;
+    option.textContent = truncatedProjectName;
+    option.value = truncatedProjectName;
     selectProject.appendChild(option);
   });
   setSelectedOption(selectProject, selected);
@@ -673,7 +675,6 @@ function onAuthChange(user) {
   if (user) {
     const username = userInfo.querySelector('.user-name');
     const userPic = userInfo.querySelector('.user-pic');
-
     username.textContent = user.displayName;
     userPic.src = user.photoURL || '/images/profile_placeholder.png';
     userInfo.classList.remove('hidden');
