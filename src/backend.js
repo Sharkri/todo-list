@@ -23,16 +23,18 @@ import getFirebaseConfig from './firebase-config';
 async function addToDatabase(key, value) {
   // Add a new entry to the Firebase database.
   try {
-    await addDoc(collection(getFirestore(), key), value);
+    return await addDoc(collection(getFirestore(), key), value);
   } catch (error) {
     console.error('Error writing to Firebase Database', error);
   }
+
+  return null;
 }
 
-async function updateDatabase(path, id, value) {
+async function updateDatabase(path, value) {
   // Update an entry in the Firebase database.
   try {
-    const reference = doc(getFirestore(), path, id);
+    const reference = doc(getFirestore(), path);
     await updateDoc(reference, value);
   } catch (error) {
     console.error('Error writing to Firebase Database', error);
