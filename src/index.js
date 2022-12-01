@@ -358,9 +358,9 @@ function addSearchOption(text, attributeName, attributeValue, className) {
   searchResults.appendChild(searchResult);
 }
 
-function query(search) {
+async function query(search) {
   const occurrences = [];
-  const projects = Projects.getProjects();
+  const projects = await Projects.getProjects();
   projects.forEach((project) => {
     if (project.name.toLowerCase().includes(search.toLowerCase())) {
       occurrences.push(project);
@@ -392,12 +392,12 @@ document.onclick = (e) => {
   }
 };
 
-searchInput.addEventListener('input', (e) => {
+searchInput.addEventListener('input', async (e) => {
   if (!e.target.value) {
     searchResults.classList.remove('found');
     return;
   }
-  const occurrences = query(e.target.value);
+  const occurrences = await query(e.target.value);
   // Reset search results found.
   searchResults.textContent = '';
   searchResults.classList.add('found');
