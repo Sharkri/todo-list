@@ -341,6 +341,11 @@ function getActiveProjectIndex() {
   return Array.from(projectElems).indexOf(project);
 }
 
+function getActiveProjectId() {
+  const project = document.querySelector('.project.active');
+  return project.getAttribute('project-id');
+}
+
 function setActiveClass(element) {
   const active = document.querySelector('.active');
   active.classList.remove('active');
@@ -365,9 +370,9 @@ function query(search) {
   return occurrences.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function switchTab(title, todos = []) {
+function switchTab(title, todos) {
   setMainHeader(title);
-  refreshTodos(todos);
+  refreshTodos(todos || []);
 }
 
 // Shows LocalStorage projects excluding first project (inbox)
@@ -479,7 +484,7 @@ links.forEach((link) => {
     else switchTab(title, Todos.getTodos());
   });
 });
-projectsContainer.addEventListener('click', (e) => {
+projectsContainer.addEventListener('click', async (e) => {
   // if delete button clicked, show confirm modal
   if (e.target.closest('.delete-project')) toggleModal(deleteModal);
   else if (e.target.closest('.edit-project')) {
@@ -493,8 +498,8 @@ projectsContainer.addEventListener('click', (e) => {
   }
   // highlight project clicked
   setActiveClass(e.target.closest('.project'));
-  const index = getActiveProjectIndex();
-  const project = Projects.getProject(index);
+  const projectId = getActiveProjectId();
+  const { project } = await Projects.getProjectById(projectId);
   switchTab(project.name, project.todos);
 });
 
@@ -538,8 +543,7 @@ submit.addEventListener('click', () => {
     return;
   }
   // if not editing, else create a new project
-  const project = Projects.createProject(name);
-  displayProject(name, project.id);
+  Projects.createProject(name);
 });
 
 titleInput.addEventListener('keyup', (e) => {
@@ -644,7 +648,7 @@ const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 // Fix later
 const getInbox = () => null;
 
-function onTodoCollectionChange(snapshot) {
+function onProjectCollectionChange(snapshot) {
   const docChanges = snapshot.docChanges();
   if (!docChanges.length) {
     initializeInbox();
@@ -670,8 +674,7 @@ function onTodoCollectionChange(snapshot) {
   });
 }
 
-function onAuthChange(user) {
-  // if user is signed in
+function setUserSignedIn(user) {
   if (user) {
     const username = userInfo.querySelector('.user-name');
     const userPic = userInfo.querySelector('.user-pic');
@@ -679,13 +682,23 @@ function onAuthChange(user) {
     userPic.src = user.photoURL || '/images/profile_placeholder.png';
     userInfo.classList.remove('hidden');
     signInButton.classList.add('hidden');
-    listenForCollectionChange(`users/${user.uid}/projects`, (snapshot) =>
-      onTodoCollectionChange(snapshot)
-    );
   } else {
     userInfo.classList.add('hidden');
     signInButton.classList.remove('hidden');
   }
+}
+
+function onAuthChange(user) {
+  if (!user) {
+    setUserSignedIn(false);
+    return;
+  }
+
+  setUserSignedIn(user);
+  listenForCollectionChange(
+    `users/${user.uid}/projects`,
+    onProjectCollectionChange
+  );
 }
 
 // Listen for auth state change
