@@ -10,8 +10,6 @@ import {
 import Todos from './todos';
 
 const Projects = (function Projects() {
-  const projects = [];
-
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] === valueToFind);
   }
@@ -19,7 +17,8 @@ const Projects = (function Projects() {
     const user = getUser();
     return getCollectionDocs(`users/${user.uid}/projects/`);
   };
-  async function getProject(id) {
+
+  async function getProjectById(id) {
     const { uid } = getUser();
     const projectPath = `users/${uid}/projects/${id}`;
     const project = await getDocData(projectPath);
@@ -27,16 +26,14 @@ const Projects = (function Projects() {
     return { projectPath, project };
   }
 
-  const getProjectById = (id) => projects.find((project) => project.id === id);
-
   async function setProjectName(projectId, name) {
-    const { project, projectPath } = await getProject(projectId);
+    const { project, projectPath } = await getProjectById(projectId);
     project.name = name;
     updateDatabase(projectPath, project);
   }
 
   async function addTodo(projectId, title, description, dueDate, priority) {
-    const { project, projectPath } = await getProject(projectId);
+    const { project, projectPath } = await getProjectById(projectId);
 
     const todo = Todos.createTodo(
       title,
@@ -55,7 +52,7 @@ const Projects = (function Projects() {
   }
 
   async function removeTodo(projectId, todoId) {
-    const { project, projectPath } = await getProject(projectId);
+    const { project, projectPath } = await getProjectById(projectId);
     const todoIndex = project.todos.findIndex((todo) => todo.id === todoId);
     project.todos.splice(todoIndex, 1);
 
@@ -63,7 +60,7 @@ const Projects = (function Projects() {
   }
 
   async function changeTodoAttribute(projectId, todoId, key, value) {
-    const { project, projectPath } = await getProject(projectId);
+    const { project, projectPath } = await getProjectById(projectId);
     // Find the todo and then change its value
     project.todos.find((todo) => todo.id === todoId)[key] = value;
 
@@ -90,7 +87,6 @@ const Projects = (function Projects() {
     createProject,
     removeProject,
     getProjects,
-    getProject,
     getProjectById,
     findIndex,
     addTodo,
