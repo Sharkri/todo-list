@@ -20,7 +20,7 @@ const Projects = (function Projects() {
 
   async function getTodos() {
     const projects = await getProjects();
-    projects.flatMap((project) => project.todos);
+    return projects.flatMap((project) => project.todos);
   }
 
   async function getProjectById(id) {

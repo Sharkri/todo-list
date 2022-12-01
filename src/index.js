@@ -249,8 +249,8 @@ function editTodo(todoId, projectId, title, description, dueDate, priority) {
   todo.setTodoProperty('priority', priority, Projects);
 }
 
-function getTodosToday() {
-  const todos = Todos.getTodos();
+async function getTodosToday() {
+  const todos = await Projects.getTodos();
   return todos.filter((todo) => isToday(new Date(todo.dueDate)));
 }
 
@@ -427,7 +427,7 @@ searchResults.addEventListener('click', (e) => {
   searchInput.value = '';
 });
 
-mainContent.addEventListener('click', (e) => {
+mainContent.addEventListener('click', async (e) => {
   const todoElement = e.target.closest('.todo');
   if (!todoElement) return;
   const projectId = todoElement.getAttribute('project-id');
@@ -438,7 +438,7 @@ mainContent.addEventListener('click', (e) => {
     project.removeTodo(todoId);
 
     const activeClass = getActive().classList;
-    if (activeClass.contains('today')) refreshTodos(getTodosToday());
+    if (activeClass.contains('today')) refreshTodos(await getTodosToday());
     else if (activeClass.contains('view-all')) refreshTodos(Todos.getTodos());
     else refreshTodos(project.todos);
     return;
@@ -474,13 +474,13 @@ addTodo.addEventListener('click', () => {
 });
 
 links.forEach((link) => {
-  link.addEventListener('click', () => {
+  link.addEventListener('click', async () => {
     setActiveClass(link);
     // Use innerText instead of textContent because of whitespace
     const title = link.innerText;
 
     if (title === 'Inbox') switchTab(title, getInbox());
-    else if (title === 'Today') switchTab(title, getTodosToday());
+    else if (title === 'Today') switchTab(title, await getTodosToday());
     else switchTab(title, Todos.getTodos());
   });
 });
@@ -687,7 +687,6 @@ function setUserSignedIn(user) {
     signInButton.classList.remove('hidden');
   }
 }
-
 function onAuthChange(user) {
   if (!user) {
     setUserSignedIn(false);
