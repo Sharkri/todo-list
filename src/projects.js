@@ -1,7 +1,7 @@
 import {
   addToDatabase,
   deleteInDatabase,
-  getDocData,
+  getCollectionDocs,
   getUser,
   updateDatabase,
 } from './backend';
@@ -14,7 +14,10 @@ const Projects = (function Projects() {
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] === valueToFind);
   }
-  const getProjects = () => projects;
+  const getProjects = () => {
+    const user = getUser();
+    return getCollectionDocs(`users/${user.uid}/projects/`);
+  };
   const getProject = (index) => projects[index];
   const getProjectById = (id) => projects.find((project) => project.id === id);
 
@@ -35,7 +38,7 @@ const Projects = (function Projects() {
     const user = getUser();
     const path = `users/${user.uid}/projects/${projectId}`;
 
-    const project = await getDocData(path);
+    const project = await getCollectionDocs(path);
     // Push todo into todos array
     project.todos.push(todo);
     // Update database with new todos array
