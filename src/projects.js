@@ -18,6 +18,11 @@ const Projects = (function Projects() {
     return getCollectionDocs(`users/${user.uid}/projects/`);
   };
 
+  async function getTodos() {
+    const projects = await getProjects();
+    return projects.map((project) => project.todos);
+  }
+
   async function getProjectById(id) {
     const { uid } = getUser();
     const projectPath = `users/${uid}/projects/${id}`;
@@ -93,6 +98,7 @@ const Projects = (function Projects() {
     setProjectName,
     removeTodo,
     changeTodoAttribute,
+    getTodos,
   };
 })();
 
