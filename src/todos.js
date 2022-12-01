@@ -25,13 +25,14 @@ const Todos = (function Todos() {
     });
   }
 
-  function createTodo(title, description, dueDate, priority, projectId) {
+  function createTodo(title, description, dueDate, priority, projectId, id) {
     return {
       title,
       description,
       dueDate,
       priority,
       projectId,
+      id,
     };
   }
   const getTodos = () => todos;

@@ -2,6 +2,7 @@ import {
   addToDatabase,
   deleteInDatabase,
   getCollectionDocs,
+  getDocData,
   getUser,
   updateDatabase,
 } from './backend';
@@ -28,21 +29,23 @@ const Projects = (function Projects() {
   }
 
   async function addTodo(projectId, title, description, dueDate, priority) {
+    const { uid } = getUser();
+    const projectPath = `users/${uid}/projects/${projectId}`;
+    const project = await getDocData(projectPath);
+
     const todo = Todos.createTodo(
       title,
       description,
       dueDate,
       priority,
-      projectId
+      projectId,
+      project.currentTodoId
     );
-    const user = getUser();
-    const path = `users/${user.uid}/projects/${projectId}`;
-
-    const project = await getCollectionDocs(path);
-    // Push todo into todos array
+    // Add new todo into todos array
     project.todos.push(todo);
-    // Update database with new todos array
-    updateDatabase(path, project);
+    project.currentTodoId += 1;
+    // Update database
+    updateDatabase(projectPath, project);
     return todo;
   }
 
@@ -56,7 +59,7 @@ const Projects = (function Projects() {
   }
 
   async function createProject(name, type) {
-    const project = { name, todos: [] };
+    const project = { name, todos: [], currentTodoId: 0 };
     if (type) project.type = type;
 
     const user = getUser();

@@ -16,6 +16,7 @@ import {
   onSnapshot,
   deleteDoc,
   getDocs,
+  getDoc,
 } from 'firebase/firestore';
 import getFirebaseConfig from './firebase-config';
 
@@ -64,6 +65,13 @@ async function getCollectionDocs(collectionName) {
   return docs.map((document) => document.data());
 }
 
+async function getDocData(path) {
+  // Get a doc in the Firebase database.
+  const reference = doc(getFirestore(), path);
+  const docInfo = await getDoc(reference);
+  return docInfo.data();
+}
+
 // Initialize firebase auth
 function listenForAuthChange(fn) {
   // Listen to auth state changes.
@@ -90,4 +98,5 @@ export {
   getUser,
   deleteInDatabase,
   getCollectionDocs,
+  getDocData,
 };
