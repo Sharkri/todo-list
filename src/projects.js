@@ -23,6 +23,11 @@ const Projects = (function Projects() {
     return projects.flatMap((project) => project.todos);
   }
 
+  async function getProject(index) {
+    const projects = await getProjects();
+    return projects[index];
+  }
+
   async function getProjectById(id) {
     const { uid } = getUser();
     const projectPath = `users/${uid}/projects/${id}`;
@@ -99,6 +104,7 @@ const Projects = (function Projects() {
     removeTodo,
     changeTodoAttribute,
     getTodos,
+    getProject,
   };
 })();
 
