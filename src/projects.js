@@ -19,19 +19,24 @@ const Projects = (function Projects() {
     const user = getUser();
     return getCollectionDocs(`users/${user.uid}/projects/`);
   };
-  const getProject = (index) => projects[index];
+  async function getProject(id) {
+    const { uid } = getUser();
+    const projectPath = `users/${uid}/projects/${id}`;
+    const project = await getDocData(projectPath);
+
+    return { projectPath, project };
+  }
+
   const getProjectById = (id) => projects.find((project) => project.id === id);
 
-  function getSetProjectName() {
-    return function setProjectName(name) {
-      this.name = name;
-    };
+  async function setProjectName(projectId, name) {
+    const { project, projectPath } = await getProject(projectId);
+    project.name = name;
+    updateDatabase(projectPath, project);
   }
 
   async function addTodo(projectId, title, description, dueDate, priority) {
-    const { uid } = getUser();
-    const projectPath = `users/${uid}/projects/${projectId}`;
-    const project = await getDocData(projectPath);
+    const { project, projectPath } = await getProject(projectId);
 
     const todo = Todos.createTodo(
       title,
@@ -96,6 +101,7 @@ const Projects = (function Projects() {
     getProjectById,
     findIndex,
     addTodo,
+    setProjectName,
   };
 })();
 
