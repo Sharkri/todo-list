@@ -54,13 +54,12 @@ const Projects = (function Projects() {
     return todo;
   }
 
-  function getRemoveTodo() {
-    return function removeTodo(todoId) {
-      const projectTodoIndex = findIndex(this.todos, 'id', todoId);
-      const todoIndex = findIndex(Todos.getTodos(), 'id', todoId);
-      Todos.deleteTodo(todoIndex);
-      this.todos.splice(projectTodoIndex, 1);
-    };
+  async function removeTodo(projectId, todoId) {
+    const { project, projectPath } = await getProject(projectId);
+    const todoIndex = project.todos.findIndex((todo) => todo.id === todoId);
+    project.todos.splice(todoIndex, 1);
+
+    updateDatabase(projectPath, project);
   }
 
   async function createProject(name, type) {
@@ -74,21 +73,7 @@ const Projects = (function Projects() {
     updateDatabase(addedDoc.path, { ...project, id: addedDoc.id });
   }
 
-  // // On load, re adds function. Because JSON can't store functions
-  // projects.forEach((project) => {
-  //   project.addTodo = getAddTodoFunction(project.todos, project.id);
-  //   project.removeTodo = getRemoveTodo();
-  //   project.setProjectName = getSetProjectName();
-  // });
-
   function removeProject(projectId) {
-    // const project = getProject(projectIndex);
-    // projects.splice(projectIndex, 1);
-    // // need to copy todos cause splicing removes from original
-    // const copiedTodos = [...project.todos];
-    // // Remove all of project todos
-    // copiedTodos.forEach((todo) => project.removeTodo(todo.id));
-    // saveProjectsAndTodos(projects, Todos.getTodos());
     const user = getUser();
     deleteInDatabase(`users/${user.uid}/projects`, projectId);
   }
@@ -102,6 +87,7 @@ const Projects = (function Projects() {
     findIndex,
     addTodo,
     setProjectName,
+    removeTodo,
   };
 })();
 
