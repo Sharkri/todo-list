@@ -62,6 +62,14 @@ const Projects = (function Projects() {
     updateDatabase(projectPath, project);
   }
 
+  async function changeTodoAttribute(projectId, todoId, key, value) {
+    const { project, projectPath } = await getProject(projectId);
+    // Find the todo and then change its value
+    project.todos.find((todo) => todo.id === todoId)[key] = value;
+
+    updateDatabase(projectPath, project);
+  }
+
   async function createProject(name, type) {
     const project = { name, todos: [], currentTodoId: 0 };
     if (type) project.type = type;
@@ -88,6 +96,7 @@ const Projects = (function Projects() {
     addTodo,
     setProjectName,
     removeTodo,
+    changeTodoAttribute,
   };
 })();
 
