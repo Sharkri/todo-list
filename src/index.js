@@ -12,9 +12,7 @@ import {
   signOutUser,
   signIn,
   listenForAuthChange,
-  addToDatabase,
   listenForCollectionChange,
-  updateDatabase,
 } from './backend';
 // declare selector
 const modalContainer = document.querySelector('.modal');
@@ -24,10 +22,10 @@ const addProjectModal = document.querySelector('.add-project-modal');
 const addTodoModal = document.querySelector('.add-todo-modal');
 const deleteModal = document.querySelector('.delete-modal');
 const cancel = document.querySelectorAll('.cancel');
-const submit = document.querySelector('.submit');
+const addProject = document.querySelector('.submit');
 const submitTodo = document.querySelector('.submit-todo');
-const confirmDeleteButton = document.querySelector('.delete');
-const svgArrow = document.querySelector('.open-project > svg');
+const deleteProjectConfirm = document.querySelector('.delete');
+const toggleProjectsOpen = document.querySelector('.open-project > svg');
 const projectElems = document.getElementsByClassName('project');
 const projectsContainer = document.querySelector('.projects');
 const addTodo = document.querySelector('.add-todo');
@@ -515,10 +513,10 @@ projectsContainer.addEventListener('click', async (e) => {
 });
 
 projectTab.addEventListener('click', (e) => {
-  if (e.target.contains(svgArrow)) {
+  if (e.target.contains(toggleProjectsOpen)) {
     // toggle show project
     projectsContainer.classList.toggle('closed');
-    svgArrow.classList.toggle('rotated');
+    toggleProjectsOpen.classList.toggle('rotated');
     return;
   }
   // Show add project modal
@@ -530,9 +528,9 @@ projectTab.addEventListener('click', (e) => {
 
 cancel.forEach((btn) => btn.addEventListener('click', closeAllModals));
 
-submit.addEventListener('click', () => {
-  const name = document.querySelector('#name').value;
-  if (!name) return;
+addProject.addEventListener('click', () => {
+  const projectName = document.querySelector('#name').value;
+  if (!projectName) return;
 
   closeAllModals();
   // check if editing project name
@@ -540,21 +538,21 @@ submit.addEventListener('click', () => {
     const id = addProjectModal.getAttribute('project-id');
     const selectedProject = Projects.getProjectById(id);
     // return if new name is same as current
-    if (selectedProject.name === name) return;
-    selectedProject.setProjectName(name);
+    if (selectedProject.name === projectName) return;
+    selectedProject.setProjectName(projectName);
     // Search all projects id to find matching id
     const index = Array.from(projectsContainer.children).findIndex(
       (project) => project.getAttribute('project-id') === id
     );
     // show project name on screen
     const projectTitles = document.getElementsByClassName('project-title');
-    projectTitles[index].textContent = name;
+    projectTitles[index].textContent = projectName;
     // show on header too
-    setMainHeader(name);
+    setMainHeader(projectName);
     return;
   }
   // if not editing, else create a new project
-  Projects.createProject(name);
+  Projects.createProject(projectName);
 });
 
 titleInput.addEventListener('keyup', (e) => {
@@ -628,9 +626,9 @@ submitTodo.addEventListener('click', async () => {
   closeAllModals();
 });
 
-confirmDeleteButton.addEventListener('click', () => {
-  const projectId = getActiveProjectId();
+deleteProjectConfirm.addEventListener('click', () => {
   // Remove project from database
+  const projectId = getActiveProjectId();
   Projects.removeProject(projectId);
   // Close modal after deleting project
   closeAllModals();
