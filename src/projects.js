@@ -103,7 +103,7 @@ const Projects = (function Projects() {
     setProjectName,
     removeTodo,
     changeTodoAttribute,
-    getTodos,
+    getAllTodos: getTodos,
     getProject,
   };
 })();

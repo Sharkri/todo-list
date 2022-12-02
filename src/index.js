@@ -250,7 +250,7 @@ function editTodo(todoId, projectId, title, description, dueDate, priority) {
 }
 
 async function getTodosToday() {
-  const todos = await Projects.getTodos();
+  const todos = await Projects.getAllTodos();
   return todos.filter((todo) => isToday(new Date(todo.dueDate)));
 }
 
@@ -489,7 +489,7 @@ links.forEach((link) => {
         break;
       // View all
       default:
-        switchTab(title, Todos.getTodos());
+        switchTab(title, await Projects.getAllTodos());
     }
   });
 });
