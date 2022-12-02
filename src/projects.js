@@ -67,6 +67,7 @@ const Projects = (function Projects() {
     project.todos.splice(todoIndex, 1);
 
     updateDatabase(projectPath, project);
+    return project;
   }
 
   async function changeTodoAttribute(projectId, todoId, key, value) {

@@ -433,14 +433,16 @@ mainContent.addEventListener('click', async (e) => {
   const todoId = todoElement.getAttribute('todo-id');
   // Mark Complete
   if (e.target.closest('.mark-todo-complete')) {
-    const project = Projects.getProjectById(projectId);
-    project.removeTodo(todoId);
-
-    const activeClass = getActive().classList;
-    if (activeClass.contains('today')) refreshTodos(await getTodosToday());
-    else if (activeClass.contains('view-all')) refreshTodos(Todos.getTodos());
-    else refreshTodos(project.todos);
-    return;
+    const activeClass = getActive().className;
+    const newProject = await Projects.removeTodo(projectId, todoId);
+    if (activeClass === 'today') {
+      refreshTodos(await getTodosToday());
+    } else if (activeClass === 'view-all') {
+      const allTodos = await Projects.getAllTodos();
+      refreshTodos(allTodos);
+    } else {
+      refreshTodos(newProject.todos);
+    }
   }
   // Edit Todo
   if (!e.target.closest('.edit-todo')) return;
