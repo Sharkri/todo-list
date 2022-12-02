@@ -347,7 +347,7 @@ function getActiveProjectId() {
 
 function setActiveClass(element) {
   const active = document.querySelector('.active');
-  active.classList.remove('active');
+  if (active) active.classList.remove('active');
   element.classList.add('active');
 }
 
@@ -629,16 +629,11 @@ submitTodo.addEventListener('click', async () => {
 });
 
 confirmDeleteButton.addEventListener('click', () => {
-  const projectIndex = getActiveProjectIndex();
-  const projectId = Projects.getProject(projectIndex).id;
-  const selectedProject = projectElems[projectIndex];
-  // Remove project from app and dom
+  const projectId = getActiveProjectId();
+  // Remove project from database
   Projects.removeProject(projectId);
-  projectsContainer.removeChild(selectedProject);
+  // Close modal after deleting project
   closeAllModals();
-  // default to inbox tab
-  switchTab('Inbox', getInbox());
-  document.querySelector('.inbox').classList.add('active');
 });
 
 // Toggle sidebar showing
@@ -666,6 +661,11 @@ function onProjectCollectionChange(snapshot) {
     return;
   }
 
+  function deleteProjectFromDOM(id) {
+    const project = document.querySelector(`[project-id="${id}"]`);
+    project.remove();
+  }
+
   docChanges.forEach((change) => {
     const project = change.doc.data();
     // if inbox was just added (initial load), switch to inbox tab
@@ -676,14 +676,18 @@ function onProjectCollectionChange(snapshot) {
       switchTab(project.name, project.todos);
     } else if (change.type === 'added') {
       displayProject(project.name, change.doc.id);
-    }
-    // if doc was modified and newIndex is equal to active project's index
-    else if (
+    } else if (
       change.type === 'modified' &&
       change.newIndex === getActiveProjectIndex()
     ) {
       // re-render project name and todos
       switchTab(project.name, project.todos);
+    } else if (change.type === 'removed') {
+      deleteProjectFromDOM(project.id);
+      // After deletion, switch to inbox tab by default
+      getInbox().then(({ todos }) => switchTab('Inbox', todos));
+      const inboxElement = document.querySelector('.inbox');
+      setActiveClass(inboxElement);
     }
   });
 }
