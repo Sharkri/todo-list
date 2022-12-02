@@ -475,15 +475,25 @@ addTodo.addEventListener('click', () => {
 
 links.forEach((link) => {
   link.addEventListener('click', async () => {
+    // Highlights link
     setActiveClass(link);
     // Use innerText instead of textContent because of whitespace
     const title = link.innerText;
 
-    if (title === 'Inbox') switchTab(title, await getInbox());
-    else if (title === 'Today') switchTab(title, await getTodosToday());
-    else switchTab(title, Todos.getTodos());
+    switch (title) {
+      case 'Inbox':
+        switchTab(title, (await getInbox()).todos);
+        break;
+      case 'Today':
+        switchTab(title, await getTodosToday());
+        break;
+      // View all
+      default:
+        switchTab(title, Todos.getTodos());
+    }
   });
 });
+
 projectsContainer.addEventListener('click', async (e) => {
   // if delete button clicked, show confirm modal
   if (e.target.closest('.delete-project')) toggleModal(deleteModal);
