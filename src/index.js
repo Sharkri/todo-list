@@ -309,7 +309,6 @@ function openTodoModal(selected) {
   titleErrorText.classList.remove('visible');
 
   addProjectOptions(selected);
-  setSelectedOption(selectProject, selected);
 }
 
 function updateModalEditing(isEditing, modalName, headerText, btnText) {
