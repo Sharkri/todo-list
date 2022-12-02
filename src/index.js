@@ -571,7 +571,7 @@ titleInput.addEventListener('keyup', (e) => {
   }
 });
 
-submitTodo.addEventListener('click', () => {
+submitTodo.addEventListener('click', async () => {
   const title = document.querySelector('#todo-title').value;
   if (!title) {
     titleInput.classList.add('error');
@@ -583,32 +583,34 @@ submitTodo.addEventListener('click', () => {
   const description = document.querySelector('#description').value || '';
   const priority = document.querySelector('#priority').value;
   const { selectedIndex } = document.querySelector('#project');
-  const project = Projects.getProject(selectedIndex);
   const isEditingTodo = addTodoModal.classList.contains('editing');
   const active = getActive();
   const currentClass = active.classList;
+  const project = await Projects.getProject(selectedIndex);
 
   if (isEditingTodo) {
-    const todoId = addTodoModal.getAttribute('todo-id');
-    editTodo(todoId, project.id, title, description, dueDate, priority);
-    // if tab is today refresh with todays todo
-    if (currentClass.contains('today')) refreshTodos(getTodosToday());
-    // else if tab is view all, get ALL todos
-    else if (currentClass.contains('view-all')) refreshTodos(Todos.getTodos());
-    else {
-      // else show activeProject todos
-      const projectId = active.getAttribute('project-id');
-      const activeProject = Projects.getProjectById(projectId);
-      refreshTodos(activeProject.todos);
-    }
+    // FIX LATER
+    // VVVVVVVVV
+    // const todoId = addTodoModal.getAttribute('todo-id');
+    // editTodo(todoId, project.id, title, description, dueDate, priority);
+    // // if tab is today refresh with todays todo
+    // if (currentClass.contains('today')) refreshTodos(getTodosToday());
+    // // else if tab is view all, get ALL todos
+    // else if (currentClass.contains('view-all')) refreshTodos(Todos.getTodos());
+    // else {
+    //   // else show activeProject todos
+    //   const projectId = active.getAttribute('project-id');
+    //   const activeProject = Projects.getProjectById(projectId);
+    //   refreshTodos(activeProject.todos);
+    // }
   } else {
     // if not editing todo then create todo instead
-    const todo = project.addTodo(
+    const todo = Projects.addTodo(
+      project.id,
       title,
       description,
       dueDate,
-      priority,
-      project.todos
+      priority
     );
 
     // if tab is on today, and date selected isToday then display.
