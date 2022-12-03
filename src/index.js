@@ -614,58 +614,78 @@ signOutButton.addEventListener('click', signOutUser);
 const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 const getInbox = () => Projects.getProject(0);
 
+function deleteProjectFromDOM(id) {
+  const project = document.querySelector(`[project-id="${id}"]`);
+  project.remove();
+}
+
+function updateProjectNameInDOM(projectId, newName) {
+  const project = document.querySelector(`.project[project-id="${projectId}"]`);
+
+  const projectName = project.querySelector('.project-title');
+  projectName.textContent = newName;
+  setMainHeader(newName);
+}
+
+function addProjectToDOM(change) {
+  const project = change.doc.data();
+  // if inbox was just added (initial load), switch to inbox tab
+  if (project.type === 'inbox') {
+    const inbox = document.querySelector('.inbox');
+    inbox.setAttribute('project-id', project.id);
+    switchTab(project.name, project.todos);
+  } else {
+    displayProject(project.name, change.doc.id);
+  }
+}
+
+async function updateProjectTodos(project) {
+  const active = getActive();
+  const activeProjectId = active.getAttribute('project-id');
+  const currentTab = active.classList;
+
+  if (currentTab.contains('today')) {
+    refreshTodos(await getTodosToday());
+  } else if (currentTab.contains('view-all')) {
+    refreshTodos(await Projects.getAllTodos());
+  } else if (project.id === activeProjectId) {
+    refreshTodos(project.todos);
+  }
+}
+
 function onProjectCollectionChange(snapshot) {
   const docChanges = snapshot.docChanges();
   if (!docChanges.length) {
     initializeInbox();
     return;
   }
-
-  function deleteProjectFromDOM(id) {
-    const project = document.querySelector(`[project-id="${id}"]`);
-    project.remove();
-  }
-
-  function updateProjectNameInDOM(projectId, newName) {
-    const project = document.querySelector(
-      `.project[project-id="${projectId}"]`
-    );
-
-    const projectName = project.querySelector('.project-title');
-    projectName.textContent = newName;
-    setMainHeader(newName);
-  }
-
   docChanges.forEach(async (change) => {
     const project = change.doc.data();
-    // if inbox was just added (initial load), switch to inbox tab
-    if (project.type === 'inbox' && change.type === 'added') {
-      const inbox = document.querySelector('.inbox');
-      inbox.setAttribute('project-id', project.id);
 
-      switchTab(project.name, project.todos);
-    } else if (change.type === 'added') {
-      displayProject(project.name, change.doc.id);
-    } else if (change.type === 'modified') {
-      const active = getActive();
-      const currentTab = active.classList;
+    switch (change.type) {
+      case 'added':
+        addProjectToDOM(change);
+        break;
 
-      updateProjectNameInDOM(project.id, project.name);
-      if (currentTab.contains('today')) {
-        refreshTodos(await getTodosToday());
-      } else if (currentTab.contains('view-all')) {
-        refreshTodos(await Projects.getAllTodos());
-      }
-      // if the project that was modified has the same id as the active project's id
-      else if (project.id === active.getAttribute('project-id')) {
-        refreshTodos(project.todos);
-      }
-    } else if (change.type === 'removed') {
-      deleteProjectFromDOM(project.id);
-      // After deletion, switch to inbox tab by default
-      getInbox().then(({ todos }) => switchTab('Inbox', todos));
-      const inboxElement = document.querySelector('.inbox');
-      setActiveClass(inboxElement);
+      case 'modified':
+        updateProjectNameInDOM(project.id, project.name);
+        updateProjectTodos(project);
+        break;
+
+      case 'deleted':
+        {
+          deleteProjectFromDOM(project.id);
+          // After deletion, switch to inbox tab by default
+          const inbox = await getInbox();
+          const inboxElement = document.querySelector('.inbox');
+
+          switchTab('Inbox', inbox.todos);
+          setActiveClass(inboxElement);
+        }
+        break;
+
+      default:
+        console.error('Unknown change type');
     }
   });
 }
