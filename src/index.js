@@ -523,7 +523,6 @@ cancel.forEach((btn) => btn.addEventListener('click', closeAllModals));
 submitProject.addEventListener('click', () => {
   const projectName = document.querySelector('#name').value;
   if (!projectName) return;
-
   closeAllModals();
   // check if editing project name
   if (addProjectModal.classList.contains('editing')) {
@@ -660,18 +659,19 @@ function onProjectCollectionChange(snapshot) {
   }
   docChanges.forEach(async (change) => {
     const project = change.doc.data();
-
     switch (change.type) {
       case 'added':
         addProjectToDOM(change);
         break;
 
       case 'modified':
+        if (change.doc.id !== getActiveProjectId()) break;
+
         updateProjectNameInDOM(project.id, project.name);
         updateProjectTodos(project);
-        break;
 
-      case 'deleted':
+        break;
+      case 'removed':
         {
           deleteProjectFromDOM(project.id);
           // After deletion, switch to inbox tab by default
