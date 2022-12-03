@@ -193,7 +193,6 @@ function displayProject(title, id) {
 }
 
 function displayTodo(todo) {
-  if (todo == null) return;
   const todoElement = createTodoElement(
     todo.title,
     todo.id,
@@ -276,10 +275,11 @@ async function addProjectOptions(selected) {
 
   const projects = await Projects.getProjects();
   projects.forEach((project) => {
+    // truncate name if too long
     const truncatedProjectName = getTruncatedString(project.name);
     const option = document.createElement('option');
     option.textContent = truncatedProjectName;
-    option.value = truncatedProjectName;
+    option.value = project.id;
     selectProject.appendChild(option);
   });
   setSelectedOption(selectProject, selected);
@@ -418,16 +418,7 @@ mainContent.addEventListener('click', async (e) => {
   const todoId = todoElement.getAttribute('todo-id');
   // Mark Complete
   if (e.target.closest('.mark-todo-complete')) {
-    const activeClass = getActive().className;
-    const newProject = await Projects.removeTodo(projectId, todoId);
-    if (activeClass === 'today') {
-      refreshTodos(await getTodosToday());
-    } else if (activeClass === 'view-all') {
-      const allTodos = await Projects.getAllTodos();
-      refreshTodos(allTodos);
-    } else {
-      refreshTodos(newProject.todos);
-    }
+    await Projects.removeTodo(projectId, todoId);
   }
   // Edit Todo
   if (!e.target.closest('.edit-todo')) return;
@@ -568,11 +559,10 @@ submitTodo.addEventListener('click', async () => {
   const dueDate = document.querySelector('#due-date').value || null;
   const description = document.querySelector('#description').value || '';
   const priority = document.querySelector('#priority').value;
-  const { selectedIndex } = document.querySelector('#project');
+  const projectId = document.querySelector('#project').value;
   const isEditingTodo = addTodoModal.classList.contains('editing');
   const active = getActive();
   const currentClass = active.classList;
-  const project = await Projects.getProject(selectedIndex);
 
   if (isEditingTodo) {
     // FIX LATER
@@ -591,23 +581,7 @@ submitTodo.addEventListener('click', async () => {
     // }
   } else {
     // if not editing todo then create todo instead
-    const todo = Projects.addTodo(
-      project.id,
-      title,
-      description,
-      dueDate,
-      priority
-    );
-
-    // if tab is on today, and date selected isToday then display.
-    if (currentClass.contains('today')) {
-      if (isToday(new Date(dueDate))) displayTodo(todo);
-    } else if (
-      getActiveProjectIndex() === selectedIndex ||
-      currentClass.contains('view-all')
-    ) {
-      displayTodo(todo);
-    }
+    Projects.addTodo(projectId, title, description, dueDate, priority);
   }
 
   closeAllModals();
@@ -651,7 +625,7 @@ function onProjectCollectionChange(snapshot) {
     project.remove();
   }
 
-  docChanges.forEach((change) => {
+  docChanges.forEach(async (change) => {
     const project = change.doc.data();
     // if inbox was just added (initial load), switch to inbox tab
     if (project.type === 'inbox' && change.type === 'added') {
@@ -661,12 +635,18 @@ function onProjectCollectionChange(snapshot) {
       switchTab(project.name, project.todos);
     } else if (change.type === 'added') {
       displayProject(project.name, change.doc.id);
-    } else if (
-      change.type === 'modified' &&
-      change.newIndex === getActiveProjectIndex()
-    ) {
-      // re-render project name and todos
-      switchTab(project.name, project.todos);
+    } else if (change.type === 'modified') {
+      const active = getActive();
+      const currentTab = active.classList;
+      if (currentTab.contains('today')) {
+        refreshTodos(await getTodosToday());
+      } else if (currentTab.contains('view-all')) {
+        refreshTodos(await Projects.getAllTodos());
+      }
+      // if the project that was modified has the same id as the active project's id
+      else if (project.id === active.getAttribute('project-id')) {
+        refreshTodos(project.todos);
+      }
     } else if (change.type === 'removed') {
       deleteProjectFromDOM(project.id);
       // After deletion, switch to inbox tab by default
