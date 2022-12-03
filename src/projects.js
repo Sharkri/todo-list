@@ -80,10 +80,22 @@ const Projects = (function Projects() {
     return project;
   }
 
-  async function changeTodoAttribute(projectId, todoId, key, value) {
+  async function changeTodoAttributes(
+    projectId,
+    todoId,
+    title,
+    description,
+    dueDate,
+    priority
+  ) {
     const { project, projectPath } = await getProjectById(projectId);
-    // Find the todo and then change its value
-    project.todos.find((todo) => todo.id === todoId)[key] = value;
+
+    const todo = project.todos.find(({ id }) => id === todoId);
+
+    todo.title = title;
+    todo.description = description;
+    todo.dueDate = dueDate;
+    todo.priority = priority;
 
     updateDatabase(projectPath, project);
   }
@@ -113,7 +125,7 @@ const Projects = (function Projects() {
     addTodo,
     setProjectName,
     removeTodo,
-    changeTodoAttribute,
+    changeTodoAttributes,
     getAllTodos,
     getProject,
     getTodoById,

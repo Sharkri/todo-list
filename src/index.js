@@ -218,25 +218,32 @@ function refreshTodos(todos = []) {
   if (low.children.length < 2) low.classList.remove('visible');
 }
 
-function editTodo(todoId, projectId, title, description, dueDate, priority) {
-  const todo = Todos.getTodoById(todoId);
-
+async function editTodo(
+  todoId,
+  prevProjectId,
+  newProjectId,
+  title,
+  description,
+  dueDate,
+  priority
+) {
   // if moved todo to other project
-  if (todo.projectId !== projectId) {
-    const originalProject = Projects.getProjectById(todo.projectId);
+  if (prevProjectId !== newProjectId) {
     // Remove todo from original project
-    originalProject.removeTodo(todo.id);
-
+    Projects.removeTodo(prevProjectId, todoId);
     // Add todo to new project
-    const newProject = Projects.getProjectById(projectId);
-    newProject.addTodo(title, description, dueDate, priority);
+    Projects.addTodo(newProjectId, title, description, dueDate, priority);
     return;
   }
   // if same project, just change todo values.
-  todo.setTodoProperty('title', title, Projects);
-  todo.setTodoProperty('description', description || '', Projects);
-  todo.setTodoProperty('dueDate', dueDate, Projects);
-  todo.setTodoProperty('priority', priority, Projects);
+  Projects.changeTodoAttributes(
+    newProjectId,
+    todoId,
+    title,
+    description || '',
+    dueDate,
+    priority
+  );
 }
 
 async function getTodosToday() {
@@ -302,10 +309,9 @@ function openTodoModal(selected) {
   addProjectOptions(selected);
 }
 
-function updateModalEditing(isEditing, modalName, headerText, btnText) {
-  const modal = document.querySelector(`.${modalName}`);
-  const header = document.querySelector(`.${modalName} > .modal-header`);
-  const button = document.querySelector(`.${modalName} button[type='submit']`);
+function setModalEditing(isEditing, modal, headerText, btnText) {
+  const header = modal.querySelector(`.modal-header`);
+  const button = modal.querySelector(`button[type='submit']`);
   header.textContent = headerText;
   button.textContent = btnText;
   if (isEditing) modal.classList.add('editing');
@@ -413,28 +419,29 @@ searchResults.addEventListener('click', async (e) => {
 
 mainContent.addEventListener('click', async (e) => {
   const todoElement = e.target.closest('.todo');
-  if (!todoElement) return;
+  if (todoElement == null) return;
+
   const projectId = todoElement.getAttribute('project-id');
-  const todoId = todoElement.getAttribute('todo-id');
+  const todoId = +todoElement.getAttribute('todo-id');
   // Mark Complete
   if (e.target.closest('.mark-todo-complete')) {
     await Projects.removeTodo(projectId, todoId);
   }
   // Edit Todo
   if (!e.target.closest('.edit-todo')) return;
-  const projects = Projects.getProjects();
-  const todo = Todos.getTodoById(todoId);
-  const selectedIndex = Projects.findIndex(projects, 'id', todo.projectId);
-  openTodoModal(selectedIndex);
-  updateModalEditing(true, 'add-todo-modal', 'Edit Todo', 'Update Todo');
+  const projectIndex = await Projects.getIndexOf(projectId);
+  openTodoModal(projectIndex);
+  setModalEditing(true, addTodoModal, 'Edit Todo', 'Update Todo');
+  addTodoModal.setAttribute('project-id', projectId);
   addTodoModal.setAttribute('todo-id', todoId);
 
-  const title = document.querySelector('#todo-title');
-  const dueDate = document.querySelector('#due-date');
-  const description = document.querySelector('#description');
-  const priority = document.querySelector('#priority');
+  const todo = await Projects.getTodoById(projectId, todoId);
 
-  // Set all input values to corresponding todo value
+  const title = addTodoModal.querySelector('#todo-title');
+  const dueDate = addTodoModal.querySelector('#due-date');
+  const description = addTodoModal.querySelector('#description');
+  const priority = addTodoModal.querySelector('#priority');
+
   title.value = todo.title;
   dueDate.value = todo.dueDate;
   description.value = todo.description;
@@ -442,12 +449,13 @@ mainContent.addEventListener('click', async (e) => {
   // Set selected to current todo priority selected
   if (todo.priority === 'High') setSelectedOption(priority, 2);
   else if (todo.priority === 'Medium') setSelectedOption(priority, 1);
+  // Don't need to set priority to low since by default it already is low
 });
 
 addTodo.addEventListener('click', () => {
   const selectedIndex = getActiveProjectIndex();
   openTodoModal(selectedIndex);
-  updateModalEditing(false, 'add-todo-modal', 'Add Todo', 'Add Todo');
+  setModalEditing(false, addTodoModal, 'Add Todo', 'Add Todo');
 });
 
 links.forEach((link) => {
@@ -479,7 +487,7 @@ projectsContainer.addEventListener('click', async (e) => {
     const projectId = e.target.closest('.project').getAttribute('project-id');
     addProjectModal.setAttribute('project-id', projectId);
     toggleModal(addProjectModal);
-    updateModalEditing(true, 'add-project-modal', 'Edit Project', 'Update');
+    setModalEditing(true, addProjectModal, 'Edit Project', 'Update');
     const name = document.querySelector('#name');
     name.value = Projects.getProjectById(projectId).name;
   }
@@ -500,7 +508,7 @@ projectTab.addEventListener('click', (e) => {
   // Show add project modal
   toggleModal(addProjectModal);
   // change status to not editing
-  updateModalEditing(false, 'add-project-modal', 'Add Project', 'Add');
+  setModalEditing(false, addProjectModal, 'Add Project', 'Add');
   modalForm.reset();
 });
 
@@ -561,24 +569,19 @@ submitTodo.addEventListener('click', async () => {
   const priority = document.querySelector('#priority').value;
   const projectId = document.querySelector('#project').value;
   const isEditingTodo = addTodoModal.classList.contains('editing');
-  const active = getActive();
-  const currentClass = active.classList;
 
   if (isEditingTodo) {
-    // FIX LATER
-    // VVVVVVVVV
-    // const todoId = addTodoModal.getAttribute('todo-id');
-    // editTodo(todoId, project.id, title, description, dueDate, priority);
-    // // if tab is today refresh with todays todo
-    // if (currentClass.contains('today')) refreshTodos(getTodosToday());
-    // // else if tab is view all, get ALL todos
-    // else if (currentClass.contains('view-all')) refreshTodos(Todos.getTodos());
-    // else {
-    //   // else show activeProject todos
-    //   const projectId = active.getAttribute('project-id');
-    //   const activeProject = Projects.getProjectById(projectId);
-    //   refreshTodos(activeProject.todos);
-    // }
+    const todoId = +addTodoModal.getAttribute('todo-id');
+    const previousProjectId = addTodoModal.getAttribute('project-id');
+    editTodo(
+      todoId,
+      previousProjectId,
+      projectId,
+      title,
+      description,
+      dueDate,
+      priority
+    );
   } else {
     // if not editing todo then create todo instead
     Projects.addTodo(projectId, title, description, dueDate, priority);
