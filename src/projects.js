@@ -41,6 +41,11 @@ const Projects = (function Projects() {
     return project.todos.find((todo) => todo.id === todoId);
   }
 
+  async function getIndexOf(projectId) {
+    const projects = await getProjects();
+    return projects.findIndex((project) => project.id === projectId);
+  }
+
   async function setProjectName(projectId, name) {
     const { project, projectPath } = await getProjectById(projectId);
     project.name = name;
@@ -112,6 +117,7 @@ const Projects = (function Projects() {
     getAllTodos,
     getProject,
     getTodoById,
+    getIndexOf,
   };
 })();
 
