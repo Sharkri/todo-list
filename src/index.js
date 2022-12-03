@@ -51,13 +51,14 @@ function createElement(tagName, className, text) {
   return element;
 }
 
-function createSVG(d, fill) {
+function createSVG(d, fill, className) {
   const SVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   SVG.setAttribute('viewBox', '0 0 24 24');
   path.setAttribute('fill', fill);
   path.setAttribute('d', d);
   SVG.appendChild(path);
+  SVG.setAttribute('class', className);
   return SVG;
 }
 
@@ -86,9 +87,9 @@ function createTodoElement(title, todoId, projectId, dueDate, description) {
   const markComplete = createElement('button', 'mark-todo-complete');
   const check = createSVG(
     'M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z',
-    'currentColor'
+    'currentColor',
+    'checkmark'
   );
-  check.classList.add('checkmark');
   markComplete.appendChild(check);
 
   // todo title / name
@@ -126,9 +127,7 @@ function createTodoElement(title, todoId, projectId, dueDate, description) {
   );
   edit.appendChild(editIcon);
 
-  todoContainer.appendChild(markComplete);
-  todoContainer.appendChild(todoInfo);
-  todoContainer.appendChild(edit);
+  todoContainer.append(markComplete, todoInfo, edit);
   return todoContainer;
 }
 
@@ -165,8 +164,7 @@ function displayProject(title, id) {
 
   const deleteButton = createElement('button', 'delete-project');
   const deleteProject = createElement('span', undefined, 'Delete Project');
-  deleteButton.appendChild(DELETE_SVG);
-  deleteButton.appendChild(deleteProject);
+  deleteButton.append(DELETE_SVG, deleteProject);
 
   const EDIT_SVG = createSVG(
     'M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z',
@@ -174,28 +172,23 @@ function displayProject(title, id) {
   );
   const editButton = createElement('button', 'edit-project');
   const editText = createElement('span', undefined, 'Edit Project');
-  editButton.appendChild(EDIT_SVG);
-  editButton.appendChild(editText);
+  editButton.append(EDIT_SVG, editText);
 
   // Append edit and delete options to dropdown
   const dropdown = createElement('div', 'dropdown');
-  dropdown.appendChild(editButton);
-  dropdown.appendChild(deleteButton);
+  dropdown.append(editButton, deleteButton);
 
   const DOTS_SVG = createSVG(
     'M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z',
-    'currentColor'
+    'currentColor',
+    'project-options'
   );
-  DOTS_SVG.classList.add('project-options');
   DOTS_SVG.onclick = () => toggleDropdown(dropdown);
 
-  projectLeft.appendChild(LIST_SVG);
-  projectLeft.appendChild(projectTitle);
-  projectRight.appendChild(DOTS_SVG);
-  projectRight.appendChild(dropdown);
+  projectLeft.append(LIST_SVG, projectTitle);
+  projectRight.append(DOTS_SVG, dropdown);
 
-  project.appendChild(projectLeft);
-  project.appendChild(projectRight);
+  project.append(projectLeft, projectRight);
   projectsContainer.appendChild(project);
 }
 
@@ -371,12 +364,6 @@ function switchTab(title, todos) {
   setMainHeader(title);
   refreshTodos(todos || []);
 }
-
-// Shows LocalStorage projects excluding first project (inbox)
-// FIX LATER
-// Projects.getProjects()
-//   .slice(1)
-//   .forEach((project) => displayProject(project.name, project.id));
 
 document.onclick = (e) => {
   // if clicked off close search results
@@ -636,7 +623,7 @@ deleteProjectConfirm.addEventListener('click', () => {
 
 // Toggle sidebar showing
 menu.addEventListener('click', () => {
-  document.querySelector('body').classList.toggle('sidebar-hidden');
+  document.body.classList.toggle('sidebar-hidden');
   nav.classList.toggle('hidden');
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
