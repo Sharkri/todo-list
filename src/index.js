@@ -46,8 +46,8 @@ const titleErrorText = document.querySelector('.title-error-text');
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
-  if (text !== undefined) element.textContent = text;
-  if (className !== undefined) element.classList.add(className);
+  if (text != null) element.textContent = text;
+  if (className != null) element.classList.add(className);
   return element;
 }
 
@@ -58,7 +58,7 @@ function createSVG(d, fill, className) {
   path.setAttribute('fill', fill);
   path.setAttribute('d', d);
   SVG.appendChild(path);
-  SVG.setAttribute('class', className);
+  if (className) SVG.setAttribute('class', className);
   return SVG;
 }
 
