@@ -37,7 +37,7 @@ const Projects = (function Projects() {
   }
 
   async function getTodoById(projectId, todoId) {
-    const project = await getProjectById(projectId);
+    const { project } = await getProjectById(projectId);
     return project.todos.find((todo) => todo.id === todoId);
   }
 
