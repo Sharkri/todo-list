@@ -7,7 +7,7 @@ import {
   updateDatabase,
 } from './backend';
 
-import Todos from './todos';
+import createTodo from './todos';
 
 const Projects = (function Projects() {
   function findIndex(array, key, valueToFind) {
@@ -55,7 +55,7 @@ const Projects = (function Projects() {
   async function addTodo(projectId, title, description, dueDate, priority) {
     const { project, projectPath } = await getProjectById(projectId);
 
-    const todo = Todos.createTodo(
+    const todo = createTodo(
       title,
       description,
       dueDate,

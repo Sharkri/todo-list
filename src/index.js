@@ -7,7 +7,6 @@ import {
   isYesterday,
 } from 'date-fns';
 import Projects from './projects';
-import Todos from './todos';
 import {
   signOutUser,
   signIn,
