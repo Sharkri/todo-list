@@ -613,7 +613,7 @@ const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 const getInbox = () => Projects.getProject(0);
 
 function deleteProjectFromDOM(id) {
-  const project = document.querySelector(`[project-id="${id}"]`);
+  const project = document.querySelector(`.project[project-id="${id}"]`);
   project.remove();
 }
 
@@ -659,6 +659,7 @@ function onProjectCollectionChange(snapshot) {
   }
   docChanges.forEach(async (change) => {
     const project = change.doc.data();
+    console.log(change, project);
     switch (change.type) {
       case 'added':
         addProjectToDOM(change);
@@ -707,7 +708,6 @@ function onAuthChange(user) {
     setUserSignedIn(false);
     return;
   }
-
   setUserSignedIn(user);
   listenForCollectionChange(
     `users/${user.uid}/projects`,
