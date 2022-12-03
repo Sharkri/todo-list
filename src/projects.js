@@ -18,7 +18,7 @@ const Projects = (function Projects() {
     return getCollectionDocs(`users/${user.uid}/projects/`);
   };
 
-  async function getTodos() {
+  async function getAllTodos() {
     const projects = await getProjects();
     return projects.flatMap((project) => project.todos);
   }
@@ -34,6 +34,11 @@ const Projects = (function Projects() {
     const project = await getDocData(projectPath);
 
     return { projectPath, project };
+  }
+
+  async function getTodoById(projectId, todoId) {
+    const project = await getProjectById(projectId);
+    return project.todos.find((todo) => todo.id === todoId);
   }
 
   async function setProjectName(projectId, name) {
@@ -104,8 +109,9 @@ const Projects = (function Projects() {
     setProjectName,
     removeTodo,
     changeTodoAttribute,
-    getAllTodos: getTodos,
+    getAllTodos,
     getProject,
+    getTodoById,
   };
 })();
 
