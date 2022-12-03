@@ -22,7 +22,7 @@ const addProjectModal = document.querySelector('.add-project-modal');
 const addTodoModal = document.querySelector('.add-todo-modal');
 const deleteModal = document.querySelector('.delete-modal');
 const cancel = document.querySelectorAll('.cancel');
-const addProject = document.querySelector('.submit');
+const submitProject = document.querySelector('.submit');
 const submitTodo = document.querySelector('.submit-todo');
 const deleteProjectConfirm = document.querySelector('.delete');
 const toggleProjectsOpen = document.querySelector('.open-project > svg');
@@ -480,20 +480,27 @@ links.forEach((link) => {
 });
 
 projectsContainer.addEventListener('click', async (e) => {
+  const projectElement = e.target.closest('.project');
+
   // if delete button clicked, show confirm modal
   if (e.target.closest('.delete-project')) toggleModal(deleteModal);
   else if (e.target.closest('.edit-project')) {
     // Find the closest project clicked then get its attribute projectId
-    const projectId = e.target.closest('.project').getAttribute('project-id');
+    const projectId = projectElement.getAttribute('project-id');
     addProjectModal.setAttribute('project-id', projectId);
+
+    const name = addProjectModal.querySelector('#name');
+    const { project } = await Projects.getProjectById(projectId);
+    name.value = project.name;
+
     toggleModal(addProjectModal);
     setModalEditing(true, addProjectModal, 'Edit Project', 'Update');
-    const name = document.querySelector('#name');
-    name.value = Projects.getProjectById(projectId).name;
   }
+  // if already project is already active then no need to switch to it
+  if (projectElement.classList.contains('active')) return;
   // highlight project clicked
-  setActiveClass(e.target.closest('.project'));
-  const projectId = getActiveProjectId();
+  setActiveClass(projectElement);
+  const projectId = projectElement.getAttribute('project-id');
   const { project } = await Projects.getProjectById(projectId);
   switchTab(project.name, project.todos);
 });
@@ -514,27 +521,18 @@ projectTab.addEventListener('click', (e) => {
 
 cancel.forEach((btn) => btn.addEventListener('click', closeAllModals));
 
-addProject.addEventListener('click', () => {
+submitProject.addEventListener('click', () => {
   const projectName = document.querySelector('#name').value;
   if (!projectName) return;
 
   closeAllModals();
   // check if editing project name
   if (addProjectModal.classList.contains('editing')) {
-    const id = addProjectModal.getAttribute('project-id');
-    const selectedProject = Projects.getProjectById(id);
+    const projectId = addProjectModal.getAttribute('project-id');
+    const selectedProject = Projects.getProjectById(projectId);
     // return if new name is same as current
     if (selectedProject.name === projectName) return;
-    selectedProject.setProjectName(projectName);
-    // Search all projects id to find matching id
-    const index = Array.from(projectsContainer.children).findIndex(
-      (project) => project.getAttribute('project-id') === id
-    );
-    // show project name on screen
-    const projectTitles = document.getElementsByClassName('project-title');
-    projectTitles[index].textContent = projectName;
-    // show on header too
-    setMainHeader(projectName);
+    Projects.setProjectName(projectId, projectName);
     return;
   }
   // if not editing, else create a new project
@@ -628,6 +626,16 @@ function onProjectCollectionChange(snapshot) {
     project.remove();
   }
 
+  function updateProjectNameInDOM(projectId, newName) {
+    const project = document.querySelector(
+      `.project[project-id="${projectId}"]`
+    );
+
+    const projectName = project.querySelector('.project-title');
+    projectName.textContent = newName;
+    setMainHeader(newName);
+  }
+
   docChanges.forEach(async (change) => {
     const project = change.doc.data();
     // if inbox was just added (initial load), switch to inbox tab
@@ -641,6 +649,8 @@ function onProjectCollectionChange(snapshot) {
     } else if (change.type === 'modified') {
       const active = getActive();
       const currentTab = active.classList;
+
+      updateProjectNameInDOM(project.id, project.name);
       if (currentTab.contains('today')) {
         refreshTodos(await getTodosToday());
       } else if (currentTab.contains('view-all')) {
