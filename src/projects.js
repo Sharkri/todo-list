@@ -1,3 +1,4 @@
+import { serverTimestamp } from 'firebase/firestore';
 import {
   addToDatabase,
   deleteInDatabase,
@@ -13,9 +14,11 @@ const Projects = (function Projects() {
   function findIndex(array, key, valueToFind) {
     return array.findIndex((item) => item[key] === valueToFind);
   }
-  const getProjects = () => {
+  const getProjects = async () => {
     const user = getUser();
-    return getCollectionDocs(`users/${user.uid}/projects/`);
+    const projects = await getCollectionDocs(`users/${user.uid}/projects/`);
+    // Sort by ascending
+    return projects.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
   };
 
   async function getAllTodos() {
@@ -94,7 +97,12 @@ const Projects = (function Projects() {
   }
 
   async function createProject(name, type) {
-    const project = { name, todos: [], currentTodoId: 0 };
+    const project = {
+      name,
+      todos: [],
+      currentTodoId: 0,
+      timestamp: serverTimestamp(),
+    };
     if (type) project.type = type;
 
     const user = getUser();
