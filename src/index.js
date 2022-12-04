@@ -17,7 +17,7 @@ import {
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
 const todoForm = document.querySelector('.add-todo-form');
-const addProjectModal = document.querySelector('.add-project-modal');
+const projectModal = document.querySelector('.add-project-modal');
 const addTodoModal = document.querySelector('.add-todo-modal');
 const deleteModal = document.querySelector('.delete-modal');
 const cancel = document.querySelectorAll('.cancel');
@@ -77,8 +77,8 @@ function getFormattedDate(date) {
 
 function createTodoElement(title, todoId, projectId, dueDate, description) {
   const todoContainer = createElement('div', 'todo');
-  todoContainer.setAttribute('todo-id', todoId);
-  todoContainer.setAttribute('project-id', projectId);
+  todoContainer.dataset.todoId = todoId;
+  todoContainer.dataset.projectId = projectId;
   // todo info. contains title, description and due date
   const todoInfo = createElement('div', 'todo-info');
 
@@ -145,7 +145,7 @@ function toggleDropdown(dropdownClicked) {
 
 function displayProject(title, id) {
   const project = createElement('div', 'project');
-  project.setAttribute('project-id', id);
+  project.dataset.projectId = id;
   const projectLeft = createElement('div', 'project-left');
   const projectRight = createElement('button', 'project-right');
 
@@ -322,12 +322,6 @@ function getActiveProjectIndex() {
   return Array.from(projectElems).indexOf(project);
 }
 
-function getActiveProjectId() {
-  const project = document.querySelector('.project.active');
-  if (project == null) return null;
-  return project.getAttribute('project-id');
-}
-
 function setActiveClass(element) {
   const active = document.querySelector('.active');
   if (active) active.classList.remove('active');
@@ -386,7 +380,7 @@ searchInput.addEventListener('input', async (e) => {
     occurrences.forEach((occurrence) => {
       // add search results found.
       const { name, id } = occurrence;
-      addSearchResult(name, 'project-id', id);
+      addSearchResult(name, 'data-project-id', id);
     });
   }
 });
@@ -394,10 +388,10 @@ searchInput.addEventListener('input', async (e) => {
 searchResults.addEventListener('click', async (e) => {
   searchResults.classList.remove('found');
   const name = e.target.textContent;
-  const id = e.target.getAttribute('project-id');
+  const { id } = e.target.dataset;
   if (!id) return;
   const { todos } = (await Projects.getProjectById(id)).project;
-  const project = document.querySelector(`.project[project-id="${id}"]`);
+  const project = document.querySelector(`.project[data-project-id="${id}"]`);
   setActiveClass(project);
   switchTab(name, todos);
   searchInput.value = '';
@@ -421,8 +415,8 @@ mainContent.addEventListener('click', async (e) => {
   const todoElement = e.target.closest('.todo');
   if (todoElement == null) return;
 
-  const projectId = todoElement.getAttribute('project-id');
-  const todoId = +todoElement.getAttribute('todo-id');
+  const { projectId, todoId: todoIdString } = todoElement.dataset;
+  const todoId = +todoIdString;
   // Mark Complete
   if (e.target.closest('.mark-todo-complete')) {
     await Projects.removeTodo(projectId, todoId);
@@ -434,8 +428,8 @@ mainContent.addEventListener('click', async (e) => {
     openTodoModal(projectIndex);
     setModalEditing(true, addTodoModal, 'Edit Todo', 'Update Todo');
     // Set data attributes
-    addTodoModal.setAttribute('project-id', projectId);
-    addTodoModal.setAttribute('todo-id', todoId);
+    addTodoModal.dataset.projectId = projectId;
+    addTodoModal.dataset.todoId = todoId;
 
     const todo = await Projects.getTodoById(projectId, todoId);
     setTodoInputValues(todo);
@@ -470,27 +464,31 @@ links.forEach((link) => {
 });
 
 projectsContainer.addEventListener('click', async (e) => {
-  const projectElement = e.target.closest('.project');
-
   // if delete button clicked, show confirm modal
-  if (e.target.closest('.delete-project')) toggleModal(deleteModal);
-  else if (e.target.closest('.edit-project')) {
-    // Find the closest project clicked then get its attribute projectId
-    const projectId = projectElement.getAttribute('project-id');
-    addProjectModal.setAttribute('project-id', projectId);
+  if (e.target.closest('.delete-project')) {
+    toggleModal(deleteModal);
+    return;
+  }
 
-    const name = addProjectModal.querySelector('#name');
+  const projectElement = e.target.closest('.project');
+  const { projectId } = projectElement.dataset;
+
+  // if edit project button was clicked
+  if (e.target.closest('.edit-project')) {
     const { project } = await Projects.getProjectById(projectId);
+    const name = projectModal.querySelector('#name');
     name.value = project.name;
 
-    toggleModal(addProjectModal);
-    setModalEditing(true, addProjectModal, 'Edit Project', 'Update');
+    projectModal.dataset.projectId = projectId;
+    toggleModal(projectModal);
+    setModalEditing(true, projectModal, 'Edit Project', 'Update');
   }
+
   // if already project is already active then no need to switch to it
   if (projectElement.classList.contains('active')) return;
   // highlight project clicked
   setActiveClass(projectElement);
-  const projectId = projectElement.getAttribute('project-id');
+  // switch to project
   const { project } = await Projects.getProjectById(projectId);
   switchTab(project.name, project.todos);
 });
@@ -503,9 +501,9 @@ projectTab.addEventListener('click', (e) => {
     return;
   }
   // Show add project modal
-  toggleModal(addProjectModal);
+  toggleModal(projectModal);
   // change status to not editing
-  setModalEditing(false, addProjectModal, 'Add Project', 'Add');
+  setModalEditing(false, projectModal, 'Add Project', 'Add');
   modalForm.reset();
 });
 
@@ -516,8 +514,8 @@ submitProject.addEventListener('click', () => {
   if (!projectName) return;
   closeAllModals();
   // check if editing project name
-  if (addProjectModal.classList.contains('editing')) {
-    const projectId = addProjectModal.getAttribute('project-id');
+  if (projectModal.classList.contains('editing')) {
+    const { projectId } = projectModal.dataset;
     const selectedProject = Projects.getProjectById(projectId);
     // return if new name is same as current
     if (selectedProject.name === projectName) return;
@@ -559,8 +557,7 @@ submitTodo.addEventListener('click', async () => {
   const isEditingTodo = addTodoModal.classList.contains('editing');
 
   if (isEditingTodo) {
-    const todoId = +addTodoModal.getAttribute('todo-id');
-    const previousProjectId = addTodoModal.getAttribute('project-id');
+    const { todoId, projectId: previousProjectId } = addTodoModal.dataset;
     const newTodo = { title, description, dueDate, priority };
     editTodo(todoId, previousProjectId, projectId, newTodo);
   } else {
@@ -573,7 +570,7 @@ submitTodo.addEventListener('click', async () => {
 
 deleteProjectConfirm.addEventListener('click', () => {
   // Remove project from database
-  const projectId = getActiveProjectId();
+  const { projectId } = getActive().dataset;
   Projects.removeProject(projectId);
   // Close modal after deleting project
   closeAllModals();
@@ -598,12 +595,14 @@ const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 const getInbox = () => Projects.getProject(0);
 
 function deleteProjectFromDOM(id) {
-  const project = document.querySelector(`.project[project-id="${id}"]`);
+  const project = document.querySelector(`.project[data-project-id="${id}"]`);
   project.remove();
 }
 
 function updateProjectNameInDOM(projectId, newName) {
-  const project = document.querySelector(`.project[project-id="${projectId}"]`);
+  const project = document.querySelector(
+    `.project[data-project-id="${projectId}"]`
+  );
 
   const projectName = project.querySelector('.project-title');
   projectName.textContent = newName;
@@ -615,7 +614,7 @@ function addProjectToDOM(change) {
   // if inbox was just added (initial load), switch to inbox tab
   if (project.type === 'inbox') {
     const inbox = document.querySelector('.inbox');
-    inbox.setAttribute('project-id', change.doc.id);
+    inbox.dataset.projectId = change.doc.id;
     switchTab(project.name, project.todos);
   } else {
     displayProject(project.name, change.doc.id);
@@ -637,10 +636,10 @@ function onProjectCollectionChange(snapshot) {
 
       case 'modified':
         {
-          const { type } = getActive().dataset;
+          const { type, projectId: activeProjectId } = getActive().dataset;
           if (type === 'view-all') refreshTodos(await Projects.getAllTodos());
           else if (type === 'today') refreshTodos(await getTodosToday());
-          else if (change.doc.id === getActiveProjectId()) {
+          else if (change.doc.id === activeProjectId) {
             updateProjectNameInDOM(project.id, project.name);
             refreshTodos(project.todos);
           }
