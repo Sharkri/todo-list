@@ -316,6 +316,11 @@ function getActive() {
   return active;
 }
 
+function getProjectElementById(id) {
+  const project = projectsContainer.querySelector(`[data-project-id="${id}"]`);
+  return project;
+}
+
 function getActiveProjectIndex() {
   const project = document.querySelector('.project.active');
   // Search in projects the index of current active project
@@ -388,10 +393,10 @@ searchInput.addEventListener('input', async (e) => {
 searchResults.addEventListener('click', async (e) => {
   searchResults.classList.remove('found');
   const name = e.target.textContent;
-  const { id } = e.target.dataset;
-  if (!id) return;
-  const { todos } = (await Projects.getProjectById(id)).project;
-  const project = document.querySelector(`.project[data-project-id="${id}"]`);
+  const { projectId } = e.target.dataset;
+  if (!projectId) return;
+  const { todos } = (await Projects.getProjectById(projectId)).project;
+  const project = getProjectElementById(projectId);
   setActiveClass(project);
   switchTab(name, todos);
   searchInput.value = '';
@@ -557,9 +562,11 @@ submitTodo.addEventListener('click', async () => {
   const isEditingTodo = addTodoModal.classList.contains('editing');
 
   if (isEditingTodo) {
-    const { todoId, projectId: previousProjectId } = addTodoModal.dataset;
+    const { todoId, projectId: prevProjectId } = addTodoModal.dataset;
+
     const newTodo = { title, description, dueDate, priority };
-    editTodo(todoId, previousProjectId, projectId, newTodo);
+    // Convert todoId to number since data-attribute gets converted to string
+    editTodo(+todoId, prevProjectId, projectId, newTodo);
   } else {
     // if not editing todo then create todo instead
     Projects.addTodo(projectId, title, description, dueDate, priority);
@@ -595,14 +602,12 @@ const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 const getInbox = () => Projects.getProject(0);
 
 function deleteProjectFromDOM(id) {
-  const project = document.querySelector(`.project[data-project-id="${id}"]`);
+  const project = getProjectElementById(id);
   project.remove();
 }
 
 function updateProjectNameInDOM(projectId, newName) {
-  const project = document.querySelector(
-    `.project[data-project-id="${projectId}"]`
-  );
+  const project = getProjectElementById(projectId);
 
   const projectName = project.querySelector('.project-title');
   projectName.textContent = newName;

@@ -87,7 +87,6 @@ const Projects = (function Projects() {
     const { project, projectPath } = await getProjectById(projectId);
     const { title, description, dueDate, priority } = newTodo;
     const todo = project.todos.find(({ id }) => id === todoId);
-
     todo.title = title;
     todo.description = description;
     todo.dueDate = dueDate;
