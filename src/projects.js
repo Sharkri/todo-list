@@ -80,16 +80,9 @@ const Projects = (function Projects() {
     return project;
   }
 
-  async function changeTodoAttributes(
-    projectId,
-    todoId,
-    title,
-    description,
-    dueDate,
-    priority
-  ) {
+  async function editTodo(projectId, todoId, newTodo) {
     const { project, projectPath } = await getProjectById(projectId);
-
+    const { title, description, dueDate, priority } = newTodo;
     const todo = project.todos.find(({ id }) => id === todoId);
 
     todo.title = title;
@@ -125,7 +118,7 @@ const Projects = (function Projects() {
     addTodo,
     setProjectName,
     removeTodo,
-    changeTodoAttributes,
+    editTodo,
     getAllTodos,
     getProject,
     getTodoById,

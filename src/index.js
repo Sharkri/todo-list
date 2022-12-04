@@ -217,15 +217,8 @@ function refreshTodos(todos = []) {
   if (low.children.length < 2) low.classList.remove('visible');
 }
 
-async function editTodo(
-  todoId,
-  prevProjectId,
-  newProjectId,
-  title,
-  description,
-  dueDate,
-  priority
-) {
+async function editTodo(todoId, prevProjectId, newProjectId, newTodo) {
+  const { title, description, dueDate, priority } = newTodo;
   // if moved todo to other project
   if (prevProjectId !== newProjectId) {
     // Remove todo from original project
@@ -235,14 +228,7 @@ async function editTodo(
     return;
   }
   // if same project, just change todo values.
-  Projects.changeTodoAttributes(
-    newProjectId,
-    todoId,
-    title,
-    description || '',
-    dueDate,
-    priority
-  );
+  Projects.editTodo(newProjectId, todoId, newTodo);
 }
 
 async function getTodosToday() {
@@ -338,6 +324,7 @@ function getActiveProjectIndex() {
 
 function getActiveProjectId() {
   const project = document.querySelector('.project.active');
+  if (project == null) return null;
   return project.getAttribute('project-id');
 }
 
@@ -347,8 +334,8 @@ function setActiveClass(element) {
   element.classList.add('active');
 }
 
-function addSearchOption(text, attributeName, attributeValue, className) {
-  const searchResult = createElement('li', className, text);
+function addSearchResult(text, attributeName, attributeValue) {
+  const searchResult = createElement('li', 'search-result', text);
   if (attributeName) searchResult.setAttribute(attributeName, attributeValue);
   searchResults.appendChild(searchResult);
 }
@@ -356,8 +343,9 @@ function addSearchOption(text, attributeName, attributeValue, className) {
 async function query(search) {
   const occurrences = [];
   const projects = await Projects.getProjects();
+  const lowercaseSearch = search.toLowerCase();
   projects.forEach((project) => {
-    if (project.name.toLowerCase().includes(search.toLowerCase())) {
+    if (project.name.toLowerCase().includes(lowercaseSearch)) {
       occurrences.push(project);
     }
   });
@@ -382,26 +370,25 @@ document.onclick = (e) => {
 };
 
 searchInput.addEventListener('input', async (e) => {
-  if (!e.target.value) {
+  const searchQuery = e.target.value;
+  if (!searchQuery) {
     searchResults.classList.remove('found');
     return;
   }
-  const occurrences = await query(e.target.value);
-  // Reset search results found.
+  const occurrences = await query(searchQuery);
+  // Clear search results.
   searchResults.textContent = '';
   searchResults.classList.add('found');
-  // if no occurences found, show "No results found."
-  if (!occurrences.length) {
-    addSearchOption('No results found.', false, false, 'search-result');
-    return;
-  }
 
-  // else add found search results.
-  occurrences.forEach((occurrence) => {
-    const text = occurrence.name;
-    const projectId = occurrence.id;
-    addSearchOption(text, 'project-id', projectId, 'search-result');
-  });
+  if (!occurrences.length) {
+    addSearchResult('No results found.');
+  } else {
+    occurrences.forEach((occurrence) => {
+      // add search results found.
+      const { name, id } = occurrence;
+      addSearchResult(name, 'project-id', id);
+    });
+  }
 });
 
 searchResults.addEventListener('click', async (e) => {
@@ -416,6 +403,20 @@ searchResults.addEventListener('click', async (e) => {
   searchInput.value = '';
 });
 
+async function setTodoInputValues(todo) {
+  const title = addTodoModal.querySelector('#todo-title');
+  const dueDate = addTodoModal.querySelector('#due-date');
+  const description = addTodoModal.querySelector('#description');
+  const priority = addTodoModal.querySelector('#priority');
+
+  title.value = todo.title;
+  dueDate.value = todo.dueDate;
+  description.value = todo.description;
+
+  if (todo.priority === 'High') setSelectedOption(priority, 2);
+  else if (todo.priority === 'Medium') setSelectedOption(priority, 1);
+}
+
 mainContent.addEventListener('click', async (e) => {
   const todoElement = e.target.closest('.todo');
   if (todoElement == null) return;
@@ -426,29 +427,19 @@ mainContent.addEventListener('click', async (e) => {
   if (e.target.closest('.mark-todo-complete')) {
     await Projects.removeTodo(projectId, todoId);
   }
-  // Edit Todo
-  if (!e.target.closest('.edit-todo')) return;
-  const projectIndex = await Projects.getIndexOf(projectId);
-  openTodoModal(projectIndex);
-  setModalEditing(true, addTodoModal, 'Edit Todo', 'Update Todo');
-  addTodoModal.setAttribute('project-id', projectId);
-  addTodoModal.setAttribute('todo-id', todoId);
+  // if editing todo
+  else if (e.target.closest('.edit-todo')) {
+    const projectIndex = await Projects.getIndexOf(projectId);
+    // Open todo modal and set modal to editing
+    openTodoModal(projectIndex);
+    setModalEditing(true, addTodoModal, 'Edit Todo', 'Update Todo');
+    // Set data attributes
+    addTodoModal.setAttribute('project-id', projectId);
+    addTodoModal.setAttribute('todo-id', todoId);
 
-  const todo = await Projects.getTodoById(projectId, todoId);
-
-  const title = addTodoModal.querySelector('#todo-title');
-  const dueDate = addTodoModal.querySelector('#due-date');
-  const description = addTodoModal.querySelector('#description');
-  const priority = addTodoModal.querySelector('#priority');
-
-  title.value = todo.title;
-  dueDate.value = todo.dueDate;
-  description.value = todo.description;
-
-  // Set selected to current todo priority selected
-  if (todo.priority === 'High') setSelectedOption(priority, 2);
-  else if (todo.priority === 'Medium') setSelectedOption(priority, 1);
-  // Don't need to set priority to low since by default it already is low
+    const todo = await Projects.getTodoById(projectId, todoId);
+    setTodoInputValues(todo);
+  }
 });
 
 addTodo.addEventListener('click', () => {
@@ -506,7 +497,7 @@ projectsContainer.addEventListener('click', async (e) => {
 
 projectTab.addEventListener('click', (e) => {
   if (e.target.contains(toggleProjectsOpen)) {
-    // toggle show project
+    // toggle projects showing
     projectsContainer.classList.toggle('closed');
     toggleProjectsOpen.classList.toggle('rotated');
     return;
@@ -531,10 +522,10 @@ submitProject.addEventListener('click', () => {
     // return if new name is same as current
     if (selectedProject.name === projectName) return;
     Projects.setProjectName(projectId, projectName);
-    return;
+  } else {
+    // if not editing, else create a new project
+    Projects.createProject(projectName);
   }
-  // if not editing, else create a new project
-  Projects.createProject(projectName);
 });
 
 titleInput.addEventListener('keyup', (e) => {
@@ -555,6 +546,7 @@ titleInput.addEventListener('keyup', (e) => {
 submitTodo.addEventListener('click', async () => {
   const title = document.querySelector('#todo-title').value;
   if (!title) {
+    // Display error
     titleInput.classList.add('error');
     titleErrorText.classList.add('visible');
     titleInput.focus();
@@ -569,15 +561,8 @@ submitTodo.addEventListener('click', async () => {
   if (isEditingTodo) {
     const todoId = +addTodoModal.getAttribute('todo-id');
     const previousProjectId = addTodoModal.getAttribute('project-id');
-    editTodo(
-      todoId,
-      previousProjectId,
-      projectId,
-      title,
-      description,
-      dueDate,
-      priority
-    );
+    const newTodo = { title, description, dueDate, priority };
+    editTodo(todoId, previousProjectId, projectId, newTodo);
   } else {
     // if not editing todo then create todo instead
     Projects.addTodo(projectId, title, description, dueDate, priority);
@@ -630,24 +615,10 @@ function addProjectToDOM(change) {
   // if inbox was just added (initial load), switch to inbox tab
   if (project.type === 'inbox') {
     const inbox = document.querySelector('.inbox');
-    inbox.setAttribute('project-id', project.id);
+    inbox.setAttribute('project-id', change.doc.id);
     switchTab(project.name, project.todos);
   } else {
     displayProject(project.name, change.doc.id);
-  }
-}
-
-async function updateProjectTodos(project) {
-  const active = getActive();
-  const activeProjectId = active.getAttribute('project-id');
-  const currentTab = active.classList;
-
-  if (currentTab.contains('today')) {
-    refreshTodos(await getTodosToday());
-  } else if (currentTab.contains('view-all')) {
-    refreshTodos(await Projects.getAllTodos());
-  } else if (project.id === activeProjectId) {
-    refreshTodos(project.todos);
   }
 }
 
@@ -659,19 +630,23 @@ function onProjectCollectionChange(snapshot) {
   }
   docChanges.forEach(async (change) => {
     const project = change.doc.data();
-    console.log(change, project);
     switch (change.type) {
       case 'added':
         addProjectToDOM(change);
         break;
 
       case 'modified':
-        if (change.doc.id !== getActiveProjectId()) break;
-
-        updateProjectNameInDOM(project.id, project.name);
-        updateProjectTodos(project);
-
+        {
+          const { type } = getActive().dataset;
+          if (type === 'view-all') refreshTodos(await Projects.getAllTodos());
+          else if (type === 'today') refreshTodos(await getTodosToday());
+          else if (change.doc.id === getActiveProjectId()) {
+            updateProjectNameInDOM(project.id, project.name);
+            refreshTodos(project.todos);
+          }
+        }
         break;
+
       case 'removed':
         {
           deleteProjectFromDOM(project.id);
@@ -703,6 +678,7 @@ function setUserSignedIn(user) {
     signInButton.classList.remove('hidden');
   }
 }
+
 function onAuthChange(user) {
   if (!user) {
     setUserSignedIn(false);

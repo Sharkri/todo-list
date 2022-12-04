@@ -55,7 +55,6 @@ async function deleteInDatabase(path, id) {
 // Queries for a given collection name and listens for new changes on it.
 function listenForCollectionChange(collectionName, onChange) {
   const recentQuery = query(collection(getFirestore(), collectionName));
-
   // Start listening to the query.
   onSnapshot(recentQuery, onChange);
 }
