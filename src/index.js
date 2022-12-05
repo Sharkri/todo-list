@@ -191,6 +191,9 @@ function displayProject(title, id) {
   projectsContainer.appendChild(project);
 }
 
+const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
+const getInbox = () => Projects.getProject(0);
+
 function displayTodo(todo) {
   const todoElement = createTodoElement(
     todo.title,
@@ -200,10 +203,10 @@ function displayTodo(todo) {
     todo.description
   );
   // Find which priority to append to and show
-  let priority;
+  let priority = low;
   if (todo.priority === 'High') priority = high;
   else if (todo.priority === 'Medium') priority = medium;
-  else priority = low;
+
   priority.classList.add('visible');
   priority.appendChild(todoElement);
 }
@@ -295,10 +298,10 @@ function openTodoModal(selected) {
 }
 
 function setModalEditing(isEditing, modal, headerText, btnText) {
-  const header = modal.querySelector(`.modal-header`);
-  const button = modal.querySelector(`button[type='submit']`);
-  header.textContent = headerText;
-  button.textContent = btnText;
+  const modalHeader = modal.querySelector(`.modal-header`);
+  const modalButton = modal.querySelector(`button[type='submit']`);
+  modalHeader.textContent = headerText;
+  modalButton.textContent = btnText;
   if (isEditing) modal.classList.add('editing');
   else modal.classList.remove('editing');
 }
@@ -317,7 +320,7 @@ function getActive() {
 }
 
 function getProjectElementById(id) {
-  const project = projectsContainer.querySelector(`[data-project-id="${id}"]`);
+  const project = document.querySelector(`.project[data-project-id="${id}"]`);
   return project;
 }
 
@@ -328,7 +331,7 @@ function getActiveProjectIndex() {
 }
 
 function setActiveClass(element) {
-  const active = document.querySelector('.active');
+  const active = getActive();
   if (active) active.classList.remove('active');
   element.classList.add('active');
 }
@@ -348,7 +351,7 @@ async function query(search) {
       occurrences.push(project);
     }
   });
-  // Sort occurences from A-Z
+  // Sort occurrences from A-Z
   return occurrences.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -597,9 +600,6 @@ const userInfo = document.querySelector('.user');
 
 signInButton.addEventListener('click', signIn);
 signOutButton.addEventListener('click', signOutUser);
-
-const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
-const getInbox = () => Projects.getProject(0);
 
 function deleteProjectFromDOM(id) {
   const project = getProjectElementById(id);
