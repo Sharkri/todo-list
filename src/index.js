@@ -42,6 +42,9 @@ const searchResults = document.querySelector('.search-results');
 const selectProject = document.querySelector('#project');
 const titleInput = document.querySelector('#todo-title');
 const titleErrorText = document.querySelector('.title-error-text');
+const noTodosToday = document.querySelector('.no-todos-today');
+const noTodosViewAll = document.querySelector('.no-todos-view-all');
+const noTodosProject = document.querySelector('.no-todos-project');
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
@@ -212,6 +215,11 @@ function displayTodo(todo) {
 }
 
 function refreshTodos(todos = []) {
+  if (!todos?.length) {
+    const { type } = getActive().dataset;
+    displayNoTodos(type);
+  } else hideNoTodos();
+
   Array.from(todoElements).forEach((todo) => todo.remove());
   todos.forEach((todo) => displayTodo(todo));
   // If no todos in high/medium/low priority todos then remove visible
@@ -354,9 +362,23 @@ async function query(search) {
   return occurrences;
 }
 
+function hideNoTodos() {
+  const noTodos = document.querySelector('.no-todos:not(.hidden)');
+  if (noTodos) noTodos.classList.add('hidden');
+}
+
+function displayNoTodos(type) {
+  // Avoid multiple no todos paragraph showing up
+  hideNoTodos();
+
+  if (type === 'today') noTodosToday.classList.remove('hidden');
+  else if (type === 'view-all') noTodosViewAll.classList.remove('hidden');
+  else noTodosProject.classList.remove('hidden');
+}
+
 function switchTab(title, todos) {
   setMainHeader(title);
-  refreshTodos(todos || []);
+  refreshTodos(todos);
 }
 
 document.onclick = (e) => {
@@ -656,9 +678,9 @@ function onProjectCollectionChange(snapshot) {
           // After deletion, switch to inbox tab by default
           const inbox = await getInbox();
           const inboxElement = document.querySelector('.inbox');
+          setActiveClass(inboxElement);
 
           switchTab('Inbox', inbox.todos);
-          setActiveClass(inboxElement);
         }
         break;
 
