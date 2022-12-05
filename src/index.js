@@ -351,8 +351,7 @@ async function query(search) {
       occurrences.push(project);
     }
   });
-  // Sort occurrences from A-Z
-  return occurrences.sort((a, b) => a.name.localeCompare(b.name));
+  return occurrences;
 }
 
 function switchTab(title, todos) {
