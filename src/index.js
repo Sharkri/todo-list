@@ -9,12 +9,8 @@ import {
 import Projects from './projects';
 import { listenForCollectionChange, initialize } from './backend';
 
-import {
-  listenForAuthChange,
-  signInWithGoogle,
-  signOutUser,
-  signUp,
-} from './auth';
+import listenForSignIn from './handleAuth';
+
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
@@ -616,30 +612,6 @@ menu.addEventListener('click', () => {
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
 
-function goToPage(page) {
-  const currentPage = document.querySelector('.page:not(.hidden)');
-  currentPage.classList.add('hidden');
-  page.classList.remove('hidden');
-}
-
-const signInPage = document.querySelector('.sign-in-page');
-const signUpPage = document.querySelector('.sign-up-page');
-const mainPage = document.querySelector('.main-page');
-const signInButton = document.querySelector('.sign-in-with-google');
-const signOutButton = document.querySelector('.sign-out');
-const goToSignUpPage = document.querySelector('.go-to-sign-up-page');
-const goToSignInPage = document.querySelector('.go-to-sign-in-page');
-// user's profile pic, username and sign out button
-const userInfo = document.querySelector('.user');
-
-signInButton.addEventListener('click', () => signInWithGoogle());
-signOutButton.addEventListener('click', () => signOutUser());
-
-goToSignUpPage.addEventListener('click', () => {
-  goToPage(signUpPage);
-});
-goToSignInPage.addEventListener('click', () => goToPage(signInPage));
-
 function deleteProjectFromDOM(id) {
   const project = getProjectElementById(id);
   project.remove();
@@ -707,29 +679,12 @@ function onProjectCollectionChange(snapshot) {
     }
   });
 }
+let unsubscribe = null;
 
-function setUserSignedIn(user) {
-  if (user) {
-    const username = userInfo.querySelector('.user-name');
-    const userPic = userInfo.querySelector('.user-pic');
-    username.textContent = user.displayName;
-    userPic.src = user.photoURL || '/images/profile_placeholder.png';
-    mainPage.classList.remove('hidden');
-    signInPage.classList.add('hidden');
-  } else {
-    mainPage.classList.add('hidden');
-    signInPage.classList.remove('hidden');
-  }
-}
-
-function onAuthChange(user) {
-  if (!user) {
-    setUserSignedIn(false);
-    return;
-  }
-
-  setUserSignedIn(user);
-  listenForCollectionChange(
+function onSignIn(user) {
+  // Unsubscribe from previous onSnapshot
+  if (typeof unsubscribe === 'function') unsubscribe();
+  unsubscribe = listenForCollectionChange(
     `users/${user.uid}/projects`,
     onProjectCollectionChange
   );
@@ -737,5 +692,4 @@ function onAuthChange(user) {
 
 // Initialize firebase app
 initialize();
-// Listen for auth state change
-listenForAuthChange(onAuthChange);
+listenForSignIn(onSignIn);

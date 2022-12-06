@@ -53,7 +53,7 @@ function listenForCollectionChange(collectionName, onChange) {
     orderBy('timestamp', 'asc')
   );
   // Start listening to the query.
-  onSnapshot(recentQuery, onChange);
+  return onSnapshot(recentQuery, onChange);
 }
 
 async function getCollectionDocs(collectionName) {

@@ -20,11 +20,7 @@ async function signInWithGoogle() {
 }
 
 function signUp(email, password) {
-  createUserWithEmailAndPassword(getAuth(), email, password)
-    .then((userCredential) => {
-      console.log(userCredential);
-    })
-    .catch(console.error);
+  return createUserWithEmailAndPassword(getAuth(), email, password);
 }
 
 const signOutUser = () => signOut(getAuth());
