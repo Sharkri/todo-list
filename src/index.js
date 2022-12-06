@@ -191,6 +191,22 @@ function displayProject(title, id) {
   projectsContainer.appendChild(project);
 }
 
+function getActive() {
+  const active = document.querySelector('.active');
+  return active;
+}
+
+function getProjectElementById(id) {
+  const project = document.querySelector(`.project[data-project-id="${id}"]`);
+  return project;
+}
+
+function getActiveProjectIndex() {
+  const project = document.querySelector('.project.active');
+  // Search in projects the index of current active project
+  return Array.from(projectElems).indexOf(project);
+}
+
 const initializeInbox = () => Projects.createProject('Inbox', 'inbox');
 const getInbox = () => Projects.getProject(0);
 
@@ -209,6 +225,20 @@ function displayTodo(todo) {
 
   priority.classList.add('visible');
   priority.appendChild(todoElement);
+}
+
+function hideNoTodos() {
+  const noTodos = document.querySelector('.no-todos:not(.hidden)');
+  if (noTodos) noTodos.classList.add('hidden');
+}
+
+function displayNoTodos(type) {
+  // Avoid multiple no todos paragraph showing up
+  hideNoTodos();
+
+  if (type === 'today') noTodosToday.classList.remove('hidden');
+  else if (type === 'view-all') noTodosViewAll.classList.remove('hidden');
+  else noTodosProject.classList.remove('hidden');
 }
 
 function refreshTodos(todos = []) {
@@ -319,22 +349,6 @@ function closeAllModals() {
   }
 }
 
-function getActive() {
-  const active = document.querySelector('.active');
-  return active;
-}
-
-function getProjectElementById(id) {
-  const project = document.querySelector(`.project[data-project-id="${id}"]`);
-  return project;
-}
-
-function getActiveProjectIndex() {
-  const project = document.querySelector('.project.active');
-  // Search in projects the index of current active project
-  return Array.from(projectElems).indexOf(project);
-}
-
 function setActiveClass(element) {
   const active = getActive();
   if (active) active.classList.remove('active');
@@ -357,20 +371,6 @@ async function query(search) {
     }
   });
   return occurrences;
-}
-
-function hideNoTodos() {
-  const noTodos = document.querySelector('.no-todos:not(.hidden)');
-  if (noTodos) noTodos.classList.add('hidden');
-}
-
-function displayNoTodos(type) {
-  // Avoid multiple no todos paragraph showing up
-  hideNoTodos();
-
-  if (type === 'today') noTodosToday.classList.remove('hidden');
-  else if (type === 'view-all') noTodosViewAll.classList.remove('hidden');
-  else noTodosProject.classList.remove('hidden');
 }
 
 function switchTab(title, todos) {
