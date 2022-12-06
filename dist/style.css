@@ -81,6 +81,11 @@ body {
   color: white;
 }
 
+.sign-in:disabled,
+.sign-up:disabled {
+  opacity: 0.5;
+}
+
 .email-input,
 .password-input {
   display: flex;
@@ -113,6 +118,14 @@ body {
   grid-template-columns: 250px 1fr;
   grid-template-rows: auto 2fr;
   background-color: var(--grey);
+}
+
+.email-invalid {
+  min-height: 19px;
+}
+
+.email-invalid:not(:empty) {
+  color: red;
 }
 
 h1,
