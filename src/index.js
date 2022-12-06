@@ -9,7 +9,12 @@ import {
 import Projects from './projects';
 import { listenForCollectionChange, initialize } from './backend';
 
-import { listenForAuthChange, signIn, signOutUser } from './auth';
+import {
+  listenForAuthChange,
+  signInWithGoogle,
+  signOutUser,
+  signUp,
+} from './auth';
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
@@ -627,10 +632,12 @@ const goToSignInPage = document.querySelector('.go-to-sign-in-page');
 // user's profile pic, username and sign out button
 const userInfo = document.querySelector('.user');
 
-signInButton.addEventListener('click', () => signIn());
+signInButton.addEventListener('click', () => signInWithGoogle());
 signOutButton.addEventListener('click', () => signOutUser());
 
-goToSignUpPage.addEventListener('click', () => goToPage(signUpPage));
+goToSignUpPage.addEventListener('click', () => {
+  goToPage(signUpPage);
+});
 goToSignInPage.addEventListener('click', () => goToPage(signInPage));
 
 function deleteProjectFromDOM(id) {

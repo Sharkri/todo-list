@@ -13,7 +13,7 @@ function listenForAuthChange(fn) {
   onAuthStateChanged(getAuth(), fn);
 }
 
-async function signIn() {
+async function signInWithGoogle() {
   // Sign in Firebase using popup auth and Google as the identity provider.
   const provider = new GoogleAuthProvider();
   await signInWithPopup(getAuth(), provider);
@@ -30,4 +30,4 @@ function signUp(email, password) {
 const signOutUser = () => signOut(getAuth());
 const getUser = () => getAuth().currentUser;
 
-export { listenForAuthChange, signUp, signIn, signOutUser, getUser };
+export { listenForAuthChange, signUp, signInWithGoogle, signOutUser, getUser };
