@@ -614,13 +614,33 @@ menu.addEventListener('click', () => {
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
 
-const signInButton = document.querySelector('.sign-in');
+function goToPage(page) {
+  const currentPage = document.querySelector('.page:not(.hidden)');
+  currentPage.classList.add('hidden');
+  page.classList.remove('hidden');
+}
+
+const signInPage = document.querySelector('.sign-in-page');
+const signUpPage = document.querySelector('.sign-up-page');
+const mainPage = document.querySelector('.main-page');
+const signInButton = document.querySelector('.sign-in-with-google');
 const signOutButton = document.querySelector('.sign-out');
+const goToSignUpPage = document.querySelector('.go-to-sign-up-page');
+const goToSignInPage = document.querySelector('.go-to-sign-in-page');
 // user's profile pic, username and sign out button
 const userInfo = document.querySelector('.user');
 
-signInButton.addEventListener('click', signIn);
-signOutButton.addEventListener('click', signOutUser);
+signInButton.addEventListener('click', () => {
+  signIn();
+  goToPage(mainPage);
+});
+signOutButton.addEventListener('click', () => {
+  signOutUser();
+  goToPage(signInPage);
+});
+
+goToSignUpPage.addEventListener('click', () => goToPage(signUpPage));
+goToSignInPage.addEventListener('click', () => goToPage(signInPage));
 
 function deleteProjectFromDOM(id) {
   const project = getProjectElementById(id);
@@ -696,11 +716,11 @@ function setUserSignedIn(user) {
     const userPic = userInfo.querySelector('.user-pic');
     username.textContent = user.displayName;
     userPic.src = user.photoURL || '/images/profile_placeholder.png';
-    userInfo.classList.remove('hidden');
-    signInButton.classList.add('hidden');
+    mainPage.classList.remove('hidden');
+    signInPage.classList.add('hidden');
   } else {
-    userInfo.classList.add('hidden');
-    signInButton.classList.remove('hidden');
+    mainPage.classList.add('hidden');
+    signInPage.classList.remove('hidden');
   }
 }
 
@@ -709,6 +729,7 @@ function onAuthChange(user) {
     setUserSignedIn(false);
     return;
   }
+
   setUserSignedIn(user);
   listenForCollectionChange(
     `users/${user.uid}/projects`,

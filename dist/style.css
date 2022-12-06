@@ -25,10 +25,92 @@ body {
   --light-grey: #f9fafb;
   --main-theme-color: #0369a1;
   --main-theme-lighter: #0f7cb6cb;
+}
+
+.sign-in-page,
+.sign-up-page {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--light-grey);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.sign-in-content,
+.sign-up-content {
+  width: clamp(75px, 97%, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sign-in-options,
+.sign-up-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sign-in-with-google,
+.sign-in,
+.sign-up {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: transparent;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: 'Montserrat-Bold', sans-serif;
+  font-size: 14px;
+  text-align: center;
+  border: 2px solid var(--grey);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.sign-in,
+.sign-up {
+  background-color: var(--main-theme-color);
+  color: white;
+}
+
+.email-input,
+.password-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  margin: 12px 0;
+}
+
+.no-account,
+.has-account {
+  text-align: center;
+  color: grey;
+}
+
+.go-to-sign-up-page,
+.go-to-sign-in-page {
+  background-color: transparent;
+  border: none;
+  color: var(--main-theme-color);
+  font-size: 16px;
+  font-family: 'Montserrat-bold', sans-serif;
+  font-weight: bold;
+}
+
+.main-page {
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: /*clamp(225px, 25%, 400px)*/ 250px 1fr;
+  grid-template-columns: 250px 1fr;
   grid-template-rows: auto 2fr;
   background-color: var(--grey);
 }
@@ -298,8 +380,7 @@ header {
   text-align: center;
 }
 
-.sign-out,
-.sign-in {
+.sign-out {
   border: none;
   background-color: transparent;
   color: white;
@@ -308,13 +389,6 @@ header {
   font-family: 'Montserrat-Bold', sans-serif;
   font-size: 14px;
   text-align: center;
-}
-
-.sign-in {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 
 .account-circle-svg {

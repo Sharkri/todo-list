@@ -8,238 +8,302 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="modal">
-      <div class="add-project-modal">
-        <h3 class="modal-header">Add Project</h3>
+    <div class="sign-in-page page">
+      <div class="sign-in-content">
+        <h2 class="sign-in-text">Sign In</h2>
 
-        <form action="" class="modal-form" onsubmit="return false;">
-          <div class="add-project-container">
-            <label for="name">Name</label>
+        <form action="" onsubmit="return false;">
+          <div class="email-input">
+            <label for="sign-in-email">Email</label>
             <input
-              type="text"
-              placeholder="Name"
-              id="name"
-              maxlength="69"
-              oninvalid="this.setCustomValidity('Project name cannot be empty.')"
-              oninput="this.setCustomValidity('')"
+              type="email"
+              name="email"
+              id="sign-in-email"
+              placeholder="Enter your email"
+              autocomplete="email"
               required
             />
-            <div class="modal-buttons">
-              <button class="cancel" type="button">Cancel</button>
-              <button type="submit" class="submit">Add</button>
-            </div>
+          </div>
+          <div class="password-input">
+            <label for="sign-in-password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="sign-in-password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <div class="sign-in-options">
+            <button class="sign-in">sign in</button>
+            <button class="sign-in-with-google">
+              <img src="images/google.png" alt="google" width="20" />
+              sign in with google
+            </button>
           </div>
         </form>
       </div>
-
-      <div class="delete-modal">
-        <h3 class="modal-header">Delete project</h3>
-
-        <div class="delete-form">
-          <p class="delete-text">Are you sure you want to delete this?</p>
-          <div class="modal-buttons">
-            <button class="cancel" type="button">Cancel</button>
-            <button class="delete">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="add-todo-modal">
-        <h3 class="modal-header">Add Todo</h3>
-
-        <form class="add-todo-form" onsubmit="return false;" novalidate>
-          <div class="inputs-container">
-            <div class="inputs">
-              <div class="input">
-                <label for="todo-title">Title:</label>
-                <input
-                  type="text"
-                  title="Title is required"
-                  id="todo-title"
-                  maxlength="300"
-                  required
-                />
-                <span class="title-error-text error-text"
-                  >Title is required</span
-                >
-              </div>
-
-              <div class="input">
-                <label for="description"
-                  >Description
-                  <span class="optional-text">(optional)</span>:</label
-                >
-                <textarea id="description" maxlength="500"></textarea>
-              </div>
-            </div>
-            <div class="inputs">
-              <div class="input">
-                <label for="due-date"
-                  >Due date
-                  <span class="optional-text">(optional)</span>:</label
-                >
-                <input
-                  type="datetime-local"
-                  id="due-date"
-                  max="9999-12-31T00:00"
-                />
-              </div>
-              <div class="input">
-                <label for="priority">Priority:</label>
-                <select id="priority">
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
-              <div class="input">
-                <label for="project">Project:</label>
-                <select id="project">
-                  <option value="Inbox">Inbox</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="modal-buttons">
-            <button class="cancel" type="button">Cancel</button>
-            <button type="submit" class="submit-todo">Add Todo</button>
-          </div>
-        </form>
-      </div>
+      <p class="no-account">
+        Don't have an account?
+        <button class="go-to-sign-up-page">Sign Up</button>
+      </p>
     </div>
 
-    <header>
-      <div class="header-left">
-        <button class="hamburger">
-          <svg viewBox="0 0 24 24">
-            <path
-              fill="white"
-              d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
-            />
-          </svg>
-        </button>
-        <div class="search-container">
-          <label class="search-bar">
+    <div class="sign-up-page page hidden">
+      <div class="sign-up-content">
+        <h2 class="sign-up-text">Sign Up</h2>
+        <form action="" onsubmit="return false;">
+          <div class="email-input">
+            <label for="sign-up">Email</label>
             <input
-              type="search"
-              placeholder="Search projects"
-              id="search-input"
+              type="email"
+              name="email"
+              id="sign-up-email"
+              placeholder="Enter your email"
+              autocomplete="email"
+              required
             />
-            <svg viewBox="0 0 24 24" class="search-icon">
+          </div>
+          <div class="password-input">
+            <label for="sign-up-password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="sign-up-password"
+              placeholder="Enter your password"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+          <div class="sign-up-options">
+            <button class="sign-up">sign up</button>
+            <button class="sign-in-with-google">
+              <img src="images/google.png" alt="google" width="20" />
+              continue with google
+            </button>
+          </div>
+        </form>
+      </div>
+      <p class="has-account">
+        Already have an account?
+        <button class="go-to-sign-in-page">Sign In</button>
+      </p>
+    </div>
+
+    <div class="main-page page">
+      <div class="modal">
+        <div class="add-project-modal">
+          <h3 class="modal-header">Add Project</h3>
+          <form action="" class="modal-form" onsubmit="return false;">
+            <div class="add-project-container">
+              <label for="name">Name</label>
+              <input
+                type="text"
+                placeholder="Name"
+                id="name"
+                maxlength="69"
+                oninvalid="this.setCustomValidity('Project name cannot be empty.')"
+                oninput="this.setCustomValidity('')"
+                required
+              />
+              <div class="modal-buttons">
+                <button class="cancel" type="button">Cancel</button>
+                <button type="submit" class="submit">Add</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="delete-modal">
+          <h3 class="modal-header">Delete project</h3>
+          <div class="delete-form">
+            <p class="delete-text">Are you sure you want to delete this?</p>
+            <div class="modal-buttons">
+              <button class="cancel" type="button">Cancel</button>
+              <button class="delete">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-todo-modal">
+          <h3 class="modal-header">Add Todo</h3>
+          <form class="add-todo-form" onsubmit="return false;" novalidate>
+            <div class="inputs-container">
+              <div class="inputs">
+                <div class="input">
+                  <label for="todo-title">Title:</label>
+                  <input
+                    type="text"
+                    title="Title is required"
+                    id="todo-title"
+                    maxlength="300"
+                    required
+                  />
+                  <span class="title-error-text error-text"
+                    >Title is required</span
+                  >
+                </div>
+                <div class="input">
+                  <label for="description"
+                    >Description
+                    <span class="optional-text">(optional)</span>:</label
+                  >
+                  <textarea id="description" maxlength="500"></textarea>
+                </div>
+              </div>
+              <div class="inputs">
+                <div class="input">
+                  <label for="due-date"
+                    >Due date
+                    <span class="optional-text">(optional)</span>:</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="due-date"
+                    max="9999-12-31T00:00"
+                  />
+                </div>
+                <div class="input">
+                  <label for="priority">Priority:</label>
+                  <select id="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div class="input">
+                  <label for="project">Project:</label>
+                  <select id="project">
+                    <option value="Inbox">Inbox</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-buttons">
+              <button class="cancel" type="button">Cancel</button>
+              <button type="submit" class="submit-todo">Add Todo</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <header>
+        <div class="header-left">
+          <button class="hamburger">
+            <svg viewBox="0 0 24 24">
               <path
-                fill="rgba(223, 213, 213, 0.8)"
-                d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
+                fill="white"
+                d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
               />
             </svg>
-          </label>
-          <ul class="search-results"></ul>
-        </div>
-      </div>
-
-      <div class="header-right">
-        <div class="user hidden">
-          <img
-            src=""
-            alt="user profile"
-            referrerpolicy="no-referrer"
-            class="user-pic"
-          />
-          <div class="user-name"></div>
-          <button class="sign-out">sign out</button>
-        </div>
-
-        <button class="sign-in">
-          <svg viewBox="0 0 24 24" class="account-circle-svg">
-            <path
-              fill="white"
-              d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
-            />
-          </svg>
-          sign in with google
-        </button>
-      </div>
-    </header>
-
-    <main>
-      <div class="main-content">
-        <h1 class="main-header"></h1>
-        <div class="todos">
-          <div class="priority high"><h4>High Priority</h4></div>
-          <div class="priority medium"><h4>Medium Priority</h4></div>
-          <div class="priority low"><h4>Low Priority</h4></div>
-        </div>
-        <!-- No todos -->
-        <p class="no-todos no-todos-today hidden">
-          You've completed all todos for today!
-        </p>
-        <p class="no-todos no-todos-view-all hidden"></p>
-        <p class="no-todos no-todos-project hidden"></p>
-        <button class="add-todo">
-          <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
-            <path
-              fill="#0369a1"
-              d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
-            />
-          </svg>
-          Add Todo
-        </button>
-      </div>
-    </main>
-
-    <nav>
-      <div class="links">
-        <div class="inbox project active" data-type="project">
-          <svg viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
-            ></path>
-          </svg>
-          <span class="project-title">Inbox</span>
-        </div>
-        <div class="today" data-type="today">
-          <svg viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"
-            ></path>
-          </svg>
-          Today
-        </div>
-        <div class="view-all" data-type="view-all">
-          <svg viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"
-            ></path>
-          </svg>
-          View all
-        </div>
-      </div>
-
-      <div class="projects-container">
-        <div class="projectTab">
-          <div class="open-project">
-            <svg viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
-              ></path>
-            </svg>
-            Projects
+          </button>
+          <div class="search-container">
+            <label class="search-bar">
+              <input
+                type="search"
+                placeholder="Search projects"
+                id="search-input"
+              />
+              <svg viewBox="0 0 24 24" class="search-icon">
+                <path
+                  fill="rgba(223, 213, 213, 0.8)"
+                  d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
+                />
+              </svg>
+            </label>
+            <ul class="search-results"></ul>
           </div>
-          <button class="add-project">
-            <svg viewBox="0 0 24 24">
+        </div>
+        <div class="header-right">
+          <div class="user">
+            <img
+              src=""
+              alt="user profile"
+              referrerpolicy="no-referrer"
+              class="user-pic"
+            />
+            <div class="user-name"></div>
+            <button class="sign-out">sign out</button>
+          </div>
+        </div>
+      </header>
+      <main>
+        <div class="main-content">
+          <h1 class="main-header"></h1>
+          <div class="todos">
+            <div class="priority high"><h4>High Priority</h4></div>
+            <div class="priority medium"><h4>Medium Priority</h4></div>
+            <div class="priority low"><h4>Low Priority</h4></div>
+          </div>
+          <!-- No todos -->
+          <p class="no-todos no-todos-today hidden">
+            You've completed all todos for today!
+          </p>
+          <p class="no-todos no-todos-view-all hidden"></p>
+          <p class="no-todos no-todos-project hidden"></p>
+          <button class="add-todo">
+            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
               <path
-                fill="currentColor"
+                fill="#0369a1"
                 d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
-              ></path>
+              />
             </svg>
+            Add Todo
           </button>
         </div>
-        <div class="projects"></div>
-      </div>
-    </nav>
+      </main>
+      <nav>
+        <div class="links">
+          <div class="inbox project active" data-type="project">
+            <svg viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
+              ></path>
+            </svg>
+            <span class="project-title">Inbox</span>
+          </div>
+          <div class="today" data-type="today">
+            <svg viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"
+              ></path>
+            </svg>
+            Today
+          </div>
+          <div class="view-all" data-type="view-all">
+            <svg viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"
+              ></path>
+            </svg>
+            View all
+          </div>
+        </div>
+        <div class="projects-container">
+          <div class="projectTab">
+            <div class="open-project">
+              <svg viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                ></path>
+              </svg>
+              Projects
+            </div>
+            <button class="add-project">
+              <svg viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="projects"></div>
+        </div>
+      </nav>
+    </div>
   </body>
   <script src="main.js"></script>
 </html>
