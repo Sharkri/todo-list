@@ -7,12 +7,9 @@ import {
   isYesterday,
 } from 'date-fns';
 import Projects from './projects';
-import {
-  signOutUser,
-  signIn,
-  listenForAuthChange,
-  listenForCollectionChange,
-} from './backend';
+import { listenForCollectionChange, initialize } from './backend';
+
+import { listenForAuthChange, signIn, signOutUser } from './auth';
 // declare selector
 const modalContainer = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
@@ -630,14 +627,8 @@ const goToSignInPage = document.querySelector('.go-to-sign-in-page');
 // user's profile pic, username and sign out button
 const userInfo = document.querySelector('.user');
 
-signInButton.addEventListener('click', () => {
-  signIn();
-  goToPage(mainPage);
-});
-signOutButton.addEventListener('click', () => {
-  signOutUser();
-  goToPage(signInPage);
-});
+signInButton.addEventListener('click', () => signIn());
+signOutButton.addEventListener('click', () => signOutUser());
 
 goToSignUpPage.addEventListener('click', () => goToPage(signUpPage));
 goToSignInPage.addEventListener('click', () => goToPage(signInPage));
@@ -737,5 +728,7 @@ function onAuthChange(user) {
   );
 }
 
+// Initialize firebase app
+initialize();
 // Listen for auth state change
 listenForAuthChange(onAuthChange);

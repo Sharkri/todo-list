@@ -4,10 +4,9 @@ import {
   deleteInDatabase,
   getCollectionDocs,
   getDocData,
-  getUser,
   updateDatabase,
 } from './backend';
-
+import { getUser } from './auth';
 import createTodo from './todos';
 
 const Projects = (function Projects() {

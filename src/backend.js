@@ -1,12 +1,5 @@
 import { initializeApp } from 'firebase/app';
 import {
-  getAuth,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth';
-import {
   getFirestore,
   collection,
   addDoc,
@@ -76,31 +69,13 @@ async function getDocData(path) {
   return docInfo.data();
 }
 
-// Initialize firebase auth
-function listenForAuthChange(fn) {
-  // Listen to auth state changes.
-  onAuthStateChanged(getAuth(), fn);
-}
-
-async function signIn() {
-  // Sign in Firebase using popup auth and Google as the identity provider.
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(getAuth(), provider);
-}
-
-const signOutUser = () => signOut(getAuth());
-const getUser = () => getAuth().currentUser;
-
-initializeApp(getFirebaseConfig());
+const initialize = () => initializeApp(getFirebaseConfig());
 export {
-  signIn,
-  signOutUser,
-  listenForAuthChange,
   addToDatabase,
   updateDatabase,
   listenForCollectionChange,
-  getUser,
   deleteInDatabase,
   getCollectionDocs,
   getDocData,
+  initialize,
 };
