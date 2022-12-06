@@ -637,6 +637,10 @@ function addProjectToDOM(change) {
   }
 }
 
+const clearProjectsInDOM = () => {
+  projectsContainer.textContent = '';
+};
+
 function onProjectCollectionChange(snapshot) {
   const docChanges = snapshot.docChanges();
   if (!docChanges.length) {
@@ -684,6 +688,7 @@ let unsubscribe = null;
 function onSignIn(user) {
   // Unsubscribe from previous onSnapshot
   if (typeof unsubscribe === 'function') unsubscribe();
+  clearProjectsInDOM();
   // listen for current snapshot
   unsubscribe = listenForCollectionChange(
     `users/${user.uid}/projects`,

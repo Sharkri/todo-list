@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   signOut,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
 
 // Initialize firebase auth
@@ -22,8 +23,17 @@ async function signInWithGoogle() {
 function signUp(email, password) {
   return createUserWithEmailAndPassword(getAuth(), email, password);
 }
-
+function signIn(email, password) {
+  return signInWithEmailAndPassword(getAuth(), email, password);
+}
 const signOutUser = () => signOut(getAuth());
 const getUser = () => getAuth().currentUser;
 
-export { listenForAuthChange, signUp, signInWithGoogle, signOutUser, getUser };
+export {
+  listenForAuthChange,
+  signUp,
+  signInWithGoogle,
+  signIn,
+  signOutUser,
+  getUser,
+};
