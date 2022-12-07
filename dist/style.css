@@ -121,7 +121,7 @@ body {
 }
 
 .email-invalid {
-  min-height: 19px;
+  font-size: 13px;
 }
 
 .email-invalid:not(:empty) {

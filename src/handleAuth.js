@@ -41,47 +41,59 @@ function signInToPage(user) {
 
 const signOutOfPage = () => goToPage(signInPage);
 
-function getEmailErrorMessage(error) {
-  if (error.code === 'auth/email-already-in-use') {
-    return 'Email is already in use';
+function getErrorMessage(error) {
+  switch (error.code) {
+    case 'auth/email-already-in-use':
+      return 'Email is already in use';
+
+    case 'auth/invalid-email':
+    case 'auth/missing-email':
+      return 'Please enter a valid email';
+
+    case 'auth/wrong-password':
+      return 'Incorrect password entered';
+
+    case 'auth/too-many-requests':
+      return 'Too many requests';
+
+    default:
+      console.error('Unknown code:', error.code);
+      return 'An unexpected error occurred';
   }
-  if (
-    error.code === 'auth/invalid-email' ||
-    error.code === 'auth/missing-email'
-  ) {
-    return 'Please enter a valid email';
-  }
-  // Unknown error
-  console.error(error);
-  return 'An unexpected error occurred';
 }
 
+function isValidInputs(...inputs) {
+  return inputs.every((input) => input.checkValidity());
+}
+
+const displayError = (element, error) => {
+  element.textContent = getErrorMessage(error);
+};
+
 async function handleSignUp() {
-  // Check if valid inputs
-  if (!signUpEmail.checkValidity() || !signUpPassword.checkValidity()) return;
+  if (!isValidInputs(signUpEmail, signUpPassword)) return;
   signUpButton.disabled = true;
 
   try {
     await signUp(signUpEmail.value, signUpPassword.value);
   } catch (error) {
-    signUpEmailError.textContent = getEmailErrorMessage(error);
+    displayError(signUpEmailError, error);
+  } finally {
+    signUpButton.disabled = false;
   }
-
-  signUpButton.disabled = false;
 }
 
 async function handleSignIn() {
-  // Check if valid inputs
-  if (!signInEmail.checkValidity() || !signInPassword.checkValidity()) return;
+  if (!isValidInputs(signInEmail, signInPassword)) return;
   signInButton.disabled = true;
 
   try {
     await signIn(signInEmail.value, signInPassword.value);
   } catch (error) {
-    signInEmailError.textContent = getEmailErrorMessage(error);
+    displayError(signInEmailError, error);
+  } finally {
+    signInButton.disabled = false;
   }
-
-  signInButton.disabled = false;
 }
 signUpButton.addEventListener('click', handleSignUp);
 signInButton.addEventListener('click', handleSignIn);
