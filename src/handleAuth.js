@@ -5,6 +5,7 @@ import {
   signUp,
   signIn,
 } from './auth';
+import { resetInput, showInputError } from './formValidation';
 
 const mainPage = document.querySelector('.main-page');
 const username = document.querySelector('.user-name');
@@ -32,18 +33,14 @@ function goToPage(page) {
   page.classList.remove('hidden');
 }
 
-function clearError(errorElement) {
-  errorElement.textContent = '';
-}
-
 function goToSignUp() {
   goToPage(signUpPage);
-  clearError(signUpEmailError);
+  resetInput(signUpEmail, signUpEmailError);
 }
 
 function goToSignIn() {
   goToPage(signInPage);
-  clearError(signInEmailError);
+  resetInput(signInEmail, signInEmailError);
 }
 
 function login(user) {
@@ -56,21 +53,27 @@ function login(user) {
 function getErrorMessage(error) {
   switch (error.code) {
     case 'auth/email-already-in-use':
-      return 'Email is already in use';
+      return 'Email is already in use.';
 
     case 'auth/invalid-email':
     case 'auth/missing-email':
-      return 'Please enter a valid email';
+      return 'Please enter a valid email.';
 
     case 'auth/wrong-password':
-      return 'Incorrect password entered';
+      return 'Incorrect password entered.';
 
     case 'auth/too-many-requests':
-      return 'Too many requests';
+      return 'Too many requests.';
+
+    case 'auth/user-not-found':
+      return 'Email not found.';
+
+    case 'auth/weak-password':
+      return 'The password is too weak.';
 
     default:
       console.error('Unknown code:', error.code);
-      return 'An unexpected error occurred';
+      return error.code;
   }
 }
 
@@ -78,8 +81,9 @@ function isValidInputs(...inputs) {
   return inputs.every((input) => input.checkValidity());
 }
 
-const displayError = (element, error) => {
-  element.textContent = getErrorMessage(error);
+const displayError = (errorElement, input, error) => {
+  errorElement.textContent = getErrorMessage(error);
+  showInputError(input, errorElement);
 };
 
 async function handleSignUp() {
@@ -89,7 +93,7 @@ async function handleSignUp() {
   try {
     await signUp(signUpEmail.value, signUpPassword.value);
   } catch (error) {
-    displayError(signUpEmailError, error);
+    displayError(signUpEmailError, signUpEmail, error);
   } finally {
     signUpButton.disabled = false;
   }
@@ -102,7 +106,7 @@ async function handleSignIn() {
   try {
     await signIn(signInEmail.value, signInPassword.value);
   } catch (error) {
-    displayError(signInEmailError, error);
+    displayError(signInEmailError, signInEmail, error);
   } finally {
     signInButton.disabled = false;
   }

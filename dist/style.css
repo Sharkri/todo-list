@@ -120,14 +120,6 @@ body {
   background-color: var(--grey);
 }
 
-.email-invalid {
-  font-size: 13px;
-}
-
-.email-invalid:not(:empty) {
-  color: red;
-}
-
 h1,
 h2,
 h3 {

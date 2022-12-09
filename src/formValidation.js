@@ -12,9 +12,9 @@ function onInput(input, isValid, errorText) {
   }
 }
 
-function showInputError(input, errorText) {
+function showInputError(input, errorElement) {
   input.classList.add('error');
-  errorText.classList.add('visible');
+  errorElement.classList.add('visible');
   input.focus();
 }
 
