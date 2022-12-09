@@ -10,6 +10,7 @@ import Projects from './projects';
 import { listenForCollectionChange, initialize } from './backend';
 
 import listenForSignIn from './handleAuth';
+import { onInput, showInputError, resetInput } from './formValidation';
 
 // declare selector
 const modalContainer = document.querySelector('.modal');
@@ -326,9 +327,7 @@ function openTodoModal(selected) {
   todoForm.reset();
   toggleModal(addTodoModal);
   // Resets to title input default state
-  titleInput.classList.remove('valid');
-  titleInput.classList.remove('error');
-  titleErrorText.classList.remove('visible');
+  resetInput(titleInput, titleErrorText);
 
   addProjectOptions(selected);
 }
@@ -553,28 +552,14 @@ submitProject.addEventListener('click', () => {
   }
 });
 
-titleInput.addEventListener('keyup', (e) => {
-  const isValid = e.target.checkValidity();
-  const { classList } = e.target;
-  // if input is in error state and changed to valid, add valid class
-  if (isValid && classList.contains('error')) {
-    classList.add('valid');
-    classList.remove('error');
-    titleErrorText.classList.remove('visible');
-  } else if (!isValid && classList.contains('valid')) {
-    classList.remove('valid');
-    classList.add('error');
-    titleErrorText.classList.add('visible');
-  }
-});
+titleInput.addEventListener('keyup', () =>
+  onInput(titleInput, titleInput.checkValidity(), titleErrorText)
+);
 
 submitTodo.addEventListener('click', async () => {
   const title = document.querySelector('#todo-title').value;
   if (!title) {
-    // Display error
-    titleInput.classList.add('error');
-    titleErrorText.classList.add('visible');
-    titleInput.focus();
+    showInputError(titleInput, titleErrorText);
     return;
   }
   const dueDate = document.querySelector('#due-date').value || null;
