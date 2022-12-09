@@ -32,14 +32,26 @@ function goToPage(page) {
   page.classList.remove('hidden');
 }
 
-function signInToPage(user) {
+function clearError(errorElement) {
+  errorElement.textContent = '';
+}
+
+function goToSignUp() {
+  goToPage(signUpPage);
+  clearError(signUpEmailError);
+}
+
+function goToSignIn() {
+  goToPage(signInPage);
+  clearError(signInEmailError);
+}
+
+function login(user) {
   // Display username and pic
   username.textContent = user.displayName;
   userPic.src = user.photoURL || '/images/profile_placeholder.png';
   goToPage(mainPage);
 }
-
-const signOutOfPage = () => goToPage(signInPage);
 
 function getErrorMessage(error) {
   switch (error.code) {
@@ -99,17 +111,18 @@ signUpButton.addEventListener('click', handleSignUp);
 signInButton.addEventListener('click', handleSignIn);
 signInWithGoogleBtn.addEventListener('click', signInWithGoogle);
 signOutButton.addEventListener('click', signOutUser);
-goToSignUpPage.addEventListener('click', () => goToPage(signUpPage));
-goToSignInPage.addEventListener('click', () => goToPage(signInPage));
+goToSignUpPage.addEventListener('click', goToSignUp);
+goToSignInPage.addEventListener('click', goToSignIn);
 
-function listenForSignIn(onSignIn) {
+function listenForSignIn(onSignInListener) {
   // Listen for auth state change
   listenForAuthChange((user) => {
+    // on auth change, check if user signed out or in
     if (!user) {
-      signOutOfPage();
+      goToSignIn();
     } else {
-      signInToPage(user);
-      onSignIn(user);
+      login(user);
+      onSignInListener(user);
     }
   });
 }
