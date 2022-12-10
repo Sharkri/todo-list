@@ -6,6 +6,7 @@ import {
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 
 // Initialize firebase auth
@@ -26,6 +27,8 @@ function signUp(email, password) {
 function signIn(email, password) {
   return signInWithEmailAndPassword(getAuth(), email, password);
 }
+const sendPassResetEmail = (email) => sendPasswordResetEmail(getAuth(), email);
+
 const signOutUser = () => signOut(getAuth());
 const getUser = () => getAuth().currentUser;
 
@@ -36,4 +39,5 @@ export {
   signIn,
   signOutUser,
   getUser,
+  sendPassResetEmail,
 };

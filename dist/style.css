@@ -27,6 +27,11 @@ body {
   --main-theme-lighter: #0f7cb6cb;
 }
 
+button.unstyled {
+  background-color: transparent;
+  border: none;
+}
+
 .sign-in-page,
 .sign-up-page {
   width: 100vw;
@@ -42,6 +47,10 @@ body {
 .sign-in-content,
 .sign-up-content {
   width: clamp(75px, 97%, 400px);
+}
+
+.sign-in-content > form,
+.sign-up-content > form {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -55,7 +64,12 @@ body {
   gap: 12px;
 }
 
-.sign-in-with-google,
+.sign-in-text,
+.sign-up-text {
+  margin-bottom: 24px;
+}
+
+button.sign-in-with-google,
 .sign-in,
 .sign-up {
   width: 100%;
@@ -64,7 +78,6 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  background-color: transparent;
   text-transform: uppercase;
   font-weight: bold;
   font-family: 'Montserrat-Bold', sans-serif;
@@ -91,8 +104,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-
-  margin: 12px 0;
 }
 
 .no-account,
@@ -103,12 +114,24 @@ body {
 
 .go-to-sign-up-page,
 .go-to-sign-in-page {
-  background-color: transparent;
-  border: none;
   color: var(--main-theme-color);
   font-size: 16px;
   font-family: 'Montserrat-bold', sans-serif;
   font-weight: bold;
+}
+
+button.forgot-password {
+  width: 100%;
+  text-align: end;
+  color: var(--main-theme-color);
+  font-family: 'Montserrat-bold', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+button.forgot-password:hover {
+  color: var(--main-theme-lighter);
 }
 
 .main-page {

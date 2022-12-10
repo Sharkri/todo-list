@@ -4,6 +4,7 @@ import {
   signOutUser,
   signUp,
   signIn,
+  sendPassResetEmail,
 } from './auth';
 import { resetInput, showInputError } from './formValidation';
 
@@ -126,7 +127,6 @@ goToSignInPage.addEventListener('click', () => goToAuthPage('signIn'));
 function listenForSignIn(onSignInListener) {
   // Listen for auth state change
   listenForAuthChange((user) => {
-    // on auth change, check if user signed out or in
     if (user == null) {
       // if user is not signed in, go to sign in page
       goToAuthPage('signIn');
