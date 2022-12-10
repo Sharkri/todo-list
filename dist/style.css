@@ -604,6 +604,7 @@ main {
 .todo-description {
   font-size: 13.7px;
   color: gray;
+  white-space: pre-line;
 }
 
 .mark-todo-complete {
