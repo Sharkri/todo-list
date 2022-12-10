@@ -13,14 +13,19 @@ function onInput(input, isValid, errorText) {
 }
 
 function showInputError(input, errorElement) {
+  console.log(input, errorElement);
   input.classList.add('error');
   errorElement.classList.add('visible');
   input.focus();
 }
 
-function resetInput(input, errorText) {
-  input.classList.remove('valid', 'error');
-  errorText.classList.remove('visible');
+function resetAllErrors() {
+  const inputs = document.querySelectorAll('input.error');
+  const errorElements = document.querySelectorAll('.error-text.visible');
+  inputs.forEach((input) => input.classList.remove('error'));
+  errorElements.forEach((errorElement) =>
+    errorElement.classList.remove('visible')
+  );
 }
 
-export { onInput, showInputError, resetInput };
+export { onInput, showInputError, resetAllErrors };
