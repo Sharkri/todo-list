@@ -22,6 +22,9 @@ const resetPasswordEmail = document.querySelector('#forgot-password-email');
 const resetPasswordError = document.querySelector(
   '.forgot-password-content .email-invalid'
 );
+const resetPasswordSuccess = document.querySelector(
+  '.forgot-password-content .success-text'
+);
 
 const auth = {
   signIn: {
@@ -125,7 +128,10 @@ goToSignUpPage.addEventListener('click', () => goToPage(auth.signUp.page));
 goToSignInPageButtons.forEach((btn) =>
   btn.addEventListener('click', () => goToPage(auth.signIn.page))
 );
-goToForgotPassPage.addEventListener('click', () => goToPage(forgotPassPage));
+goToForgotPassPage.addEventListener('click', () => {
+  goToPage(forgotPassPage);
+  resetPasswordSuccess.classList.remove('visible');
+});
 resetPassword.addEventListener('click', async () => {
   const email = resetPasswordEmail;
   if (!email.checkValidity()) return;
@@ -134,6 +140,8 @@ resetPassword.addEventListener('click', async () => {
     await sendPassResetEmail(email.value);
     // if the code above was successful, reset errors
     resetAllErrors();
+    // show reset password success
+    resetPasswordSuccess.classList.add('visible');
   } catch (error) {
     displayError(resetPasswordError, email, error);
   } finally {

@@ -147,7 +147,7 @@ button.sign-in-with-google {
 .forgot-password-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 17px;
 }
 
 button.forgot-password {
@@ -267,15 +267,24 @@ input.error {
   border-color: #ef4444;
 }
 
-.error-text {
+.error-text,
+.success-text {
   color: #ef4444;
   font-size: small;
   font-family: 'Montserrat-semibold';
   visibility: hidden;
 }
 
-.error-text.visible {
+.error-text.visible,
+.success-text.visible {
   visibility: visible;
+}
+
+.success-text {
+  color: #16a34a;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'Montserrat-bold';
 }
 
 input.valid {

@@ -23,9 +23,9 @@ function resetAllErrors() {
   const inputs = document.querySelectorAll('input.error');
   const errorElements = document.querySelectorAll('.error-text.visible');
   inputs.forEach((input) => input.classList.remove('error'));
-  errorElements.forEach((errorElement) =>
-    errorElement.classList.remove('visible')
-  );
+  errorElements.forEach((errorElement) => {
+    errorElement.classList.remove('visible');
+  });
 }
 
 export { onInput, showInputError, resetAllErrors };
