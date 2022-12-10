@@ -42,8 +42,13 @@
             Forgot Password?
           </button>
           <div class="sign-in-options">
-            <button class="sign-in" type="submit">sign in</button>
-            <button class="sign-in-with-google unstyled" type="button">
+            <button class="sign-in default-button-styles" type="submit">
+              sign in
+            </button>
+            <button
+              class="sign-in-with-google default-button-styles"
+              type="button"
+            >
               <img src="images/google.png" alt="google" width="20" />
               sign in with google
             </button>
@@ -88,8 +93,13 @@
             <span class="pass-invalid error-text"> </span>
           </div>
           <div class="sign-up-options">
-            <button class="sign-up" type="submit">sign up</button>
-            <button class="sign-in-with-google unstyled" type="button">
+            <button class="sign-up default-button-styles" type="submit">
+              sign up
+            </button>
+            <button
+              class="sign-in-with-google default-button-styles"
+              type="button"
+            >
               <img src="images/google.png" alt="google" width="20" />
               continue with google
             </button>
@@ -102,6 +112,36 @@
           Sign In
         </button>
       </p>
+    </div>
+
+    <div class="forgot-password-page page hidden">
+      <div class="forgot-password-content">
+        <h2 class="forgot-password-heading">
+          Forgot your <br />
+          password?
+        </h2>
+        <p class="forgot-password-instructions">
+          To reset your password, please enter the email address of your
+          account.
+        </p>
+        <form action="" onsubmit="return false;" class="forgot-password-form">
+          <div class="email-input">
+            <label for="forgot-password-email">Email</label>
+            <input
+              type="email"
+              name="forgot-password-email"
+              id="forgot-password-email"
+              placeholder="Enter your email"
+            />
+          </div>
+          <button class="default-button-styles reset-password">
+            Reset my password
+          </button>
+        </form>
+        <div class="forgot-password-back-to-login">
+          <button class="go-to-sign-in-page unstyled">back to login</button>
+        </div>
+      </div>
     </div>
 
     <!-- MAIN PAGE -->

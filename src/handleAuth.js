@@ -13,8 +13,10 @@ const username = document.querySelector('.user-name');
 const userPic = document.querySelector('.user-pic');
 const signOutButton = document.querySelector('.sign-out');
 const goToSignUpPage = document.querySelector('.go-to-sign-up-page');
-const goToSignInPage = document.querySelector('.go-to-sign-in-page');
+const goToSignInPageButtons = document.querySelectorAll('.go-to-sign-in-page');
 const signInGoogleButtons = document.querySelectorAll('.sign-in-with-google');
+const goToForgotPassPage = document.querySelector('.forgot-password');
+const forgotPassPage = document.querySelector('.forgot-password-page');
 
 const auth = {
   signIn: {
@@ -122,7 +124,10 @@ signInGoogleButtons.forEach((btn) =>
 );
 signOutButton.addEventListener('click', signOutUser);
 goToSignUpPage.addEventListener('click', () => goToAuthPage('signUp'));
-goToSignInPage.addEventListener('click', () => goToAuthPage('signIn'));
+goToSignInPageButtons.forEach((btn) =>
+  btn.addEventListener('click', () => goToAuthPage('signIn'))
+);
+goToForgotPassPage.addEventListener('click', () => goToPage(forgotPassPage));
 
 function listenForSignIn(onSignInListener) {
   // Listen for auth state change
