@@ -1,3 +1,3 @@
 # Todo List
 
-## [Live App](https://sharkri.github.io/todo-list/)
+## [Live App](https://todo-list-4aa13.web.app/)
