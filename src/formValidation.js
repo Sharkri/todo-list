@@ -13,7 +13,6 @@ function onInput(input, isValid, errorText) {
 }
 
 function showInputError(input, errorElement) {
-  console.log(input, errorElement);
   input.classList.add('error');
   errorElement.classList.add('visible');
   input.focus();
