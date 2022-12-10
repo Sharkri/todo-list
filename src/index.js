@@ -8,9 +8,8 @@ import {
 } from 'date-fns';
 import Projects from './projects';
 import { listenForCollectionChange, initialize } from './backend';
-
 import listenForSignIn from './handleAuth';
-import { onInput, showInputError, resetInput } from './formValidation';
+import { onInput, showInputError, resetAllErrors } from './formValidation';
 
 // declare selector
 const modalContainer = document.querySelector('.modal');
@@ -326,8 +325,8 @@ function toggleModal(modalElement) {
 function openTodoModal(selected) {
   todoForm.reset();
   toggleModal(addTodoModal);
-  // Resets to title input default state
-  resetInput(titleInput, titleErrorText);
+  // Resets all errors to hidden
+  resetAllErrors();
 
   addProjectOptions(selected);
 }

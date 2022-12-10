@@ -6,7 +6,7 @@ import {
   signIn,
   sendPassResetEmail,
 } from './auth';
-import { resetInput, showInputError } from './formValidation';
+import { resetAllErrors, showInputError } from './formValidation';
 
 const mainPage = document.querySelector('.main-page');
 const username = document.querySelector('.user-name');
@@ -17,6 +17,11 @@ const goToSignInPageButtons = document.querySelectorAll('.go-to-sign-in-page');
 const signInGoogleButtons = document.querySelectorAll('.sign-in-with-google');
 const goToForgotPassPage = document.querySelector('.forgot-password');
 const forgotPassPage = document.querySelector('.forgot-password-page');
+const resetPassword = document.querySelector('.reset-password');
+const resetPasswordEmail = document.querySelector('#forgot-password-email');
+const resetPasswordError = document.querySelector(
+  '.forgot-password-content .email-invalid'
+);
 
 const auth = {
   signIn: {
@@ -43,14 +48,7 @@ function goToPage(page) {
   const currentPage = document.querySelector('.page:not(.hidden)');
   currentPage.classList.add('hidden');
   page.classList.remove('hidden');
-}
-
-function goToAuthPage(name) {
-  const { page, email, emailError, password, passwordError } = auth[name];
-  goToPage(page);
-  // reset input error showing
-  resetInput(email, emailError);
-  resetInput(password, passwordError);
+  resetAllErrors();
 }
 
 function login(user) {
@@ -123,22 +121,35 @@ signInGoogleButtons.forEach((btn) =>
   btn.addEventListener('click', signInWithGoogle)
 );
 signOutButton.addEventListener('click', signOutUser);
-goToSignUpPage.addEventListener('click', () => goToAuthPage('signUp'));
+goToSignUpPage.addEventListener('click', () => goToPage(auth.signUp.page));
 goToSignInPageButtons.forEach((btn) =>
-  btn.addEventListener('click', () => goToAuthPage('signIn'))
+  btn.addEventListener('click', () => goToPage(auth.signIn.page))
 );
 goToForgotPassPage.addEventListener('click', () => goToPage(forgotPassPage));
+resetPassword.addEventListener('click', async () => {
+  const email = resetPasswordEmail;
+  if (!email.checkValidity()) return;
+  resetPassword.disabled = true;
+  try {
+    await sendPassResetEmail(email.value);
+    // if the code above was successful, reset errors
+    resetAllErrors();
+  } catch (error) {
+    displayError(resetPasswordError, email, error);
+  } finally {
+    resetPassword.disabled = false;
+  }
+});
 
-function listenForSignIn(onSignInListener) {
+export default function listenForSignIn(onSignInListener) {
   // Listen for auth state change
   listenForAuthChange((user) => {
     if (user == null) {
       // if user is not signed in, go to sign in page
-      goToAuthPage('signIn');
+      goToPage(auth.signIn.page);
     } else {
       login(user);
       onSignInListener(user);
     }
   });
 }
-export default listenForSignIn;
