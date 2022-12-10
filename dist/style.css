@@ -109,7 +109,17 @@ button.sign-in-with-google {
 .password-input {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
+}
+
+.email-input label,
+.password-input label {
+  font-weight: bold;
+  font-family: 'Montserrat-bold', sans-serif;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: rgba(0, 0, 0, 0.7);
+  text-transform: uppercase;
 }
 
 .no-account,
@@ -137,7 +147,7 @@ button.sign-in-with-google {
 .forgot-password-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 button.forgot-password {
@@ -148,6 +158,11 @@ button.forgot-password {
   font-weight: bold;
   font-size: 14px;
   transition: 0.3s;
+}
+
+.forgot-password-h2,
+.forgot-password-instructions {
+  text-align: center;
 }
 
 .forgot-password-back-to-login {
@@ -166,7 +181,8 @@ button.reset-password {
 }
 
 .forgot-password-instructions {
-  color: #2f2f2f;
+  color: #383838;
+  margin-top: 8px;
   font-size: small;
 }
 
