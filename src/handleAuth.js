@@ -11,21 +11,30 @@ const mainPage = document.querySelector('.main-page');
 const username = document.querySelector('.user-name');
 const userPic = document.querySelector('.user-pic');
 const signOutButton = document.querySelector('.sign-out');
-// Sign up selectors
-const signUpPage = document.querySelector('.sign-up-page');
 const goToSignUpPage = document.querySelector('.go-to-sign-up-page');
-const signUpButton = document.querySelector('.sign-up');
-const signUpEmail = document.querySelector('#sign-up-email');
-const signUpPassword = document.querySelector('#sign-up-password');
-const signUpEmailError = document.querySelector('.sign-up-page .email-invalid');
-// Sign in selectors
-const signInPage = document.querySelector('.sign-in-page');
-const signInButton = document.querySelector('.sign-in');
-const signInGoogleButtons = document.querySelectorAll('.sign-in-with-google');
 const goToSignInPage = document.querySelector('.go-to-sign-in-page');
-const signInEmailError = document.querySelector('.sign-in-page .email-invalid');
-const signInPassword = document.querySelector('#sign-in-password');
-const signInEmail = document.querySelector('#sign-in-email');
+const signInGoogleButtons = document.querySelectorAll('.sign-in-with-google');
+
+const auth = {
+  signIn: {
+    email: document.querySelector('#sign-in-email'),
+    password: document.querySelector('#sign-in-password'),
+    passwordError: document.querySelector('.sign-in-page .pass-invalid'),
+    emailError: document.querySelector('.sign-in-page .email-invalid'),
+    page: document.querySelector('.sign-in-page'),
+    submitButton: document.querySelector('.sign-in'),
+    fn: signIn,
+  },
+  signUp: {
+    email: document.querySelector('#sign-up-email'),
+    password: document.querySelector('#sign-up-password'),
+    passwordError: document.querySelector('.sign-up-page .pass-invalid'),
+    emailError: document.querySelector('.sign-up-page .email-invalid'),
+    page: document.querySelector('.sign-up-page'),
+    submitButton: document.querySelector('.sign-up'),
+    fn: signUp,
+  },
+};
 
 function goToPage(page) {
   const currentPage = document.querySelector('.page:not(.hidden)');
@@ -33,14 +42,12 @@ function goToPage(page) {
   page.classList.remove('hidden');
 }
 
-function goToSignUp() {
-  goToPage(signUpPage);
-  resetInput(signUpEmail, signUpEmailError);
-}
-
-function goToSignIn() {
-  goToPage(signInPage);
-  resetInput(signInEmail, signInEmailError);
+function goToAuthPage(name) {
+  const { page, email, emailError, password, passwordError } = auth[name];
+  goToPage(page);
+  // reset input error showing
+  resetInput(email, emailError);
+  resetInput(password, passwordError);
 }
 
 function login(user) {
@@ -86,46 +93,43 @@ const displayError = (errorElement, input, error) => {
   showInputError(input, errorElement);
 };
 
-async function handleSignUp() {
-  if (!isValidInputs(signUpEmail, signUpPassword)) return;
-  signUpButton.disabled = true;
+async function handleAuthentication(name) {
+  const { email, emailError, password, passwordError, submitButton, fn } =
+    auth[name];
+
+  if (!isValidInputs(email, password)) return;
+  submitButton.disabled = true;
 
   try {
-    await signUp(signUpEmail.value, signUpPassword.value);
+    await fn(email.value, password.value);
   } catch (error) {
-    displayError(signUpEmailError, signUpEmail, error);
+    if (error.code.includes('password')) {
+      displayError(passwordError, password, error);
+    } else displayError(emailError, email, error);
   } finally {
-    signUpButton.disabled = false;
+    submitButton.disabled = false;
   }
 }
 
-async function handleSignIn() {
-  if (!isValidInputs(signInEmail, signInPassword)) return;
-  signInButton.disabled = true;
+const handleSignUp = () => handleAuthentication('signUp');
+const handleSignIn = () => handleAuthentication('signIn');
 
-  try {
-    await signIn(signInEmail.value, signInPassword.value);
-  } catch (error) {
-    displayError(signInEmailError, signInEmail, error);
-  } finally {
-    signInButton.disabled = false;
-  }
-}
-signUpButton.addEventListener('click', handleSignUp);
-signInButton.addEventListener('click', handleSignIn);
+auth.signUp.submitButton.addEventListener('click', handleSignUp);
+auth.signIn.submitButton.addEventListener('click', handleSignIn);
 signInGoogleButtons.forEach((btn) =>
   btn.addEventListener('click', signInWithGoogle)
 );
 signOutButton.addEventListener('click', signOutUser);
-goToSignUpPage.addEventListener('click', goToSignUp);
-goToSignInPage.addEventListener('click', goToSignIn);
+goToSignUpPage.addEventListener('click', () => goToAuthPage('signUp'));
+goToSignInPage.addEventListener('click', () => goToAuthPage('signIn'));
 
 function listenForSignIn(onSignInListener) {
   // Listen for auth state change
   listenForAuthChange((user) => {
     // on auth change, check if user signed out or in
-    if (!user) {
-      goToSignIn();
+    if (user == null) {
+      // if user is not signed in, go to sign in page
+      goToAuthPage('signIn');
     } else {
       login(user);
       onSignInListener(user);
