@@ -12,6 +12,7 @@ import {
   getDoc,
   orderBy,
 } from 'firebase/firestore';
+import { getPerformance } from 'firebase/performance';
 import getFirebaseConfig from './firebase-config';
 
 // Saves a new value to Cloud Firestore.
@@ -69,7 +70,11 @@ async function getDocData(path) {
   return docInfo.data();
 }
 
-const initialize = () => initializeApp(getFirebaseConfig());
+const initialize = () => {
+  initializeApp(getFirebaseConfig());
+  getPerformance();
+};
+
 export {
   addToDatabase,
   updateDatabase,
