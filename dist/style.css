@@ -199,6 +199,16 @@ button.forgot-password:hover {
   background-color: var(--grey);
 }
 
+/* change to 1 column if sidebar is hidden */
+.main-page.sidebar-hidden {
+  grid-template-columns: 1fr;
+}
+
+/* Prevent scrolling when in modal */
+.main-page.modal-open {
+  overflow: hidden;
+}
+
 h1,
 h2,
 h3 {
@@ -209,16 +219,6 @@ h4,
 h5,
 h6 {
   font-family: 'Montserrat-semibold';
-}
-
-/* change to 1 column if sidebar is hidden */
-body.sidebar-hidden {
-  grid-template-columns: 1fr;
-}
-
-/* Prevent scrolling when in modal */
-body.modal-open {
-  overflow: hidden;
 }
 
 li {

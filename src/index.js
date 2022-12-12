@@ -591,7 +591,8 @@ deleteProjectConfirm.addEventListener('click', () => {
 
 // Toggle sidebar showing
 menu.addEventListener('click', () => {
-  document.body.classList.toggle('sidebar-hidden');
+  const mainPage = document.querySelector('.main-page');
+  mainPage.classList.toggle('sidebar-hidden');
   nav.classList.toggle('hidden');
   document.querySelector('.todos').classList.toggle('sidebar-hidden');
 });
