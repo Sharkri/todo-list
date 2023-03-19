@@ -19,7 +19,7 @@ This is a responsive Todo List application that uses Firebase to store todos and
 - Todo due date is formatted using date-fns
 - Search bar with autocomplete to look up projects
 - Sidebar to switch to different projects (inbox, today, view all, and custom projects)
-- Can toggle a collapsible sidebar and the project list
+- Collapsible sidebar and project list
 
 ## Technologies
 - Firebase
