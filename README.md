@@ -1,7 +1,7 @@
 # Todo List
 
 ## Summary
-This is a responsive Todo List application that uses Firebase to store todos and projects. You will need to sign up/in to your account to use Firebase. Todos and projects are synced across accounts and devices, so you can access them from anywhere.
+This is a responsive Todo List application that uses Firebase to store todos and projects. You can either create an account to use, or continue as a guest.
 
 > See it live here: [todo-list-4aa13.web.app/
 ](https://todo-list-4aa13.web.app/)
@@ -19,7 +19,7 @@ This is a responsive Todo List application that uses Firebase to store todos and
 - Todo due date is formatted using date-fns
 - Search bar with autocomplete to look up projects
 - Sidebar to switch to different projects (inbox, today, view all, and custom projects)
-- Toggle a collapsible sidebar and project list
+- Can toggle a collapsible sidebar and the project list
 
 ## Technologies
 - Firebase
