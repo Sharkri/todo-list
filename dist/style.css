@@ -83,6 +83,7 @@ button.unstyled {
   border-radius: 8px;
   font-size: 14px;
   width: 100%;
+  background-color: transparent;
 }
 
 button.sign-in-with-google {
@@ -91,13 +92,23 @@ button.sign-in-with-google {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  background-color: transparent;
+}
+
+.sign-in-anonymously {
+  background-color: #374151;
+  color: white;
 }
 
 .sign-in,
 .sign-up {
   background-color: var(--main-theme-color);
   color: var(--light-grey);
+}
+
+.or-separator {
+  text-align: center;
+  width: 100%;
+  color: #9ca3af;
 }
 
 .sign-in:disabled,

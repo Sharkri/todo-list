@@ -1,3 +1,4 @@
+import { getAuth, signInAnonymously } from 'firebase/auth';
 import {
   listenForAuthChange,
   signInWithGoogle,
@@ -25,6 +26,8 @@ const resetPasswordError = document.querySelector(
 const resetPasswordSuccess = document.querySelector(
   '.forgot-password-content .success-text'
 );
+
+const continueAnonymously = document.querySelector('.sign-in-anonymously');
 
 const auth = {
   signIn: {
@@ -97,6 +100,14 @@ const displayError = (errorElement, input, error) => {
   showInputError(input, errorElement);
 };
 
+async function handleAnonymousSignIn() {
+  try {
+    signInAnonymously(getAuth());
+  } catch (error) {
+    auth.signIn.emailError.textContent = error.message;
+  }
+}
+
 async function handleAuthentication(name) {
   const { email, emailError, password, passwordError, submitButton, fn } =
     auth[name];
@@ -120,22 +131,30 @@ const handleSignIn = () => handleAuthentication('signIn');
 
 auth.signUp.submitButton.addEventListener('click', handleSignUp);
 auth.signIn.submitButton.addEventListener('click', handleSignIn);
+continueAnonymously.addEventListener('click', handleAnonymousSignIn);
+
 signInGoogleButtons.forEach((btn) =>
   btn.addEventListener('click', signInWithGoogle)
 );
+
 signOutButton.addEventListener('click', signOutUser);
+
 goToSignUpPage.addEventListener('click', () => goToPage(auth.signUp.page));
+
 goToSignInPageButtons.forEach((btn) =>
   btn.addEventListener('click', () => goToPage(auth.signIn.page))
 );
+
 goToForgotPassPage.addEventListener('click', () => {
   goToPage(forgotPassPage);
   resetPasswordSuccess.classList.remove('visible');
 });
+
 resetPassword.addEventListener('click', async () => {
   const email = resetPasswordEmail;
   if (!email.checkValidity()) return;
   resetPassword.disabled = true;
+
   try {
     await sendPassResetEmail(email.value);
     // if the code above was successful, reset errors
