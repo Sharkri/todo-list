@@ -6,12 +6,13 @@ This is a responsive Todo List application that uses Firebase to store todos and
 > See it live here: [todo-list-4aa13.web.app/
 ](https://todo-list-4aa13.web.app/)
 
-<img width="1209" alt="image" src="https://user-images.githubusercontent.com/95330865/226138770-eb1efd4b-33ab-4415-b97e-3d08f6a162fd.png">
-<img width="1437" alt="image" src="https://user-images.githubusercontent.com/95330865/226140033-67b97ef4-ccaf-447e-9d37-dc9023096ff5.png">
+<img width="1437" alt="todo demo" src="https://user-images.githubusercontent.com/95330865/226140033-67b97ef4-ccaf-447e-9d37-dc9023096ff5.png">
+<img alt="sign up form" src="https://user-images.githubusercontent.com/95330865/226199202-8e00f50c-1976-4adc-ae2c-06f26181fdc1.png">
 
 ## Features
 - Firebase to store todos and projects
 - Todos and projects are synced across accounts and devices
+- Firebase Anonymous accounts
 - Responsive design for mobile
 - Edit todos and projects
 - Complete projects (delete)
